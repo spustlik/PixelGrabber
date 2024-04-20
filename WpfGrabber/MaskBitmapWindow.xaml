@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfGrabber"
         mc:Ignorable="d"
-        Title="MaskBitmapWindow" Height="288" Width="600" Initialized="Window_Initialized">
+        Title="Mask Bitmap processor" Height="334" Width="495" Initialized="Window_Initialized">
     <Window.Resources>
         <Style TargetType="Border" x:Key="checkerBorder">
             <Setter Property="Background">
@@ -28,7 +28,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Border Padding="10">
-            <StackPanel Orientation="Horizontal">
+            <WrapPanel Orientation="Horizontal">
                 <Label Content="Height"/>
                 <local:NumberEditor Width="80" Value="{Binding Height}"/>
                 <Label Content="Items"/>
@@ -38,7 +38,7 @@
                 <!--<Slider Value="{Binding Zoom}" Minimum="0.1" Maximum="16" Width="100" Margin="0,4,5,0"/>-->
                 <Button Content="Open..." Click="ButtonOpen_Click" Padding="5,0" Margin="10,0"/>
                 <Button Content="Save..." Click="ButtonSave_Click" Padding="5,0" Margin="10,0"/>
-            </StackPanel>
+            </WrapPanel>
         </Border>
         <Border Grid.Row="1" Style="{StaticResource checkerBorder}">
             <Image x:Name="image" Margin="10" RenderOptions.BitmapScalingMode="NearestNeighbor"/>

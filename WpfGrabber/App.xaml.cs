@@ -13,5 +13,6 @@ namespace WpfGrabber
     /// </summary>
     public partial class App : Application
     {
+        
     }
 }

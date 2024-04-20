@@ -57,6 +57,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BitReader.cs" />
+    <Compile Include="ExceptionWindow.xaml.cs">
+      <DependentUpon>ExceptionWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Interval.cs" />
     <Compile Include="MaskBitmapWindow.xaml.cs">
       <DependentUpon>MaskBitmapWindow.xaml</DependentUpon>
@@ -67,6 +70,10 @@
     </Compile>
     <Compile Include="SimpleDataObject.cs" />
     <Compile Include="WpfExtensions.cs" />
+    <Page Include="ExceptionWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

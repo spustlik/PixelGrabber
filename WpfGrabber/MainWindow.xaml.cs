@@ -17,6 +17,7 @@ namespace WpfGrabber
         public MainWindowViewModel ViewModel => this.DataContext as MainWindowViewModel;
         public MainWindow()
         {
+            ExceptionWindow.StartHandlingExceptions();
             this.DataContext = new MainWindowViewModel();
             ViewModel.FileName = @"E:\GameWork\FEUD\FEUD1.COM";
             ViewModel.FileName = @"E:\GameWork\FEUD\FEUD.RAM";
