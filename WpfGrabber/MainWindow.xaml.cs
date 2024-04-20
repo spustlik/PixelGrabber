@@ -134,6 +134,10 @@ namespace WpfGrabber
             return 0;
         }
 
+        private void ButtonOpen_Click(object sender, RoutedEventArgs e)
+        {
+            //TODO: load, reset, add to recent
+        }
 
         private void ButtonSave_Click(object sender, RoutedEventArgs e)
         {
@@ -155,7 +159,6 @@ namespace WpfGrabber
         {
             var w = new MaskBitmapWindow();
             w.Owner = this;
-            ///w.ViewModel.FileName
             w.Show();
         }
 
