@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Documents;
@@ -69,11 +70,16 @@ namespace WpfGrabber
             image.RenderTransform = new ScaleTransform(ViewModel.Zoom, ViewModel.Zoom);
             var pos = ViewModel.Offset;
             ViewModel.HexLines.Clear();
+            DumpToHexLines(pos);
+        }
+
+        private void DumpToHexLines(int pos)
+        {
             int rows = 0;
             while (pos < bytes.Length)
             {
                 var line = new StringBuilder();
-                for (int x = 0;  x < 16; x++)
+                for (int x = 0; x < 16; x++)
                 {
                     if (pos >= bytes.Length)
                         break;
@@ -160,38 +166,35 @@ namespace WpfGrabber
             //var pos = 0x4902;
             var pos = 0x466e;
             var endpos = 0x736e;
-            ProcessAlien(fileName, pos, endpos);
+            var images = AlienReader.ReadList(bytes, pos, endpos);
+            SaveAlienDataGroupedBySize(fileName, images);
+            MessageBox.Show("Saved...");
         }
-
-        private void ProcessAlien(string fileName, int pos, int endpos)
+        private void ButtonDealien_Click(object sender, RoutedEventArgs e)
         {
-            var ar = new AlienReader(bytes) { Position = pos };
-            var images = new Dictionary<string, List<ByteImage8Bit>>();
-            while (ar.Position < endpos)
-            {
-                var aimg = ar.ReadMaskedImage();
-                var key = aimg.Width + "x" + aimg.Height;
-                if (!images.TryGetValue(key, out var list))
-                {
-                    images.Add(key, list = new List<ByteImage8Bit>());
-                }
-                list.Add(aimg);
-            }
+            var pos = ViewModel.Offset;
+            var endpos = ViewModel.DataLength;
+            var images = AlienReader.ReadList(bytes, pos, -1);
+            //TODO: show or save?
 
-            foreach (var pair in images)
+        }
+        private void SaveAlienDataGroupedBySize(string fileName, List<ByteImage8Bit> images)
+        {
+            foreach (var g in images.GroupBy(img => img.Width + "x" + img.Height))
             {
-                var first = pair.Value[0];
-                var bmp = new ByteBitmapRgba(first.Width, first.Height * pair.Value.Count);
+                var first = g.First();
+                var bmp = new ByteBitmapRgba(first.Width, first.Height * g.Count());
                 int posY = 0;
-                for (var i = 0; i < pair.Value.Count; i++)
+                for (var i = 0; i < g.Count(); i++)
                 {
-                    var src = pair.Value[i];
+                    var src = g.Skip(i).First();
                     src.PutToBitmap(bmp, 0, posY);
                     posY += src.Height;
                 }
                 var bs = bmp.ToBitmapSource();
-                bs.SaveToPngFile(Path.ChangeExtension(fileName, $"{first.Width}x{first.Height}.png"));
+                bs.SaveToPngFile(Path.ChangeExtension(fileName, $"{first.Width}x{first.Height}-{g.Count()}.png"));
             }
         }
+
     }
 }

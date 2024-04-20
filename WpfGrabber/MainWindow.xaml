@@ -87,6 +87,7 @@
                         <Button Content="Save..." Click="ButtonSave_Click"/>
                         <Button Content="Mask" Click="ButtonMask_Click"/>
                         <Button Content="Alien" Click="ButtonAlien_Click"/>
+                        <Button Content="De-alien" Click="ButtonDealien_Click"/>
 
                     </StackPanel>
                 </Grid>
@@ -96,18 +97,17 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="380"/>
+                <ColumnDefinition Width="340"/>
             </Grid.ColumnDefinitions>
             <Border x:Name="imageBorder" Style="{StaticResource checkerBorder}">
                 <Canvas Margin="10">
                     <Image x:Name="image" Stretch="None" RenderOptions.BitmapScalingMode="NearestNeighbor"
-                   HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                 </Canvas>
             </Border>
             <GridSplitter Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="5"/>
             <Border Grid.Column="2" Padding="10" Background="LightYellow">
-                <ItemsControl ItemsSource="{Binding HexLines}" FontFamily="Courier New">
-                </ItemsControl>
+                <ItemsControl ItemsSource="{Binding HexLines}" FontFamily="Courier New" FontSize="10"/>
             </Border>
 
         </Grid>

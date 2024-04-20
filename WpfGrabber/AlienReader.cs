@@ -20,10 +20,38 @@ namespace WpfGrabber
         {
             this.bytes = bytes;
         }
+        public static List<ByteImage8Bit> ReadList(byte[] bytes, int pos, int endpos)
+        {
+            var ar = new AlienReader(bytes) { Position = pos };
+            var images = new List<ByteImage8Bit>();
+            while (true)
+            {
+                if (endpos > 0 && ar.Position >= endpos)
+                    break;
+                if (!ar.TryRead(out var w, out var h))
+                    break;
+                if (endpos < 0 && (w >= 64 || h >= 64))
+                    break;
+                var aimg = ar.ReadMaskedImage();
+                images.Add(aimg);
+            }
+            return images;
+        }
 
         public byte Read()
         {
             return bytes[Position++];
+        }
+
+        public bool TryRead(out int w, out int h)
+        {
+            w = 0;
+            h = 0;
+            if (Position>bytes.Length-2)
+                return false;
+            w= bytes[Position];
+            h = bytes[Position+1];
+            return w != 0 && h != 0;
         }
         public ByteImage8Bit ReadMaskedImage()
         {
@@ -54,6 +82,8 @@ namespace WpfGrabber
             }
             return result;
         }
+
+
 
     }
 }
