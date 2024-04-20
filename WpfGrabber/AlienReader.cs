@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace WpfGrabber
 {
+    //reader of stored images
+    //format:
+    // byte width - pixels 
+    // byte height
+    // byte[] data - 2 bytes for mask and data for each 8 pixels
+
     public class AlienReader
     {
         private readonly byte[] bytes;
@@ -19,11 +25,11 @@ namespace WpfGrabber
         {
             return bytes[Position++];
         }
-        public AlienImage ReadMaskedImage()
+        public ByteImage8Bit ReadMaskedImage()
         {
             var w = Read();
             var h = Read();
-            var result = new AlienImage(w*8, h);
+            var result = new ByteImage8Bit(w*8, h);
             for (int y = 0; y < h; y++)
             {
                 for (int x = 0; x < w; x++)
@@ -49,45 +55,5 @@ namespace WpfGrabber
             return result;
         }
 
-
-
-    }
-
-    public class AlienImage
-    {
-        public int Width { get; private set; }
-        public int Height { get; private set; }
-        public byte[,] Data { get; private set; }
-
-        public AlienImage(int w, int h)
-        {
-            Width = w;
-            Height = h;
-            Data = new byte[w, h];
-        }
-
-        public void SetPixel(int x, int y, byte value)
-        {
-            Data[x, y] = value;
-        }
-        public byte GetPixel(int x, int y)
-        {
-            return Data[x, y];
-        }
-
-        public void PutToBitmap(ByteBitmap bmp, int posX, int posY)
-        {
-            for (int y = 0; y < Height; y++)
-            {
-                for (int x = 0; x < Width; x++)
-                {
-                    var b = GetPixel(x, y);
-                    if (b != 0)
-                    {
-                        bmp.SetPixel(x + posX, y + posY, b == 1 ? 0xFF000000 : 0xFFFFFFFF);
-                    }
-                }
-            }
-        }
     }
 }

@@ -166,14 +166,14 @@ namespace WpfGrabber
         private void ProcessAlien(string fileName, int pos, int endpos)
         {
             var ar = new AlienReader(bytes) { Position = pos };
-            var images = new Dictionary<string, List<AlienImage>>();
+            var images = new Dictionary<string, List<ByteImage8Bit>>();
             while (ar.Position < endpos)
             {
                 var aimg = ar.ReadMaskedImage();
                 var key = aimg.Width + "x" + aimg.Height;
                 if (!images.TryGetValue(key, out var list))
                 {
-                    images.Add(key, list = new List<AlienImage>());
+                    images.Add(key, list = new List<ByteImage8Bit>());
                 }
                 list.Add(aimg);
             }
@@ -181,7 +181,7 @@ namespace WpfGrabber
             foreach (var pair in images)
             {
                 var first = pair.Value[0];
-                var bmp = new ByteBitmap(first.Width, first.Height * pair.Value.Count);
+                var bmp = new ByteBitmapRgba(first.Width, first.Height * pair.Value.Count);
                 int posY = 0;
                 for (var i = 0; i < pair.Value.Count; i++)
                 {
