@@ -157,7 +157,8 @@ namespace WpfGrabber
         {
             var fileName = @"E:\GameWork\8bitgames\Alien8.rom";
             bytes = File.ReadAllBytes(fileName);
-            var pos = 0x4902;
+            //var pos = 0x4902;
+            var pos = 0x466e;
             var endpos = 0x736e;
             ProcessAlien(fileName, pos, endpos);
         }

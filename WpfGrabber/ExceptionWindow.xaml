@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfGrabber"
         mc:Ignorable="d"
+        Icon="{x:Null}"
         WindowStartupLocation="CenterScreen"
-        
         Title="Error" Height="200" Width="500" >
     <Grid Margin="10">
         <Grid.RowDefinitions>
@@ -15,10 +15,9 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
-
         </Grid.RowDefinitions>
         <Label Grid.Row="0" FontSize="20" Content="Error"/>
-        <Label Grid.Row="1" Content="Some error occured"/>
+        <!--<Label Grid.Row="1" Content="Some error occured"/>-->
         <Label Grid.Row="2" Content="{Binding Message}"/>
         <TextBlock Grid.Row="3" Text="{Binding .}"/>
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
@@ -27,11 +26,10 @@
                     <Setter Property="MinWidth" Value="100"/>
                     <Setter Property="Padding" Value="10,3"/>
                     <Setter Property="Margin" Value="10,0"/>
-                    
                 </Style>
             </StackPanel.Resources>
+            <Button Content="Continue" Click="ButtonContinue_Click" Foreground="White" Background="DodgerBlue"/>
             <Button Content="Close application" Click="ButtonClose_Click" Foreground="Red" Background="#f0f0f0" FontWeight="Bold"/>
-            <Button Content="Continue" Click="ButtonContinue_Click"/>
         </StackPanel>
     </Grid>
 </Window>
