@@ -1,0 +1,50 @@
+﻿<Window x:Class="WpfGrabber.MaskBitmapWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfGrabber"
+        mc:Ignorable="d"
+        Title="MaskBitmapWindow" Height="288" Width="600" Initialized="Window_Initialized">
+    <Window.Resources>
+        <Style TargetType="Border" x:Key="checkerBorder">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <DrawingBrush TileMode="Tile" Viewport="0,0,32,32" ViewportUnits="Absolute">
+                        <DrawingBrush.Drawing>
+                            <DrawingGroup>
+                                <GeometryDrawing Geometry="M0,0 H1 V1 H2 V2 H1 V1 H0Z" Brush="LightGray"/>
+                                <GeometryDrawing Geometry="M1,1 V0 H2 V1 H1 H0 V2 H1Z" Brush="DarkGray"/>
+                            </DrawingGroup>
+                        </DrawingBrush.Drawing>
+                    </DrawingBrush>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Border Padding="10">
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Height"/>
+                <local:NumberEditor Width="80" Value="{Binding Height}"/>
+                <Label Content="Items"/>
+                <local:NumberEditor Width="80" Value="{Binding ItemsCount}"/>
+                <Label Content="Zoom"/>
+                <local:NumberEditor Width="180" SliderWidth="100" Value="{Binding Zoom}" />
+                <!--<Slider Value="{Binding Zoom}" Minimum="0.1" Maximum="16" Width="100" Margin="0,4,5,0"/>-->
+                <Button Content="Open..." Click="ButtonOpen_Click" Padding="5,0" Margin="10,0"/>
+                <Button Content="Save..." Click="ButtonSave_Click" Padding="5,0" Margin="10,0"/>
+            </StackPanel>
+        </Border>
+        <Border Grid.Row="1" Style="{StaticResource checkerBorder}">
+            <Image x:Name="image" Margin="10" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+
+
+        </Border>
+
+    </Grid>
+</Window>

@@ -1,0 +1,91 @@
+﻿<Window x:Class="WpfGrabber.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfGrabber" 
+        
+        mc:Ignorable="d"
+        Title="Grabber" Height="450" Width="800">
+    <Grid d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}">
+        <Grid.Resources>
+            <Style TargetType="Border" x:Key="checkerBorder">
+                <Setter Property="Background">
+                    <Setter.Value>
+                        <DrawingBrush TileMode="Tile" Viewport="0,0,32,32" ViewportUnits="Absolute">
+                            <DrawingBrush.Drawing>
+                                <GeometryDrawing Geometry="M0,0 H1 V1 H2 V2 H1 V1 H0Z" Brush="LightGray"/>
+                            </DrawingBrush.Drawing>
+                        </DrawingBrush>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Border Background="#c0c0ff" BorderBrush="#c0c0ff" BorderThickness="2" CornerRadius="5">
+            <StackPanel Margin="10,5"  >
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel.Resources>
+                        <Style TargetType="Label">
+                            <Setter Property="Margin" Value="10,0,0,0"/>
+                        </Style>
+                        <Style TargetType="TextBox" x:Key="tb">
+                            <Setter Property="MinWidth" Value="60"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="Margin" Value="0,4,4,0"/>
+                            <Setter Property="Height" Value="18"/>
+                            <Setter Property="VerticalAlignment" Value="Top"/>
+                        </Style>
+                        <Style TargetType="Slider" x:Key="slider">
+                            <Setter Property="Margin" Value="0,4,0,0"/>
+                            <Setter Property="Width" Value="100"/>
+                        </Style>
+                        <Style TargetType="local:NumberEditor">
+                            <Setter Property="Margin" Value="0,0,0,0"/>
+                            <Setter Property="Width" Value="140"/>
+                            <Setter Property="Height" Value="18"/>
+                        </Style>
+                    </StackPanel.Resources>
+                    <Label>Offset</Label>
+                    <!--<TextBox Text="{Binding Offset}"/>-->
+                    <local:NumberEditor 
+                        SliderWidth="160"
+                        Value="{Binding Offset}" Maximum="{Binding DataLength}" Width="250"/>
+                    <Label>Width</Label>
+                    <!--<TextBox Text="{Binding Width}"/>-->
+                    <local:NumberEditor Maximum="256" Value="{Binding Width}" 
+                                        Width="200" SliderWidth="120"/>
+                    <Label>Zoom</Label>
+                    <TextBox Text="{Binding Zoom, StringFormat=N2}" Style="{StaticResource tb}"/>
+                    <Slider Value="{Binding Zoom}" Maximum="10" Minimum="0.1" Style="{StaticResource slider}"/>
+                </StackPanel>
+                <!--<Label Content="{Binding FileName}"/>-->
+                <Grid >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="300"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <ComboBox Grid.Column="0"
+                          ItemsSource="{Binding RecentFileNames}"
+                          SelectedValue="{Binding FileName}"
+                          />
+                    <Label Grid.Column="1" Padding="10,0" Content="{Binding DataLength}" DockPanel.Dock="Right"/>
+                    <Button Grid.Column="2" Content="Save..." Padding="5,0" Click="ButtonSave_Click"/>
+                    <Button Grid.Column="3" Content="Mask" Padding="5,0" Margin="5,0" Click="ButtonMask_Click"/>
+                </Grid>
+            </StackPanel>
+        </Border>
+        <Border Grid.Row="1" x:Name="imageBorder" Style="{StaticResource checkerBorder}">
+            <Canvas Margin="10">
+                <Image x:Name="image" Stretch="None" RenderOptions.BitmapScalingMode="NearestNeighbor"
+                   HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+            </Canvas>
+        </Border>
+
+    </Grid>
+</Window>
