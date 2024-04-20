@@ -36,7 +36,9 @@ namespace WpfGrabber
         }
         private void Redraw()
         {
-            var src = new BitmapImage(new Uri(ViewModel.FileName));
+            //var src = new BitmapImage(new Uri(ViewModel.FileName));
+            var src = new BitmapImage();
+            src.LoadFromFile(ViewModel.FileName);
             var bmp = ProcessMask(src, ViewModel.Height, ViewModel.ItemsCount);
             image.RenderTransform = new ScaleTransform(ViewModel.Zoom, ViewModel.Zoom);
             image.Source = bmp;
@@ -93,7 +95,7 @@ namespace WpfGrabber
                 return;
             var src = new BitmapImage(new Uri(ViewModel.FileName));
             var bmp = ProcessMask(src, ViewModel.Height, ViewModel.ItemsCount);
-            bmp.SaveToPngFile(ViewModel.FileName);
+            bmp.SaveToPngFile(dlg.FileName);
         }
     }
 }

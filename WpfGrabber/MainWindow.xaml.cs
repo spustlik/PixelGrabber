@@ -1,6 +1,8 @@
 ﻿using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
@@ -58,13 +60,34 @@ namespace WpfGrabber
             var total_h = GetNumber(imageBorder.ActualHeight, imageBorder.Height, this.Height);
             total_h = (int)(total_h / ViewModel.Zoom);
             //log.Text += $"H:{total_h},W:{total_w}, w={w}\n";
-            
+
             var space = 10;
             if (w < 16)
                 space = 4;
             BitmapSource bmp = CreateBitmap(reader, total_w, total_h, w, space);
             image.Source = bmp;
             image.RenderTransform = new ScaleTransform(ViewModel.Zoom, ViewModel.Zoom);
+            var pos = ViewModel.Offset;
+            ViewModel.HexLines.Clear();
+            int rows = 0;
+            while (pos < bytes.Length)
+            {
+                var line = new StringBuilder();
+                for (int x = 0;  x < 16; x++)
+                {
+                    if (pos >= bytes.Length)
+                        break;
+                    var b = bytes[pos++];
+                    line.Append(b.ToString("X2"));
+                    line.Append(" ");
+                    if (x == 7)
+                        line.Append("| ");
+                }
+                ViewModel.HexLines.Add(line.ToString());
+                rows++;
+                if (rows > 100)
+                    break;
+            }
         }
 
         private BitmapSource CreateBitmap(BitReader reader, int total_w, int total_h, int w, int space)
@@ -128,6 +151,46 @@ namespace WpfGrabber
             w.Owner = this;
             ///w.ViewModel.FileName
             w.Show();
+        }
+
+        private void ButtonAlien_Click(object sender, RoutedEventArgs e)
+        {
+            var fileName = @"E:\GameWork\8bitgames\Alien8.rom";
+            bytes = File.ReadAllBytes(fileName);
+            var pos = 0x4902;
+            var endpos = 0x736e;
+            ProcessAlien(fileName, pos, endpos);
+        }
+
+        private void ProcessAlien(string fileName, int pos, int endpos)
+        {
+            var ar = new AlienReader(bytes) { Position = pos };
+            var images = new Dictionary<string, List<AlienImage>>();
+            while (ar.Position < endpos)
+            {
+                var aimg = ar.ReadMaskedImage();
+                var key = aimg.Width + "x" + aimg.Height;
+                if (!images.TryGetValue(key, out var list))
+                {
+                    images.Add(key, list = new List<AlienImage>());
+                }
+                list.Add(aimg);
+            }
+
+            foreach (var pair in images)
+            {
+                var first = pair.Value[0];
+                var bmp = new ByteBitmap(first.Width, first.Height * pair.Value.Count);
+                int posY = 0;
+                for (var i = 0; i < pair.Value.Count; i++)
+                {
+                    var src = pair.Value[i];
+                    src.PutToBitmap(bmp, 0, posY);
+                    posY += src.Height;
+                }
+                var bs = bmp.ToBitmapSource();
+                bs.SaveToPngFile(Path.ChangeExtension(fileName, $"{first.Width}x{first.Height}.png"));
+            }
         }
     }
 }

@@ -50,7 +50,8 @@
                         </Style>
                     </StackPanel.Resources>
                     <Label>Offset</Label>
-                    <!--<TextBox Text="{Binding Offset}"/>-->
+                    <TextBlock Text="{Binding Offset, StringFormat=X4}" 
+                               MinWidth="50" Margin="5,0" VerticalAlignment="Center" TextAlignment="Right"/>
                     <local:NumberEditor 
                         SliderWidth="160"
                         Value="{Binding Offset}" Maximum="{Binding DataLength}" Width="250"/>
@@ -75,17 +76,40 @@
                           SelectedValue="{Binding FileName}"
                           />
                     <Label Grid.Column="1" Padding="10,0" Content="{Binding DataLength}" DockPanel.Dock="Right"/>
-                    <Button Grid.Column="2" Content="Save..." Padding="5,0" Click="ButtonSave_Click"/>
-                    <Button Grid.Column="3" Content="Mask" Padding="5,0" Margin="5,0" Click="ButtonMask_Click"/>
+                    
+                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                        <StackPanel.Resources>
+                            <Style TargetType="Button">
+                                <Setter Property="Padding" Value="10,0"/>
+                                <Setter Property="Margin" Value="0,0,5,0"/>
+                            </Style>
+                        </StackPanel.Resources>
+                        <Button Content="Save..." Click="ButtonSave_Click"/>
+                        <Button Content="Mask" Click="ButtonMask_Click"/>
+                        <Button Content="Alien" Click="ButtonAlien_Click"/>
+
+                    </StackPanel>
                 </Grid>
             </StackPanel>
         </Border>
-        <Border Grid.Row="1" x:Name="imageBorder" Style="{StaticResource checkerBorder}">
-            <Canvas Margin="10">
-                <Image x:Name="image" Stretch="None" RenderOptions.BitmapScalingMode="NearestNeighbor"
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="380"/>
+            </Grid.ColumnDefinitions>
+            <Border x:Name="imageBorder" Style="{StaticResource checkerBorder}">
+                <Canvas Margin="10">
+                    <Image x:Name="image" Stretch="None" RenderOptions.BitmapScalingMode="NearestNeighbor"
                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-            </Canvas>
-        </Border>
+                </Canvas>
+            </Border>
+            <GridSplitter Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="5"/>
+            <Border Grid.Column="2" Padding="10" Background="LightYellow">
+                <ItemsControl ItemsSource="{Binding HexLines}" FontFamily="Courier New">
+                </ItemsControl>
+            </Border>
 
+        </Grid>
     </Grid>
 </Window>

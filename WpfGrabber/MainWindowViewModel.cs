@@ -78,6 +78,7 @@ namespace WpfGrabber
         public ObservableCollection<string> RecentFileNames { get; private set; } 
             = new ObservableCollection<string>();
 
-
+        public ObservableCollection<string> HexLines { get; private set; }
+            = new ObservableCollection<string>();
     }
 }
