@@ -1,0 +1,24 @@
+﻿<UserControl x:Class="WpfGrabber.Shell.ShellWindowToolbar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfGrabber.Shell" xmlns:c="clr-namespace:WpfGrabber.Controls"
+             mc:Ignorable="d" 
+             HorizontalAlignment="Stretch"
+             Height="30" d:DesignWidth="414.944">
+    <Grid>
+        <Border Background="#f0f0f0" Padding="0" 
+                CornerRadius="5" BorderBrush="#b0b0b0" BorderThickness="1">
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Offset:"/>
+                <TextBlock Text="{Binding Offset, StringFormat=X4}" Padding="5,0"/>
+                <c:NumberEditor 
+                        SliderWidth="160"
+                        Value="{Binding Offset}" Maximum="{Binding DataLength}" Width="250"/>
+                <Label Content="File size:" Margin="10,0,0,0"/>
+                <TextBlock Text="{Binding DataLength}" Padding="5,0"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

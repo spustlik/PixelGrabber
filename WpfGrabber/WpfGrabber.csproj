@@ -73,6 +73,21 @@
     </Compile>
     <Compile Include="Properties\Settings.cs" />
     <Compile Include="Data\SimpleDataObject.cs" />
+    <Compile Include="Shell\ShellWindow.xaml.cs">
+      <DependentUpon>ShellWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Shell\ShellWindowContent.xaml.cs">
+      <DependentUpon>ShellWindowContent.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Shell\ShellWindowFooter.xaml.cs">
+      <DependentUpon>ShellWindowFooter.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Shell\ShellWindowMenu.xaml.cs">
+      <DependentUpon>ShellWindowMenu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Shell\ShellWindowToolbar.xaml.cs">
+      <DependentUpon>ShellWindowToolbar.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WpfExtensions.cs" />
     <Page Include="ExceptionWindow.xaml">
       <SubType>Designer</SubType>
@@ -97,6 +112,26 @@
     <Page Include="Controls\NumberEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Shell\ShellWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Shell\ShellWindowContent.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Shell\ShellWindowFooter.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Shell\ShellWindowMenu.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Shell\ShellWindowToolbar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,22 @@
+﻿<UserControl x:Class="WpfGrabber.Shell.ShellWindowFooter"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfGrabber.Shell" xmlns:controls="clr-namespace:WpfGrabber.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="50" d:DesignWidth="800">
+    <StatusBar>
+        <StatusBarItem>
+            <TextBlock Text="{Binding StatusBarMessage}"/>
+        </StatusBarItem>
+        <StatusBarItem HorizontalAlignment="Right">
+            <StackPanel Grid.Column="1" Orientation="Horizontal" >
+                <Label Content="Zoom" Padding="5,0"/>
+                <TextBlock Text="{Binding Zoom,StringFormat=0.00}" Padding="5,0"/>
+                <Slider Minimum="0.1" Maximum="16" Width="120"/>
+            </StackPanel>
+
+        </StatusBarItem>
+    </StatusBar>
+</UserControl>
