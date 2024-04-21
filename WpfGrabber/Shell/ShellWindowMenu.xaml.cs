@@ -24,5 +24,12 @@ namespace WpfGrabber.Shell
         {
             InitializeComponent();
         }
+
+        private void MainWindow_Click(object sender, RoutedEventArgs e)
+        {
+            var w = new MainWindow();
+            w.Show();
+        }
+
     }
 }

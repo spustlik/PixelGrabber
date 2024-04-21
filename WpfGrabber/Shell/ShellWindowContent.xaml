@@ -3,17 +3,34 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:WpfGrabber.Shell"
+             xmlns:local="clr-namespace:WpfGrabber.Shell" xmlns:controls="clr-namespace:WpfGrabber.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid Margin="5">
-        <TabControl>
-            <TabItem Header="Binary viewer">
-
-            </TabItem>
-            <TabItem Header="Hex view">
-
-            </TabItem>
-        </TabControl>
+             d:DesignHeight="222" d:DesignWidth="338">
+    <Grid Margin="3">
+        <Grid.Resources>
+            <Style TargetType="Border">
+                <Setter Property="Background" Value="White"/>
+            </Style>
+            <Style TargetType="GridSplitter">
+                <Setter Property="VerticalAlignment" Value="Stretch"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="Width" Value="5" />
+            </Style>
+        </Grid.Resources>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="100"/>
+        </Grid.ColumnDefinitions>
+        <controls:ViewPartControl Grid.Column="0" Title="Bit8">
+            <Border CornerRadius="10" Background="Pink" Width="50" Height="50"/>
+        </controls:ViewPartControl>
+        <GridSplitter Grid.Column="1"/>
+        <controls:ViewPartControl Grid.Column="2" Title="Hex dump">
+            <ListBox/>
+        </controls:ViewPartControl>
+        <GridSplitter Grid.Column="3"/>
     </Grid>
 </UserControl>

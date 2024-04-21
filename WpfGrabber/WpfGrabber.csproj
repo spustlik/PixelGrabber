@@ -73,6 +73,7 @@
     </Compile>
     <Compile Include="Properties\Settings.cs" />
     <Compile Include="Data\SimpleDataObject.cs" />
+    <Compile Include="Shell\ShellVm.cs" />
     <Compile Include="Shell\ShellWindow.xaml.cs">
       <DependentUpon>ShellWindow.xaml</DependentUpon>
     </Compile>
@@ -88,6 +89,7 @@
     <Compile Include="Shell\ShellWindowToolbar.xaml.cs">
       <DependentUpon>ShellWindowToolbar.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\ViewPartControl.cs" />
     <Compile Include="WpfExtensions.cs" />
     <Page Include="ExceptionWindow.xaml">
       <SubType>Designer</SubType>
@@ -133,6 +135,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Themes\ViewPartControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainWindowViewModel.cs" />
@@ -160,6 +170,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

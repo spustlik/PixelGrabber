@@ -21,7 +21,10 @@ namespace WpfGrabber.Shell
     {
         public ShellWindow()
         {
+            DataContext = new ShellVm();
             InitializeComponent();
         }
+
+        public ShellVm ViewModel => DataContext as ShellVm;
     }
 }

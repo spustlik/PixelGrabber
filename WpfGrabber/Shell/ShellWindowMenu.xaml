@@ -20,6 +20,9 @@
                 <MenuItem Header="Binary 8bit mask"/>
                 <MenuItem Header="Dealien"/>
             </MenuItem>
+            <MenuItem Header="Tools">
+                <MenuItem Header="Main window" Click="MainWindow_Click"/>
+            </MenuItem>
         </Menu>
     </Grid>
 </UserControl>
