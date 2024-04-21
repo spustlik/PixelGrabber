@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,7 +12,7 @@ namespace WpfGrabber.Shell
     {
         public ShellVm()
         {
-            Zoom = 1;       
+            Zoom = 1;
         }
 
         #region FileName property
@@ -48,6 +50,15 @@ namespace WpfGrabber.Shell
             set => Set(ref _zoom, value);
         }
         #endregion
+
+        public byte[] Data { get; private set; }
+        public void LoadData(string fileName)
+        {
+            this.Data = File.ReadAllBytes(fileName);
+            FileName = fileName;
+            Offset = 0;
+        }
+        public ObservableCollection<string> RecentFiles { get; private set; } = new ObservableCollection<string>();
 
     }
 }

@@ -5,6 +5,15 @@
 
     <SolidColorBrush x:Key="HeaderForegroundBrush" Color="White"/>
     <SolidColorBrush x:Key="HeaderBackgroundBrush" Color="#404040"/>
+
+    <Style TargetType="Button" x:Key="btn">
+        <Setter Property="Width" Value="24" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+    
     <Style TargetType="{x:Type controls:ViewPartControl}">
         <Setter Property="Template">
             <Setter.Value>
@@ -24,9 +33,21 @@
                                        Foreground="{StaticResource HeaderForegroundBrush}" 
                                        FontWeight="Bold"
                                        Padding="0" Margin="5,3"/>
-                                <Button Grid.Column="1" Width="28" Background="Transparent" BorderThickness="0">
-                                    <Path Data="M0,0 L10,10 M0,10 L10,0" Stroke="{StaticResource HeaderForegroundBrush}" StrokeThickness="2"/>
-                                </Button>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <StackPanel.Resources>
+                                        <Style TargetType="Button" BasedOn="{StaticResource btn}"/>
+                                    </StackPanel.Resources>
+                                    <Button>
+                                        <Path Data="M0,5 L 5,0 L5,10 L0,5" Fill="{StaticResource HeaderForegroundBrush}" />
+                                    </Button>
+                                    <Button>
+                                        <Path Data="M5,5 L 0,0 L0,10 L5,5" Fill="{StaticResource HeaderForegroundBrush}" />
+                                    </Button>
+                                    <Button>
+                                        <Path Data="M0,0 L10,10 M0,10 L10,0" Stroke="{StaticResource HeaderForegroundBrush}" StrokeThickness="2"/>
+                                    </Button>
+
+                                </StackPanel>
                             </Grid>
                         </Border>
                         <ContentPresenter Grid.Row="1"/>

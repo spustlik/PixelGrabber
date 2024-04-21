@@ -7,17 +7,29 @@
              mc:Ignorable="d" 
              HorizontalAlignment="Stretch"
              Height="30" d:DesignWidth="414.944">
-    <Grid>
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="boolToVisi"/>
+    </UserControl.Resources>
+    <Grid IsEnabled="{Binding DataLength}">
         <Border Background="#f0f0f0" Padding="0" 
                 CornerRadius="5" BorderBrush="#b0b0b0" BorderThickness="1">
             <StackPanel Orientation="Horizontal">
+                <StackPanel.Resources>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Padding" Value="5,0" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                    </Style>
+                </StackPanel.Resources>
                 <Label Content="Offset:"/>
-                <TextBlock Text="{Binding Offset, StringFormat=X4}" Padding="5,0"/>
+                <TextBlock>
+                    <Run Text="0x"/>
+                    <Run Text="{Binding Offset, StringFormat=X4}" />
+                </TextBlock>
                 <c:NumberEditor 
                         SliderWidth="160"
                         Value="{Binding Offset}" Maximum="{Binding DataLength}" Width="250"/>
                 <Label Content="File size:" Margin="10,0,0,0"/>
-                <TextBlock Text="{Binding DataLength}" Padding="5,0"/>
+                <TextBlock Text="{Binding DataLength}"/>
             </StackPanel>
         </Border>
     </Grid>
