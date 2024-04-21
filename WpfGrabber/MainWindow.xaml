@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfGrabber" 
+        xmlns:c="clr-namespace:WpfGrabber.Controls" 
         
         mc:Ignorable="d"
         Title="Grabber" Height="450" Width="800">
@@ -43,7 +44,7 @@
                             <Setter Property="Margin" Value="0,4,0,0"/>
                             <Setter Property="Width" Value="100"/>
                         </Style>
-                        <Style TargetType="local:NumberEditor">
+                        <Style TargetType="c:NumberEditor">
                             <Setter Property="Margin" Value="0,0,0,0"/>
                             <Setter Property="Width" Value="140"/>
                             <Setter Property="Height" Value="18"/>
@@ -52,12 +53,12 @@
                     <Label>Offset</Label>
                     <TextBlock Text="{Binding Offset, StringFormat=X4}" 
                                MinWidth="50" Margin="5,0" VerticalAlignment="Center" TextAlignment="Right"/>
-                    <local:NumberEditor 
+                    <c:NumberEditor 
                         SliderWidth="160"
                         Value="{Binding Offset}" Maximum="{Binding DataLength}" Width="250"/>
                     <Label>Width</Label>
                     <!--<TextBox Text="{Binding Width}"/>-->
-                    <local:NumberEditor Maximum="256" Value="{Binding Width}" 
+                    <c:NumberEditor Maximum="256" Value="{Binding Width}" 
                                         Width="200" SliderWidth="120"/>
                     <Label>Zoom</Label>
                     <TextBox Text="{Binding Zoom, StringFormat=N2}" Style="{StaticResource tb}"/>

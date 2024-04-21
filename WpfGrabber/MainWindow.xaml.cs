@@ -27,6 +27,7 @@ namespace WpfGrabber
             ViewModel.FileName = @"E:\GameWork\sord\STEPUP.rom";
             //ViewModel.FileName = @"E:\GameWork\8bitgames\SOROBO.COM";
             //ViewModel.FileName = @"E:\GameWork\8bitgames\KNIGHT.COM";
+            Properties.Settings.Default.GetRecentFileNames(ViewModel.RecentFileNames);
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
             this.Initialized += MainWindow_Initialized;
             InitializeComponent();
@@ -36,7 +37,6 @@ namespace WpfGrabber
         {
             DrawData();
         }
-
 
         private void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
@@ -51,8 +51,15 @@ namespace WpfGrabber
         {
             if (bytes == null)
             {
+                if (!File.Exists(ViewModel.FileName))
+                {
+                    ViewModel.RemoveRecent(ViewModel.FileName);
+                }
                 bytes = File.ReadAllBytes(ViewModel.FileName);
+                ViewModel.AddRecent(ViewModel.FileName);
                 ViewModel.DataLength = bytes.Length;
+                Properties.Settings.Default.SetRecentFileNames(ViewModel.RecentFileNames);
+                Properties.Settings.Default.Save();
             }
             var reader = new BitReader(bytes);
             reader.Position = ViewModel.Offset;
@@ -136,7 +143,13 @@ namespace WpfGrabber
 
         private void ButtonOpen_Click(object sender, RoutedEventArgs e)
         {
-            //TODO: load, reset, add to recent
+            var dlg = new OpenFileDialog();
+            if (dlg.ShowDialog() != true)
+                return;
+            bytes = null;
+            ViewModel.FileName = dlg.FileName;
+            ViewModel.Offset = 0;
+            DrawData();
         }
 
         private void ButtonSave_Click(object sender, RoutedEventArgs e)

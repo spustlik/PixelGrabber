@@ -14,7 +14,7 @@ namespace WpfGrabber
             Zoom = 1;
             Offset = 0;
             Width = 64;
-            DataLength = 10000;            
+            DataLength = 10000;
             RecentFileNames.Add(@"E:\GameWork\FEUD\FEUD1.COM");
             RecentFileNames.Add(@"E:\GameWork\FEUD\FEUD.RAM");
             RecentFileNames.Add(@"E:\GameWork\sord\STEPUP.rom");
@@ -75,10 +75,24 @@ namespace WpfGrabber
         #endregion
 
 
-        public ObservableCollection<string> RecentFileNames { get; private set; } 
+        public ObservableCollection<string> RecentFileNames { get; private set; }
             = new ObservableCollection<string>();
 
         public ObservableCollection<string> HexLines { get; private set; }
             = new ObservableCollection<string>();
+
+        public void AddRecent(string fileName)
+        {
+            if (RecentFileNames.Any(x => String.Compare(x, fileName, StringComparison.CurrentCultureIgnoreCase) == 0))
+                return;
+            RecentFileNames.Add(fileName);
+        }
+
+        public void RemoveRecent(string fileName)
+        {
+            var f = RecentFileNames.FirstOrDefault(x => String.Compare(x, fileName, StringComparison.CurrentCultureIgnoreCase) == 0);
+            if (!string.IsNullOrEmpty(f))
+                RecentFileNames.Remove(f);
+        }
     }
 }

@@ -56,22 +56,23 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ByteImage8Bit.cs" />
-    <Compile Include="AlienReader.cs" />
-    <Compile Include="BitReader.cs" />
-    <Compile Include="ByteBitmapRgba.cs" />
+    <Compile Include="Data\ByteImage8Bit.cs" />
+    <Compile Include="Readers\AlienReader.cs" />
+    <Compile Include="Readers\BitReader.cs" />
+    <Compile Include="Data\ByteBitmapRgba.cs" />
     <Compile Include="ExceptionWindow.xaml.cs">
       <DependentUpon>ExceptionWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Interval.cs" />
+    <Compile Include="Data\Interval.cs" />
     <Compile Include="MaskBitmapWindow.xaml.cs">
       <DependentUpon>MaskBitmapWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="MaskBitmapWindowViewModel.cs" />
-    <Compile Include="NumberEditor.xaml.cs">
+    <Compile Include="Controls\NumberEditor.xaml.cs">
       <DependentUpon>NumberEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SimpleDataObject.cs" />
+    <Compile Include="Properties\Settings.cs" />
+    <Compile Include="Data\SimpleDataObject.cs" />
     <Compile Include="WpfExtensions.cs" />
     <Page Include="ExceptionWindow.xaml">
       <SubType>Designer</SubType>
@@ -93,7 +94,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="NumberEditor.xaml">
+    <Page Include="Controls\NumberEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

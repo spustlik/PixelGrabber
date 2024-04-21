@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WpfGrabber"
+        xmlns:c="clr-namespace:WpfGrabber.Controls"
         mc:Ignorable="d"
         Title="Mask Bitmap processor" Height="334" Width="495" Initialized="Window_Initialized">
     <Window.Resources>
@@ -30,11 +30,11 @@
         <Border Padding="10">
             <WrapPanel Orientation="Horizontal">
                 <Label Content="Height"/>
-                <local:NumberEditor Width="80" Value="{Binding Height}"/>
+                <c:NumberEditor Width="80" Value="{Binding Height}"/>
                 <Label Content="Items"/>
-                <local:NumberEditor Width="80" Value="{Binding ItemsCount}"/>
+                <c:NumberEditor Width="80" Value="{Binding ItemsCount}"/>
                 <Label Content="Zoom"/>
-                <local:NumberEditor Width="180" SliderWidth="100" Value="{Binding Zoom}" />
+                <c:NumberEditor Width="180" SliderWidth="100" Value="{Binding Zoom}" />
                 <!--<Slider Value="{Binding Zoom}" Minimum="0.1" Maximum="16" Width="100" Margin="0,4,5,0"/>-->
                 <Button Content="Open..." Click="ButtonOpen_Click" Padding="5,0" Margin="10,0"/>
                 <Button Content="Save..." Click="ButtonSave_Click" Padding="5,0" Margin="10,0"/>
