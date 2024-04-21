@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using WpfGrabber.Readers;
 
 namespace WpfGrabber
 {
@@ -82,6 +83,10 @@ namespace WpfGrabber
 
         private void DumpToHexLines(int pos)
         {
+            var r =  new HexReader(bytes, pos);
+            ViewModel.HexLines.AddRange(r.ReadLines().Take(100));
+            return;
+
             int rows = 0;
             while (pos < bytes.Length)
             {

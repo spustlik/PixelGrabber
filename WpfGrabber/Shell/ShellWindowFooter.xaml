@@ -14,7 +14,7 @@
             <StackPanel Grid.Column="1" Orientation="Horizontal" >
                 <Label Content="Zoom" Padding="5,0"/>
                 <TextBlock Text="{Binding Zoom, StringFormat=0.00}" Padding="5,0"/>
-                <Slider Minimum="0.1" Maximum="16" Width="120"/>
+                <Slider Minimum="0.1" Maximum="16" Width="120" Value="{Binding Zoom}"/>
             </StackPanel>
 
         </StatusBarItem>

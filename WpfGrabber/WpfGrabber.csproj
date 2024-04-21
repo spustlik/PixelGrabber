@@ -73,6 +73,9 @@
     </Compile>
     <Compile Include="Properties\Settings.cs" />
     <Compile Include="Data\SimpleDataObject.cs" />
+    <Compile Include="Readers\HexReader.cs" />
+    <Compile Include="Services\XmlHelper.cs" />
+    <Compile Include="Services\AppConfig.cs" />
     <Compile Include="Shell\ShellVm.cs" />
     <Compile Include="Shell\ShellWindow.xaml.cs">
       <DependentUpon>ShellWindow.xaml</DependentUpon>
@@ -90,6 +93,11 @@
       <DependentUpon>ShellWindowToolbar.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\ViewPartControl.cs" />
+    <Compile Include="ViewParts\HexDumpViewPart.xaml.cs">
+      <DependentUpon>HexDumpViewPart.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewParts\ViewPart.cs" />
+    <Compile Include="ViewParts\ViewPartService.cs" />
     <Compile Include="WpfExtensions.cs" />
     <Page Include="ExceptionWindow.xaml">
       <SubType>Designer</SubType>
@@ -142,6 +150,10 @@
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ViewParts\HexDumpViewPart.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>

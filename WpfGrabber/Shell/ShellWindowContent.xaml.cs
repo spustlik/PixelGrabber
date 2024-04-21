@@ -12,17 +12,70 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WpfGrabber.Controls;
+using WpfGrabber.ViewParts;
 
 namespace WpfGrabber.Shell
 {
     /// <summary>
     /// Interaction logic for ShellWindowContent.xaml
     /// </summary>
-    public partial class ShellWindowContent : UserControl
+    public partial class ShellWindowContent : UserControl, IViewPartService
     {
         public ShellWindowContent()
         {
             InitializeComponent();
+            //there are data for design time
+            partsGrid.Children.Clear();
+            partsGrid.ColumnDefinitions.Clear();
         }
+
+        protected override void OnInitialized(EventArgs e)
+        {
+            base.OnInitialized(e);
+            App.Current?.ServiceContainer?.AddService<IViewPartService>(this);
+        }
+
+        #region IViewPartService
+        private int GetViewPartControlIndex(ViewPart viewPart)
+        {
+            for (int i = 0; i < partsGrid.Children.Count; i++)
+            {
+                var vpc = partsGrid.Children[i] as ViewPartControl;
+                if (vpc?.Content == viewPart)
+                    return i;
+            }
+            return -1;
+        }
+
+        void IViewPartService.Add(ViewPart viewPart)
+        {
+
+            if (GetViewPartControlIndex(viewPart)>=0)
+                return;
+            var vpc = new ViewPartControl();
+            vpc.Content = viewPart;
+            void add(Control c, GridLength width)
+            {
+                partsGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = width });
+                Grid.SetColumn(c, partsGrid.Children.Count);
+                partsGrid.Children.Add(c);
+            }
+            add(new ViewPartControl() { Content = viewPart, Title = viewPart.Title }, new GridLength(300));
+            add(new GridSplitter(), GridLength.Auto);
+            viewPart.OnInitialize();
+        }
+
+        void IViewPartService.Remove(ViewPart viewPart)
+        {
+            var i = GetViewPartControlIndex(viewPart);
+            if (i < 0)
+                return;
+            viewPart.OnClose();
+            partsGrid.Children.RemoveAt(i); //remove viewPartControl
+            partsGrid.Children.RemoveAt(i); //remove splitter
+        }
+
+        #endregion
     }
 }

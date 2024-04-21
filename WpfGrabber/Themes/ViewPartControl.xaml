@@ -43,7 +43,7 @@
                                     <Button>
                                         <Path Data="M5,5 L 0,0 L0,10 L5,5" Fill="{StaticResource HeaderForegroundBrush}" />
                                     </Button>
-                                    <Button>
+                                    <Button Command="controls:ViewPartControl.CommandClose">
                                         <Path Data="M0,0 L10,10 M0,10 L10,0" Stroke="{StaticResource HeaderForegroundBrush}" StrokeThickness="2"/>
                                     </Button>
 

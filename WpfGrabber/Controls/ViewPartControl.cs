@@ -12,14 +12,28 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WpfGrabber.ViewParts;
 
 namespace WpfGrabber.Controls
 {
     public class ViewPartControl : ContentControl
     {
+        public static RoutedCommand CommandClose = new RoutedCommand();
         static ViewPartControl()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ViewPartControl), new FrameworkPropertyMetadata(typeof(ViewPartControl)));
+        }
+
+        protected override void OnInitialized(EventArgs e)
+        {
+            base.OnInitialized(e);
+            CommandBindings.Add(new CommandBinding(CommandClose, OnCloseCommandExecuted));
+        }
+
+        private void OnCloseCommandExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            var vps = App.Current.ServiceProvider.GetService<IViewPartService>();
+            vps.Remove(this.Content as ViewPart);
         }
 
         #region Title dp

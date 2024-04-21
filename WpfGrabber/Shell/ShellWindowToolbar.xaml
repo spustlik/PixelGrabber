@@ -9,8 +9,16 @@
              Height="30" d:DesignWidth="414.944">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="boolToVisi"/>
+        <Style TargetType="Grid" x:Key="disableGrid">
+            <Setter Property="IsEnabled" Value="true" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding DataLength}" Value="0">
+                    <Setter Property="IsEnabled" Value="false" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
     </UserControl.Resources>
-    <Grid IsEnabled="{Binding DataLength}">
+    <Grid Style="{StaticResource disableGrid}">
         <Border Background="#f0f0f0" Padding="0" 
                 CornerRadius="5" BorderBrush="#b0b0b0" BorderThickness="1">
             <StackPanel Orientation="Horizontal">
@@ -21,15 +29,18 @@
                     </Style>
                 </StackPanel.Resources>
                 <Label Content="Offset:"/>
-                <TextBlock>
-                    <Run Text="0x"/>
-                    <Run Text="{Binding Offset, StringFormat=X4}" />
+                <TextBlock Width="50">
+                    <Run Text="0x"/><Run Text="{Binding Offset, StringFormat=X4}" />
                 </TextBlock>
                 <c:NumberEditor 
-                        SliderWidth="160"
-                        Value="{Binding Offset}" Maximum="{Binding DataLength}" Width="250"/>
-                <Label Content="File size:" Margin="10,0,0,0"/>
+                        SliderWidth="160" Width="250"
+                        Value="{Binding Offset}" Minimum="0" Maximum="{Binding DataLength}" />
+                <FrameworkElement Width="10"/>
+                <TextBlock Text="{Binding FileName}" TextTrimming="CharacterEllipsis"/>
+                <FrameworkElement Width="10"/>
+                <Label Content="Size:"/>
                 <TextBlock Text="{Binding DataLength}"/>
+                <FrameworkElement Width="10"/>
             </StackPanel>
         </Border>
     </Grid>

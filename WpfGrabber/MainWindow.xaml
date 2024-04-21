@@ -109,7 +109,9 @@
             </Border>
             <GridSplitter Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="5"/>
             <Border Grid.Column="2" Padding="10" Background="LightYellow">
-                <ItemsControl ItemsSource="{Binding HexLines}" FontFamily="Courier New" FontSize="10"/>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding HexLines}" FontFamily="Courier New" FontSize="10"/>
+                </ScrollViewer>
             </Border>
 
         </Grid>

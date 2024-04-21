@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Configuration;
 using System.Data;
 using System.Linq;
@@ -13,6 +14,9 @@ namespace WpfGrabber
     /// </summary>
     public partial class App : Application
     {
-        
+        public static new App Current => Application.Current as App;
+
+        public IServiceContainer ServiceContainer { get; private set; } = new ServiceContainer();
+        public IServiceProvider ServiceProvider => ServiceContainer;
     }
 }

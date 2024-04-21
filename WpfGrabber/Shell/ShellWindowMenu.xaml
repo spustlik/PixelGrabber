@@ -11,13 +11,22 @@
     <Grid>
         <Menu>
             <MenuItem Header="File">
-                <MenuItem Header="Open..."/>
+                <MenuItem Header="Open..." Click="OnOpenMenu_Click"/>
                 <MenuItem Header="Recent" ItemsSource="{Binding RecentFiles}">
+                    <MenuItem.ItemContainerStyle>
+                        <Style TargetType="MenuItem">
+                            <Setter Property="CommandParameter" Value="{Binding .}" />
+                            <EventSetter Event="Click" Handler="OnRecentMenu_Click"/>
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
                 </MenuItem>
+                <Separator/>
+                <MenuItem Header="Exit" Click="OnExitMenu_Click"/>
             </MenuItem>
             <MenuItem Header="Viewer">
                 <MenuItem Header="Binary 8bit"/>
                 <MenuItem Header="Binary 8bit mask"/>
+                <MenuItem Header="Hex dump" Click="OnViewHexDump_Click"/>
                 <MenuItem Header="Dealien"/>
             </MenuItem>
             <MenuItem Header="Tools">

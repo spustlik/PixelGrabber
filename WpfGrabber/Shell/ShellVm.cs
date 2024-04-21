@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace WpfGrabber.Shell
 {
@@ -51,12 +52,39 @@ namespace WpfGrabber.Shell
         }
         #endregion
 
+        [XmlIgnore]
         public byte[] Data { get; private set; }
         public void LoadData(string fileName)
         {
-            this.Data = File.ReadAllBytes(fileName);
-            FileName = fileName;
+            if (!File.Exists(fileName))
+            {
+                RemoveRecentFile(fileName);
+                Data = new byte[0];
+            }
+            else
+            {
+                this.Data = File.ReadAllBytes(fileName);
+                FileName = fileName;
+                AddRecentFile(fileName);
+            }
             Offset = 0;
+            DataLength = Data.Length;
+            DoPropertyChanged(nameof(Data));
+        }
+
+        private void AddRecentFile(string fileName)
+        {
+            var i = RecentFiles.FindIndex(x=>String.Compare(x, fileName, StringComparison.OrdinalIgnoreCase) == 0);
+            if (i >= 0)
+                return;
+            RecentFiles.Add(fileName);
+        }
+        private void RemoveRecentFile(string fileName)
+        {
+            var i = RecentFiles.FindIndex(x => String.Compare(x, fileName, StringComparison.OrdinalIgnoreCase) == 0);
+            if (i < 0)
+                return;
+            RecentFiles.RemoveAt(i);
         }
         public ObservableCollection<string> RecentFiles { get; private set; } = new ObservableCollection<string>();
 
