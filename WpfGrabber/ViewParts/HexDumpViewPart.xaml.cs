@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using WpfGrabber.Readers;
+using WpfGrabber.Shell;
 
 namespace WpfGrabber.ViewParts
 {
@@ -22,6 +23,8 @@ namespace WpfGrabber.ViewParts
     /// </summary>
     public partial class HexDumpViewPart : ViewPart
     {
+        private ShellVm shellVm;
+
         public HexDumpViewPart()
         {
             Title = "Hex dump";
@@ -29,7 +32,13 @@ namespace WpfGrabber.ViewParts
             InitializeComponent();
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
         }
-
+        public override void OnInitialize()
+        {
+            base.OnInitialize();
+            shellVm = App.GetService<ShellVm>();
+            shellVm.PropertyChanged += ShellVm_PropertyChanged;
+            ShowData();
+        }
 
         public VM ViewModel => DataContext as VM;
         public class VM : SimpleDataObject
@@ -67,18 +76,34 @@ namespace WpfGrabber.ViewParts
 
         private void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            //TODO: read data and offset from shell/data service
+            ShowData();
+        }
+        private void ShellVm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ShellVm.Data)
+                || e.PropertyName == nameof(ShellVm.Offset)
+                )
+            {
+                ShowData();
+            }
+        }
+
+
+        private void ShowData()
+        {
+            if (shellVm.DataLength <= 0)
+                return;
+            var rd = new HexReader(shellVm.Data, shellVm.Offset);
+            ViewModel.HexLines.AddRange(rd.ReadLines(
+                showAddr: ViewModel.ShowAddr,
+                showAscii: ViewModel.ShowAscii,
+                showHex: ViewModel.ShowHex)
+                .Take(100), clear: true);
         }
 
         public override void OnDataChanged(DataChangedArgs args)
         {
             base.OnDataChanged(args);
-            var rd = new HexReader(args.Data, args.Offset);
-            ViewModel.HexLines.AddRange(rd.ReadLines(
-                showAddr: ViewModel.ShowAddr, 
-                showAscii: ViewModel.ShowAscii, 
-                showHex: ViewModel.ShowHex)
-                .Take(100), clear: true);
         }
 
     }

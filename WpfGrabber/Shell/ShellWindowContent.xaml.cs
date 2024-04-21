@@ -37,6 +37,17 @@ namespace WpfGrabber.Shell
         }
 
         #region IViewPartService
+        private void UpdateGrid()
+        {
+            for (int i = 0; i < partsGrid.ColumnDefinitions.Count; i++)
+            {
+                var c = partsGrid.ColumnDefinitions[i];
+                if (i == 0)
+                    c.Width = new GridLength(1, GridUnitType.Star);
+            }
+            var last = partsGrid.ColumnDefinitions.LastOrDefault();
+            //if(last!=null && last.Width.Value!=)
+        }
         private int GetViewPartControlIndex(ViewPart viewPart)
         {
             for (int i = 0; i < partsGrid.Children.Count; i++)
@@ -50,7 +61,6 @@ namespace WpfGrabber.Shell
 
         void IViewPartService.Add(ViewPart viewPart)
         {
-
             if (GetViewPartControlIndex(viewPart)>=0)
                 return;
             var vpc = new ViewPartControl();
@@ -64,6 +74,7 @@ namespace WpfGrabber.Shell
             add(new ViewPartControl() { Content = viewPart, Title = viewPart.Title }, new GridLength(300));
             add(new GridSplitter(), GridLength.Auto);
             viewPart.OnInitialize();
+            UpdateGrid();
         }
 
         void IViewPartService.Remove(ViewPart viewPart)
@@ -74,6 +85,7 @@ namespace WpfGrabber.Shell
             viewPart.OnClose();
             partsGrid.Children.RemoveAt(i); //remove viewPartControl
             partsGrid.Children.RemoveAt(i); //remove splitter
+            UpdateGrid();
         }
 
         #endregion

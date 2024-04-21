@@ -7,20 +7,20 @@
              mc:Ignorable="d" 
              d:DesignHeight="350" d:DesignWidth="300"
                 Background="LightYellow"
-                Padding="10">
+                >
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Border Padding="5,0,0,3" Background="Transparent">
+        <Border Padding="10,5,10,3" Background="Transparent">
             <Border.Resources>
                 <Style TargetType="CheckBox">
                     <Setter Property="Margin" Value="0,0,10,0" />
                 </Style>
             </Border.Resources>
             <StackPanel Orientation="Horizontal">
-                <CheckBox Content="Address" IsChecked="{Binding ShowAddress}"/>
+                <CheckBox Content="Address" IsChecked="{Binding ShowAddr}"/>
                 <CheckBox Content="ASCII" IsChecked="{Binding ShowAscii}"/>
                 <CheckBox Content="Hex" IsChecked="{Binding ShowHex}"/>
             </StackPanel>

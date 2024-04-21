@@ -18,5 +18,10 @@ namespace WpfGrabber
 
         public IServiceContainer ServiceContainer { get; private set; } = new ServiceContainer();
         public IServiceProvider ServiceProvider => ServiceContainer;
+
+        public static T GetService<T>() where T:class
+        {
+            return Current?.ServiceProvider?.GetService<T>();
+        }
     }
 }

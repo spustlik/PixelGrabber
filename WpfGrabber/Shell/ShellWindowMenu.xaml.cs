@@ -55,7 +55,7 @@ namespace WpfGrabber.Shell
         private void OnViewHexDump_Click(object sender, RoutedEventArgs e)
         {
             var part = new HexDumpViewPart();
-            var vps = App.Current.ServiceProvider.GetService<IViewPartService>();
+            var vps = App.GetService<IViewPartService>();
             vps.Add(part);
         }
 

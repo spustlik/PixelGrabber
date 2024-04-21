@@ -25,7 +25,7 @@ namespace WpfGrabber.Readers
             while (Position < Data.Length)
             {
                 var b = Data[Position++];
-                asciiLine.Append(b >= 32 ? Char.ConvertFromUtf32(b) : "☺");
+                asciiLine.Append(b >= 32 ? 'A' : ' '); //☺ (char)b 
                 hexline.Append(b.ToString("X2"));
                 hexline.Append(" ");
                 if (x == 7)
