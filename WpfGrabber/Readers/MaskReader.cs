@@ -72,7 +72,7 @@ namespace WpfGrabber.Readers
                 dstposY += itemHeight;
             }
             var bmp = new WriteableBitmap(width, height, 96, 96, PixelFormats.Pbgra32, null);
-            bmp.WritePixels(new Int32Rect(0, 0, width, height), dstpixels, stride, 0);
+            bmp.WritePixels(new Int32Rect(0, 0, width, height), dstpixels, width*4, 0);
             return bmp;
         }
     }
