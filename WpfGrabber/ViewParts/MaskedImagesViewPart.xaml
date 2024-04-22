@@ -36,6 +36,7 @@
                 <Canvas Margin="10">
                     <Image x:Name="image" Stretch="None" RenderOptions.BitmapScalingMode="NearestNeighbor"
                             HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                    <Label Content="Not implemented"/>
                 </Canvas>
             </Border>
         </ScrollViewer>

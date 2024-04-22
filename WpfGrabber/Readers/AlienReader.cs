@@ -16,16 +16,25 @@ namespace WpfGrabber
     {
         private readonly byte[] bytes;
         public int Position { get; set; }
+        public bool FlipY { get; set; }
         public AlienReader(byte[] bytes)
         {
             this.bytes = bytes;
         }
-        public static List<ByteBitmap8Bit> ReadList(byte[] bytes, int pos, int endpos)
+
+        public class AlienImage
         {
-            var ar = new AlienReader(bytes) { Position = pos };
-            var images = new List<ByteBitmap8Bit>();
+            public ByteBitmap8Bit Bitmap { get; set; }
+            public int Position { get; set; }
+        }
+
+        public static IEnumerable<AlienImage> ReadList(byte[] bytes, int pos, int endpos, bool flipY)
+        {
+            var ar = new AlienReader(bytes) { Position = pos, FlipY = flipY };
+            var images = new List<AlienImage>();
             while (true)
             {
+                var start=ar.Position;
                 if (endpos > 0 && ar.Position >= endpos)
                     break;
                 if (!ar.TryRead(out var w, out var h))
@@ -33,7 +42,7 @@ namespace WpfGrabber
                 if (endpos < 0 && (w >= 64 || h >= 64))
                     break;
                 var aimg = ar.ReadMaskedImage();
-                images.Add(aimg);
+                images.Add(new AlienImage() { Bitmap = aimg, Position = start });
             }
             return images;
         }
@@ -73,13 +82,16 @@ namespace WpfGrabber
                         int shift = (7 - i);
                         var db = (d >> shift) & 1;
                         var mb = (m >> shift) & 1;
+                        var ry = y;
+                        if (FlipY)
+                            ry = h - y - 1;
                         if (mb == 1)
                         {
-                            result.SetPixel(x * 8 + i, y, 0);
+                            result.SetPixel(x * 8 + i, ry, 0);
                         }
                         else
                         {
-                            result.SetPixel(x * 8 + i, y, db == 0 ? (byte)1 : (byte)2);
+                            result.SetPixel(x * 8 + i, ry, db == 0 ? (byte)1 : (byte)2);
                         }
                     }
                 }

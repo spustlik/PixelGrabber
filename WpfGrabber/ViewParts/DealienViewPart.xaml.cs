@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using WpfGrabber.Shell;
@@ -28,6 +29,17 @@ namespace WpfGrabber.ViewParts
                 end = dataLen - 1;
             return end;
         }
+
+
+        #region FlipVertical property
+        private bool _flipVertical;
+        public bool FlipVertical
+        {
+            get => _flipVertical;
+            set => Set(ref _flipVertical, value);
+        }
+        #endregion
+
     }
     public class DealienViewPartBase : ViewPartDataViewer<DealienViewPartVM>
     {
@@ -50,27 +62,30 @@ namespace WpfGrabber.ViewParts
         }
         protected override void OnShowData()
         {
-            //487a
-            var images = AlienReader.ReadList(ShellVm.Data, ShellVm.Offset, ViewModel.GetEndPosSafe(ShellVm.DataLength));
+            //0x4902
+            var images = AlienReader.ReadList(ShellVm.Data, ShellVm.Offset,
+                ViewModel.GetEndPosSafe(ShellVm.DataLength), flipY: ViewModel.FlipVertical);
             var max_h = this.GetFirstValid(imageBorder.ActualHeight, imageBorder.Height, Height, 300);
+            max_h = (int)(max_h / ShellVm.Zoom);
             var max_w = this.GetFirstValid(imageBorder.ActualWidth, imageBorder.Width, Width, 500);
+            max_w = (int)(max_w / ShellVm.Zoom);
             var rgba = new ByteBitmapRgba(max_w, max_h);
             var posX = 0;
             var posY = 0;
             const int XSPACER = 10;
             const int YSPACER = 0;
             int maxw = 0;
-            foreach (var img in images)
+            foreach (var img in images.Select(a=>a.Bitmap))
             {
-                img.PutToBitmap(rgba, posX, posY);
-                posY += img.Height + YSPACER;
-                maxw = Math.Max(maxw, img.Width);
-                if (posY > max_h)
+                if (posY + img.Height > max_h)
                 {
                     posX += maxw + XSPACER;
                     posY = 0;
                     maxw = 0;
                 }
+                img.PutToBitmap(rgba, posX, posY);
+                posY += img.Height + YSPACER;
+                maxw = Math.Max(maxw, img.Width);
                 if (posX > max_w)
                     break;
             }
@@ -86,8 +101,18 @@ namespace WpfGrabber.ViewParts
             dlg.FileName = Path.ChangeExtension(ShellVm.FileName, ".png");
             if (dlg.ShowDialog() != true)
                 return;
-            var images = AlienReader.ReadList(ShellVm.Data, ShellVm.Offset, ViewModel.GetEndPosSafe(ShellVm.DataLength));
-            SaveAlienDataGroupedBySize(dlg.FileName, images);
+            var images = AlienReader.ReadList(ShellVm.Data, ShellVm.Offset, ViewModel.GetEndPosSafe(ShellVm.DataLength), flipY:ViewModel.FlipVertical);
+            var id = 0;
+            foreach ( var item in images)
+            { 
+                var img = item.Bitmap;
+                var bmp = new ByteBitmapRgba(img.Width, img.Height);
+                img.PutToBitmap(bmp, 0, 0);
+                var bs = bmp.ToBitmapSource();
+                var fileName = Path.ChangeExtension(dlg.FileName, $"{id:00}-{item.Position:X4}-{img.Width}x{img.Height}.png");
+                bs.SaveToPngFile(fileName);
+                id++;
+            }
         }
 
         private void OnButtonSave_Click(object sender, RoutedEventArgs e)
@@ -100,23 +125,6 @@ namespace WpfGrabber.ViewParts
             ((BitmapSource)image.Source).SaveToPngFile(dlg.FileName);
         }
 
-        private void SaveAlienDataGroupedBySize(string fileName, List<ByteBitmap8Bit> images)
-        {
-            foreach (var g in images.GroupBy(img => img.Width + "x" + img.Height))
-            {
-                var first = g.First();
-                var bmp = new ByteBitmapRgba(first.Width, first.Height * g.Count());
-                int posY = 0;
-                for (var i = 0; i < g.Count(); i++)
-                {
-                    var src = g.Skip(i).First();
-                    src.PutToBitmap(bmp, 0, posY);
-                    posY += src.Height;
-                }
-                var bs = bmp.ToBitmapSource();
-                bs.SaveToPngFile(Path.ChangeExtension(fileName, $"{first.Width}x{first.Height}-{g.Count()}.png"));
-            }
-        }
     }
 
 }

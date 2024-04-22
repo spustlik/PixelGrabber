@@ -19,7 +19,9 @@
         </Grid.RowDefinitions>
         <ItemsControl Style="{StaticResource toolbar}">
             <Label Content="End pos"/>
-            <c:NumberEditor Value="{Binding EndPos}" Maximum="{Binding ShellVm.DataLength, ElementName=root}" Width="160"/>
+            <c:NumberEditor Value="{Binding EndPos}" Maximum="{Binding ShellVm.DataLength, ElementName=root}" Width="160" SliderWidth="80"/>
+            <Separator/>
+            <CheckBox Content="Flip V" IsChecked="{Binding FlipVertical}"/>
             <Separator/>
             <Button Content="Save" Style="{StaticResource dropDown}">
                 <Button.ContextMenu>
