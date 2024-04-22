@@ -37,7 +37,6 @@ namespace WpfGrabber
         }
         private void Redraw()
         {
-            //var src = new BitmapImage(new Uri(ViewModel.FileName));
             var src = new BitmapImage();
             src.LoadFromFile(ViewModel.FileName);
             var p = new MaskReader();

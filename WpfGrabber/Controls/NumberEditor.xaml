@@ -21,6 +21,10 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+        <local:HexStringConverter x:Key="hexConv" HexNums="0"/>
+        <Style TargetType="Path">
+            <Setter Property="Stroke" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RepeatButton}}" />
+        </Style>
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -29,15 +33,13 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        <TextBox Text="{Binding Value, ElementName=root}"/>
+        <TextBox Text="{Binding Value, ElementName=root, Converter={StaticResource hexConv}}"/>
         <RepeatButton Grid.Column="1" Margin="0,0,2,0" Click="ButtonMinus_Click">
-            <Path Data="M0,0 L10,0" 
-                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RepeatButton}}" 
+            <Path Data="M0,0 L10,0"  
                   StrokeThickness="2"/>
         </RepeatButton>
         <RepeatButton Grid.Column="3" Margin="2,0,0,0" Click="ButtonPlus_Click">
             <Path Data="M5,0 L5,10 M0,5 L10,5" 
-                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RepeatButton}}" 
                   StrokeThickness="2"/>
         </RepeatButton>
         <Slider Grid.Column="2" VerticalAlignment="Center" 

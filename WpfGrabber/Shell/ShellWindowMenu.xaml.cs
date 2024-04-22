@@ -17,7 +17,6 @@ namespace WpfGrabber.Shell
     /// </summary>
     public partial class ShellWindowMenu : UserControl
     {
-        public ShellVm ShellVm { get; private set; }
         public static RoutedUICommand OpenRecentCommand = new RoutedUICommand();
         public static RoutedUICommand ShowViewPartCommand = new RoutedUICommand();
         public ShellWindowMenu()
@@ -30,6 +29,16 @@ namespace WpfGrabber.Shell
         public class VM : SimpleDataObject
         {
             public ObservableCollection<ViewPartDef> ViewParts { get; } = new ObservableCollection<ViewPartDef>();
+
+            #region ShellVm property
+            private ShellVm _shellVm;
+            public ShellVm ShellVm
+            {
+                get => _shellVm;
+                set => Set(ref _shellVm, value);
+            }
+            #endregion
+
         }
         public abstract class ViewPartDef
         {
@@ -54,7 +63,8 @@ namespace WpfGrabber.Shell
                 new ViewPartDef<MaskedImagesViewPart>(){Title = "Binary masked images"},
                 new ViewPartDef<TestViewPart>(){Title = "Test"}
             });
-            ShellVm = App.Current?.ServiceProvider?.GetService<ShellVm>();
+            ViewModel.ShellVm = App.Current?.ServiceProvider?.GetService<ShellVm>();
+
             CommandBindings.Add(new CommandBinding(ApplicationCommands.Open, OnOpenFileExecuted));
             CommandBindings.Add(new CommandBinding(OpenRecentCommand, OnOpenRecentFileExecuted));
             CommandBindings.Add(new CommandBinding(ApplicationCommands.Close, OnCloseExecuted));
@@ -77,7 +87,7 @@ namespace WpfGrabber.Shell
         private void OnOpenRecentFileExecuted(object sender, ExecutedRoutedEventArgs e)
         {
             var fn = (string)e.Parameter;
-            ShellVm.LoadData(fn);
+            ViewModel.ShellVm.LoadData(fn);
         }
 
         private void OnOpenFileExecuted(object sender, ExecutedRoutedEventArgs e)
@@ -85,7 +95,7 @@ namespace WpfGrabber.Shell
             var dlg = new OpenFileDialog();
             if (dlg.ShowDialog() != true)
                 return;
-            ShellVm.LoadData(dlg.FileName);
+            ViewModel.ShellVm.LoadData(dlg.FileName);
         }
 
         private void MainWindow_Click(object sender, RoutedEventArgs e)
@@ -96,14 +106,14 @@ namespace WpfGrabber.Shell
 
         private void OnTestData_Click(object sender, RoutedEventArgs e)
         {
-            ShellVm.FileName = "...test data...";
-            ShellVm.Offset = 0;
+            ViewModel.ShellVm.FileName = "...test data...";
+            ViewModel.ShellVm.Offset = 0;
             var data = new List<byte>();
             data.AddRange(new byte[] { 1, 2, 4, 8, 16, 32, 64, 128 });
             data.AddRange(new byte[] { 0x0a, 0x05, 0xa0, 0x50 });
             data.AddRange(Enumerable.Range(0, 8).Select((i, pos) => pos % 2 == 0 ? (byte)0xaa : (byte)0x55));
             data.AddRange(Enumerable.Range(0, 255).Select(i => (byte)i));
-            ShellVm.SetData(data.ToArray());
+            ViewModel.ShellVm.SetData(data.ToArray());
         }
 
         private void OnTestDropdown_Click(object sender, RoutedEventArgs e)

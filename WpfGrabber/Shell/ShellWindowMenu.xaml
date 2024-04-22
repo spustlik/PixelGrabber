@@ -6,14 +6,14 @@
              xmlns:local="clr-namespace:WpfGrabber.Shell"
              xmlns:vp="clr-namespace:WpfGrabber.ViewParts"
              mc:Ignorable="d" 
-             
+             x:Name="root"
              d:DesignHeight="26.5" d:DesignWidth="138"
              >
     <Grid>
         <Menu>
             <MenuItem Header="File">
                 <MenuItem Header="Open..." Command="ApplicationCommands.Open"/>
-                <MenuItem Header="Recent" ItemsSource="{Binding RecentFiles}">
+                <MenuItem Header="Recent" ItemsSource="{Binding ShellVm.RecentFiles}">
                     <MenuItem.ItemContainerStyle>
                         <Style TargetType="MenuItem">
                             <Setter Property="Command" Value="local:ShellWindowMenu.OpenRecentCommand" />

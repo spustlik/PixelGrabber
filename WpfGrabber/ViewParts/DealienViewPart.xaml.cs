@@ -50,6 +50,7 @@ namespace WpfGrabber.ViewParts
         }
         protected override void OnShowData()
         {
+            //487a
             var images = AlienReader.ReadList(ShellVm.Data, ShellVm.Offset, ViewModel.GetEndPosSafe(ShellVm.DataLength));
             var max_h = this.GetFirstValid(imageBorder.ActualHeight, imageBorder.Height, Height, 300);
             var max_w = this.GetFirstValid(imageBorder.ActualWidth, imageBorder.Width, Width, 500);

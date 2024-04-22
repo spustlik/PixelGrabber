@@ -56,6 +56,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\HexStringConverter.cs" />
     <Compile Include="Data\ByteBitmap8Bit.cs" />
     <Compile Include="Readers\AlienReader.cs" />
     <Compile Include="Readers\BitImageReader.cs" />
@@ -230,9 +231,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Converters\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Resource Include="icon.ico" />
   </ItemGroup>
