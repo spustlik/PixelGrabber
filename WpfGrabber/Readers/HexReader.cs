@@ -25,7 +25,14 @@ namespace WpfGrabber.Readers
             while (Position < Data.Length)
             {
                 var b = Data[Position++];
-                asciiLine.Append(b >= 32 ? 'A' : ' '); //☺ (char)b 
+                Char c = (char)b;
+                //if (b < 32)
+                //    c = '☺';
+                //else if (b >= 0x7f)
+                //    c = '♯';
+                if (c < 0x20 || c >= 0x7f)
+                    c = ' ';
+                asciiLine.Append(c);
                 hexline.Append(b.ToString("X2"));
                 hexline.Append(" ");
                 if (x == 7)
@@ -51,10 +58,10 @@ namespace WpfGrabber.Readers
                 if (showAddr)
                     sb.Append(Position.ToString("X4")).Append(": ");
                 var line = ReadLineStr();
-                if(showHex)
+                if (showHex)
                     sb.Append(line.Hex);
                 if (showHex && showAscii)
-                    sb.Append("  ");
+                    sb.Append("  " + new String(' ', 3 * 16 + 2 - line.Hex.Length));
                 if (showAscii)
                     sb.Append(line.Ascii);
                 yield return sb.ToString();

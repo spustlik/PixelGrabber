@@ -65,5 +65,17 @@ namespace WpfGrabber.Shell
             var fn = (string)mi.DataContext;
             ShellVm.LoadData(fn);
         }
+
+        private void OnTestData_Click(object sender, RoutedEventArgs e)
+        {
+            ShellVm.FileName = "...test data...";
+            ShellVm.Offset = 0;
+            var data = new List<byte>();
+            data.AddRange(new byte[] {1,2,4,8,16,32,64,128});
+            data.AddRange(new byte[] { 0x0a, 0x05, 0xa0, 0x50 });
+            data.AddRange(Enumerable.Range(0, 8).Select((i, pos) => pos % 2 == 0 ? (byte)0xaa : (byte)0x55));
+            data.AddRange(Enumerable.Range(0, 255).Select(i => (byte)i));
+            ShellVm.SetData(data.ToArray());
+        }
     }
 }

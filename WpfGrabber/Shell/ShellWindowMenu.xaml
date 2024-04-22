@@ -11,7 +11,7 @@
     <Grid>
         <Menu>
             <MenuItem Header="File">
-                <MenuItem Header="Open..." Click="OnOpenMenu_Click"/>
+                <MenuItem Header="Open..." Click="OnOpenMenu_Click" Command="ApplicationCommands.Open"/>
                 <MenuItem Header="Recent" ItemsSource="{Binding RecentFiles}">
                     <MenuItem.ItemContainerStyle>
                         <Style TargetType="MenuItem">
@@ -31,6 +31,7 @@
             </MenuItem>
             <MenuItem Header="Tools">
                 <MenuItem Header="Main window" Click="MainWindow_Click"/>
+                <MenuItem Header="Test data" Click="OnTestData_Click"/>
             </MenuItem>
         </Menu>
     </Grid>

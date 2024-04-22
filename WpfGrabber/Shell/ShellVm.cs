@@ -63,12 +63,20 @@ namespace WpfGrabber.Shell
             }
             else
             {
-                this.Data = File.ReadAllBytes(fileName);
                 FileName = fileName;
                 AddRecentFile(fileName);
+                Data = File.ReadAllBytes(fileName);
             }
             Offset = 0;
             DataLength = Data.Length;
+            DoPropertyChanged(nameof(Data));
+        }
+
+        public void SetData(byte[] data)
+        {
+            Offset = 0;
+            Data = data;
+            DataLength = data.Length;
             DoPropertyChanged(nameof(Data));
         }
 
