@@ -65,10 +65,14 @@
       <DependentUpon>ExceptionWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Data\Interval.cs" />
+    <Compile Include="Themes\ResourceEvents.cs" />
     <Compile Include="ViewParts\TestViewPart.xaml.cs">
       <DependentUpon>TestViewPart.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewParts\ViewPartDataViewer.cs" />
+    <Compile Include="_Legacy\DropDownTestWindow.xaml.cs">
+      <DependentUpon>DropDownTestWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="_Legacy\MaskBitmapWindow.xaml.cs">
       <DependentUpon>MaskBitmapWindow.xaml</DependentUpon>
     </Compile>
@@ -115,6 +119,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ViewParts\TestViewPart.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="_Legacy\DropDownTestWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

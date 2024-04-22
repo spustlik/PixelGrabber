@@ -7,6 +7,7 @@ using System.Runtime.Remoting.Messaging;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using WpfGrabber._Legacy;
 using WpfGrabber.ViewParts;
 
 namespace WpfGrabber.Shell
@@ -103,6 +104,12 @@ namespace WpfGrabber.Shell
             data.AddRange(Enumerable.Range(0, 8).Select((i, pos) => pos % 2 == 0 ? (byte)0xaa : (byte)0x55));
             data.AddRange(Enumerable.Range(0, 255).Select(i => (byte)i));
             ShellVm.SetData(data.ToArray());
+        }
+
+        private void OnTestDropdown_Click(object sender, RoutedEventArgs e)
+        {
+            var wnd = new DropDownTestWindow();
+            wnd.Show();
         }
     }
 }

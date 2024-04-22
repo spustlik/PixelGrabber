@@ -1,0 +1,34 @@
+﻿<Window x:Class="WpfGrabber._Legacy.DropDownTestWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfGrabber._Legacy"
+        mc:Ignorable="d"
+        Title="DropDownTestWindow" Height="212" Width="268">
+    <Grid>
+        <Grid.Resources>
+        </Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal">
+            <ToggleButton Content="Save" x:Name="dd">
+                <ToggleButton.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Test 1"/>
+                        <MenuItem Header="Test 2"/>
+                        <MenuItem Header="Test 3"/>
+                    </ContextMenu>
+                </ToggleButton.ContextMenu>
+            </ToggleButton>
+            <FrameworkElement Width="20"/>
+            <ComboBox Text="Save..." IsEditable="False">
+            </ComboBox>
+            <FrameworkElement Width="20"/>
+            <Button Content="Open ctx" Click="btnOpenCtx_Click"/>
+        </StackPanel>
+    </Grid>
+
+</Window>

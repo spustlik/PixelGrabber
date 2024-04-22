@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -81,18 +82,12 @@ namespace WpfGrabber.ViewParts
 
         private void OnButtonSaveImages_Click(object sender, RoutedEventArgs e)
         {
-            var r = MessageBox.Show("YES - save images to folder,NO - all images to one", "Save options...", MessageBoxButton.YesNoCancel);
-            if (r == MessageBoxResult.Yes)
-            {
-
-            }
-            else if (r == MessageBoxResult.No)
-            {
-
-            }
         }
 
+        private void OnButtonSave_Click(object sender, RoutedEventArgs e)
+        {
 
+        }
     }
 
 }

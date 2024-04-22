@@ -21,7 +21,14 @@
             <Label Content="End pos"/>
             <c:NumberEditor Value="{Binding EndPos}" Maximum="{Binding ShellVm.DataLength, ElementName=root}" Width="160"/>
             <Separator/>
-            <Button Content="Save ..." Click="OnButtonSaveImages_Click"/>
+            <Button Content="Save" Style="{StaticResource dropDown}">
+                <Button.ContextMenu>
+                    <ContextMenu Placement="Bottom">
+                        <MenuItem Header="Save images to folder..." Click="OnButtonSaveImages_Click"/>
+                        <MenuItem Header="Save to one image..." Click="OnButtonSave_Click"/>
+                    </ContextMenu>
+                </Button.ContextMenu>
+            </Button>
         </ItemsControl>
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <Border x:Name="imageBorder" 
