@@ -1,18 +1,11 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using WpfGrabber.Shell;
 
 namespace WpfGrabber.ViewParts
@@ -27,6 +20,14 @@ namespace WpfGrabber.ViewParts
             set => Set(ref _endPos, value);
         }
         #endregion
+
+        public int GetEndPosSafe(int dataLen)
+        {
+            var end = EndPos;
+            if (end == 0 || end > dataLen)
+                end = dataLen - 1;
+            return end;
+        }
     }
     public class DealienViewPartBase : ViewPartDataViewer<DealienViewPartVM>
     {
@@ -49,10 +50,7 @@ namespace WpfGrabber.ViewParts
         }
         protected override void OnShowData()
         {
-            var end = ViewModel.EndPos;
-            if (end == 0 || end > ShellVm.DataLength)
-                end = ShellVm.DataLength-1;
-            var images = AlienReader.ReadList(ShellVm.Data, ShellVm.Offset, end);
+            var images = AlienReader.ReadList(ShellVm.Data, ShellVm.Offset, ViewModel.GetEndPosSafe(ShellVm.DataLength));
             var max_h = this.GetFirstValid(imageBorder.ActualHeight, imageBorder.Height, Height, 300);
             var max_w = this.GetFirstValid(imageBorder.ActualWidth, imageBorder.Width, Width, 500);
             var rgba = new ByteBitmapRgba(max_w, max_h);
@@ -82,11 +80,41 @@ namespace WpfGrabber.ViewParts
 
         private void OnButtonSaveImages_Click(object sender, RoutedEventArgs e)
         {
+            var dlg = new SaveFileDialog();
+            dlg.DefaultExt = ".png";
+            dlg.FileName = Path.ChangeExtension(ShellVm.FileName, ".png");
+            if (dlg.ShowDialog() != true)
+                return;
+            var images = AlienReader.ReadList(ShellVm.Data, ShellVm.Offset, ViewModel.GetEndPosSafe(ShellVm.DataLength));
+            SaveAlienDataGroupedBySize(dlg.FileName, images);
         }
 
         private void OnButtonSave_Click(object sender, RoutedEventArgs e)
         {
+            var dlg = new SaveFileDialog();
+            dlg.DefaultExt = ".png";
+            dlg.FileName = Path.ChangeExtension(ShellVm.FileName, "-data.png");
+            if (dlg.ShowDialog() != true)
+                return;
+            ((BitmapSource)image.Source).SaveToPngFile(dlg.FileName);
+        }
 
+        private void SaveAlienDataGroupedBySize(string fileName, List<ByteBitmap8Bit> images)
+        {
+            foreach (var g in images.GroupBy(img => img.Width + "x" + img.Height))
+            {
+                var first = g.First();
+                var bmp = new ByteBitmapRgba(first.Width, first.Height * g.Count());
+                int posY = 0;
+                for (var i = 0; i < g.Count(); i++)
+                {
+                    var src = g.Skip(i).First();
+                    src.PutToBitmap(bmp, 0, posY);
+                    posY += src.Height;
+                }
+                var bs = bmp.ToBitmapSource();
+                bs.SaveToPngFile(Path.ChangeExtension(fileName, $"{first.Width}x{first.Height}-{g.Count()}.png"));
+            }
         }
     }
 

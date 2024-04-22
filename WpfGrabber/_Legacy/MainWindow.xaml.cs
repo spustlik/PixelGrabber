@@ -117,49 +117,10 @@ namespace WpfGrabber
             bmp2.SaveToPngFile(Path.ChangeExtension(dlg.FileName, ".data.png"));
         }
 
-        private void ButtonMask_Click(object sender, RoutedEventArgs e)
-        {
-            var w = new MaskBitmapWindow();
-            w.Owner = this;
-            w.Show();
-        }
 
-        private void ButtonAlien_Click(object sender, RoutedEventArgs e)
-        {
-            var fileName = @"E:\GameWork\8bitgames\Alien8.rom";
-            bytes = File.ReadAllBytes(fileName);
-            //var pos = 0x4902;
-            var pos = 0x466e;
-            var endpos = 0x736e;
-            var images = AlienReader.ReadList(bytes, pos, endpos);
-            SaveAlienDataGroupedBySize(fileName, images);
-            MessageBox.Show("Saved...");
-        }
-        private void ButtonDealien_Click(object sender, RoutedEventArgs e)
-        {
-            var pos = ViewModel.Offset;
-            var endpos = ViewModel.DataLength;
-            var images = AlienReader.ReadList(bytes, pos, -1);
-            //TODO: show or save?
 
-        }
-        private void SaveAlienDataGroupedBySize(string fileName, List<ByteImage8Bit> images)
-        {
-            foreach (var g in images.GroupBy(img => img.Width + "x" + img.Height))
-            {
-                var first = g.First();
-                var bmp = new ByteBitmapRgba(first.Width, first.Height * g.Count());
-                int posY = 0;
-                for (var i = 0; i < g.Count(); i++)
-                {
-                    var src = g.Skip(i).First();
-                    src.PutToBitmap(bmp, 0, posY);
-                    posY += src.Height;
-                }
-                var bs = bmp.ToBitmapSource();
-                bs.SaveToPngFile(Path.ChangeExtension(fileName, $"{first.Width}x{first.Height}-{g.Count()}.png"));
-            }
-        }
+
+
 
     }
 }

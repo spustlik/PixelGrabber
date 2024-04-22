@@ -18,7 +18,7 @@
     <Style TargetType="ButtonBase" x:Key="dropDown">
         <Setter Property="MinWidth" Value="16" />
         <Setter Property="MinHeight" Value="16" />
-        <Setter Property="Padding" Value="10,0,0,0" />
+        <Setter Property="Padding" Value="10,2,0,2" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ButtonBase">

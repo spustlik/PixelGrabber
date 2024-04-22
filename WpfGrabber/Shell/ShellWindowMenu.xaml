@@ -35,6 +35,7 @@
             </MenuItem>
             <MenuItem Header="Tools">
                 <MenuItem Header="Main window" Click="MainWindow_Click"/>
+                <MenuItem Header="Mask window" Click="ButtonMask_Click"/>
                 <MenuItem Header="Test data" Click="OnTestData_Click"/>
                 <MenuItem Header="Test dropdown" Click="OnTestDropdown_Click"/>
             </MenuItem>

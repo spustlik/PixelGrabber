@@ -87,9 +87,6 @@
                         </StackPanel.Resources>
                         <Button Content="Open..." Click="ButtonOpen_Click"/>
                         <Button Content="Save..." Click="ButtonSave_Click"/>
-                        <Button Content="Mask" Click="ButtonMask_Click"/>
-                        <Button Content="(Alien)" Click="ButtonAlien_Click"/>
-                        <Button Content="De-alien" Click="ButtonDealien_Click"/>
 
                     </StackPanel>
                 </Grid>

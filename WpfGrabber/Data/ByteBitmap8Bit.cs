@@ -1,12 +1,12 @@
 ﻿namespace WpfGrabber
 {
-    public class ByteImage8Bit
+    public class ByteBitmap8Bit
     {
         public int Width { get; private set; }
         public int Height { get; private set; }
         public byte[,] Data { get; private set; }
 
-        public ByteImage8Bit(int w, int h)
+        public ByteBitmap8Bit(int w, int h)
         {
             Width = w;
             Height = h;

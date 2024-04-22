@@ -4,6 +4,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using WpfGrabber.Readers;
 
 namespace WpfGrabber
 {
@@ -44,37 +45,7 @@ namespace WpfGrabber
             image.Source = bmp;
         }
 
-        private WriteableBitmap ProcessMask(BitmapImage src, int itemHeight, int itemsCount)
-        {
-            int width = (int)src.Width;
-            int height = (int)src.Height;
-            var stride = width * 4;
-            var srcpixels = new uint[width * height];
-            src.CopyPixels(srcpixels, stride, 0);
-            var bmp = new WriteableBitmap(width, height, 96, 96, PixelFormats.Pbgra32, null);
-            var dstpixels = new uint[width * height];
-            var srcposY = 0;
-            var dstposY = 0;
-            for (int i = 0; i < itemsCount; i++)
-            {
-                for (int y = 0; y < itemHeight; y++)
-                {
-                    for (int x = 0; x < width; x++)
-                    {
-                        var sb = srcpixels[(srcposY + y) * width + x];
-                        var sbm = srcpixels[(srcposY + itemHeight + y) * width + x];
-                        if ((sbm & 0xFFFFFF) == 0)
-                        {
-                            dstpixels[(dstposY + y) * width + x] = sb;
-                        }
-                    }
-                }
-                srcposY += itemHeight * 2;
-                dstposY += itemHeight;
-            }
-            bmp.WritePixels(new Int32Rect(0, 0, width, height), dstpixels, stride, 0);
-            return bmp;
-        }
+
 
         private void ButtonOpen_Click(object sender, RoutedEventArgs e)
         {
@@ -94,7 +65,8 @@ namespace WpfGrabber
             if(dlg.ShowDialog() != true) 
                 return;
             var src = new BitmapImage(new Uri(ViewModel.FileName));
-            var bmp = ProcessMask(src, ViewModel.Height, ViewModel.ItemsCount);
+            var rd = new MaskReader();
+            var bmp = rd.ProcessMask(src, ViewModel.Height, ViewModel.ItemsCount);
             bmp.SaveToPngFile(dlg.FileName);
         }
     }

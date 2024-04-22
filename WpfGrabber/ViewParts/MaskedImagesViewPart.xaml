@@ -1,11 +1,11 @@
-﻿<local:ViewPart x:Class="WpfGrabber.ViewParts.Binary8BitViewPart"
+﻿<local:MaskedImagesViewPartBase x:Class="WpfGrabber.ViewParts.MaskedImagesViewPart"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:WpfGrabber.ViewParts" xmlns:c="clr-namespace:WpfGrabber.Controls"
-             mc:Ignorable="d"                 
-             d:DesignHeight="466.909" d:DesignWidth="583.262">
+             xmlns:local="clr-namespace:WpfGrabber.ViewParts"
+             mc:Ignorable="d" 
+             d:DesignHeight="452.516" d:DesignWidth="367.195">
     <d:DesignerProperties.DesignStyle>
         <Style TargetType="UserControl">
             <Setter Property="Background" Value="White" />
@@ -17,31 +17,27 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <ItemsControl Style="{StaticResource toolbar}">
-            <Label>Width</Label>
-            <!--<TextBox Text="{Binding Width}"/>-->
-            <c:NumberEditor Maximum="256" Value="{Binding Width}" Minimum="1" Width="200" SliderWidth="120"/>
+            <!--<Label Content="End pos"/>
+            <c:NumberEditor Value="{Binding EndPos}" Maximum="{Binding ShellVm.DataLength, ElementName=root}" Width="160"/>
             <Separator/>
-            <CheckBox Content="Reversed" IsChecked="{Binding Reversed}"/>
-            <Separator/>
-            <Button Content="Save..." Style="{StaticResource dropDown}">
+            <Button Content="Save" Style="{StaticResource dropDown}">
                 <Button.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Header="Save image" Click="OnButtonSave_Click"/>
-                        <MenuItem Header="Save as data image" Click="OnButtonSaveData_Click"/>
+                    <ContextMenu Placement="Bottom">
+                        <MenuItem Header="Save images to folder..." Click="OnButtonSaveImages_Click"/>
+                        <MenuItem Header="Save to one image..." Click="OnButtonSave_Click"/>
                     </ContextMenu>
                 </Button.ContextMenu>
-            </Button>
-
+            </Button>-->
         </ItemsControl>
-        
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <Border x:Name="imageBorder" Style="{StaticResource checkerBorder}"
-                    SizeChanged="BorderSize_Changed">
+            <Border x:Name="imageBorder" 
+                    SizeChanged="BorderSize_Changed"
+                    Style="{StaticResource checkerBorder}">
                 <Canvas Margin="10">
                     <Image x:Name="image" Stretch="None" RenderOptions.BitmapScalingMode="NearestNeighbor"
-                           HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                 </Canvas>
             </Border>
         </ScrollViewer>
     </Grid>
-</local:ViewPart>
+</local:MaskedImagesViewPartBase>

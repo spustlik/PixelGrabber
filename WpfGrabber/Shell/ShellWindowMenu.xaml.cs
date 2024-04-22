@@ -37,7 +37,7 @@ namespace WpfGrabber.Shell
             public virtual Type ViewPartType { get; }
             public abstract ViewPart Create();
         }
-        public class ViewPartDef<T>: ViewPartDef where T:ViewPart,new ()
+        public class ViewPartDef<T> : ViewPartDef where T : ViewPart, new()
         {
             public override Type ViewPartType => typeof(T);
             public override ViewPart Create() => new T();
@@ -49,9 +49,9 @@ namespace WpfGrabber.Shell
             ViewModel.ViewParts.AddRange(new ViewPartDef[]
             {
                 new ViewPartDef<Binary8BitViewPart>(){Title = "Binary 8bit" },
-                //new ViewPartDef(){Title = "Binary 8bit mask" },
                 new ViewPartDef<HexDumpViewPart>(){Title = "Hex dump" },
                 new ViewPartDef<DealienViewPart>(){Title = "Dealien"},
+                new ViewPartDef<MaskedImagesViewPart>(){Title = "Binary masked images"},
                 new ViewPartDef<TestViewPart>(){Title = "Test"}
             });
             ShellVm = App.Current?.ServiceProvider?.GetService<ShellVm>();
@@ -110,6 +110,13 @@ namespace WpfGrabber.Shell
         {
             var wnd = new DropDownTestWindow();
             wnd.Show();
+        }
+
+        private void ButtonMask_Click(object sender, RoutedEventArgs e)
+        {
+            var w = new MaskBitmapWindow();
+            w.Owner = Application.Current.MainWindow;
+            w.Show();
         }
     }
 }
