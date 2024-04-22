@@ -65,15 +65,16 @@ namespace WpfGrabber
             var reader = new BitReader(bytes);
             reader.Position = ViewModel.Offset;
             var w = ViewModel.Width;
-            var total_w = GetNumber(imageBorder.ActualWidth, imageBorder.Width, Width);
-            var total_h = GetNumber(imageBorder.ActualHeight, imageBorder.Height, this.Height);
+            var total_w = this.GetFirstValid(imageBorder.ActualWidth, imageBorder.Width, Width);
+            var total_h = this.GetFirstValid(imageBorder.ActualHeight, imageBorder.Height, this.Height);
             total_h = (int)(total_h / ViewModel.Zoom);
             //log.Text += $"H:{total_h},W:{total_w}, w={w}\n";
 
             var space = 10;
             if (w < 16)
                 space = 4;
-            BitmapSource bmp = CreateBitmap(reader, total_w, total_h, w, space);
+            var bir = new BitImageReader();
+            BitmapSource bmp = bir.ReadBitmap(reader, total_w, total_h, w, space);
             image.Source = bmp;
             image.RenderTransform = new ScaleTransform(ViewModel.Zoom, ViewModel.Zoom);
             var pos = ViewModel.Offset;
@@ -86,64 +87,6 @@ namespace WpfGrabber
             var r =  new HexReader(bytes, pos);
             ViewModel.HexLines.AddRange(r.ReadLines().Take(100));
             return;
-
-            int rows = 0;
-            while (pos < bytes.Length)
-            {
-                var line = new StringBuilder();
-                for (int x = 0; x < 16; x++)
-                {
-                    if (pos >= bytes.Length)
-                        break;
-                    var b = bytes[pos++];
-                    line.Append(b.ToString("X2"));
-                    line.Append(" ");
-                    if (x == 7)
-                        line.Append("| ");
-                }
-                ViewModel.HexLines.Add(line.ToString());
-                rows++;
-                if (rows > 100)
-                    break;
-            }
-        }
-
-        private BitmapSource CreateBitmap(BitReader reader, int total_w, int total_h, int w, int space)
-        {
-            var columnX = 0;
-            var pixels = new uint[total_h * total_w];
-            while (columnX + w <= total_w)
-            {
-                for (int y = 0; y < total_h; y++)
-                {
-                    for (int x = 0; x < w; x++)
-                    {
-                        var bit = reader.ReadBit();
-                        if (reader.Position >= ViewModel.DataLength)
-                            break;
-                        var dest = y * total_w + x + columnX;
-                        if (dest >= pixels.Length)
-                            break;
-                        pixels[dest] = bit ? 0xffffffff : 0xff000000;
-                    }
-                }
-                columnX += w + space;
-            }
-            var bmp = BitmapSource.Create(total_w, total_h, 96, 96, PixelFormats.Pbgra32, null, pixels, total_w * 4);
-            return bmp;
-        }
-
-        private int GetNumber(params double[] n)
-        {
-            foreach (var v in n)
-            {
-                if (double.IsNaN(v))
-                    continue;
-                if (v == 0)
-                    continue;
-                return (int)v;
-            }
-            return 0;
         }
 
         private void ButtonOpen_Click(object sender, RoutedEventArgs e)
@@ -166,7 +109,8 @@ namespace WpfGrabber
             if (dlg.ShowDialog(this) != true)
                 return;
             ((BitmapSource)image.Source).SaveToPngFile(dlg.FileName);
-            var bmp2 = CreateBitmap(new BitReader(bytes) { Position = ViewModel.Offset },
+            var bir = new BitImageReader();
+            var bmp2 = bir.ReadBitmap(new BitReader(bytes) { Position = ViewModel.Offset },
                 ViewModel.Width,
                 (ViewModel.DataLength - ViewModel.Offset) / (ViewModel.Width / 8),
                 ViewModel.Width, 10);

@@ -40,6 +40,8 @@ namespace WpfGrabber
 
         public byte Read()
         {
+            if (Position >= bytes.Length)
+                return 0;
             return bytes[Position++];
         }
 
@@ -47,21 +49,23 @@ namespace WpfGrabber
         {
             w = 0;
             h = 0;
-            if (Position>bytes.Length-2)
+            if (Position > bytes.Length - 2)
                 return false;
-            w= bytes[Position];
-            h = bytes[Position+1];
+            w = bytes[Position];
+            h = bytes[Position + 1];
             return w != 0 && h != 0;
         }
         public ByteImage8Bit ReadMaskedImage()
         {
             var w = Read();
             var h = Read();
-            var result = new ByteImage8Bit(w*8, h);
+            var result = new ByteImage8Bit(w * 8, h);
             for (int y = 0; y < h; y++)
             {
                 for (int x = 0; x < w; x++)
                 {
+                    if (Position >= bytes.Length)
+                        break;
                     var d = Read();
                     var m = Read();
                     for (int i = 0; i < 8; i++)

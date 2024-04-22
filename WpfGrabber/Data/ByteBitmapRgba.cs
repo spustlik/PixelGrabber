@@ -27,12 +27,14 @@ namespace WpfGrabber
 
         public void SetPixel(int x, int y, uint value)
         {
-            //data[x,y] = value;
+            if (x >= Width || y >= Height)
+                return;
             Data[x + y * Width] = value;
         }
         public uint GetPixel(int x, int y)
         {
-            //return data[x,y];
+            if (x >= Width || y >= Height)
+                return 0x00000000;
             return Data[x + y * Width];
         }
     }

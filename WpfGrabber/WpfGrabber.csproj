@@ -58,16 +58,21 @@
     </ApplicationDefinition>
     <Compile Include="Data\ByteImage8Bit.cs" />
     <Compile Include="Readers\AlienReader.cs" />
+    <Compile Include="Readers\BitImageReader.cs" />
     <Compile Include="Readers\BitReader.cs" />
     <Compile Include="Data\ByteBitmapRgba.cs" />
     <Compile Include="ExceptionWindow.xaml.cs">
       <DependentUpon>ExceptionWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Data\Interval.cs" />
-    <Compile Include="MaskBitmapWindow.xaml.cs">
+    <Compile Include="ViewParts\TestViewPart.xaml.cs">
+      <DependentUpon>TestViewPart.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewParts\ViewPartDataViewer.cs" />
+    <Compile Include="_Legacy\MaskBitmapWindow.xaml.cs">
       <DependentUpon>MaskBitmapWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MaskBitmapWindowViewModel.cs" />
+    <Compile Include="_Legacy\MaskBitmapWindowViewModel.cs" />
     <Compile Include="Controls\NumberEditor.xaml.cs">
       <DependentUpon>NumberEditor.xaml</DependentUpon>
     </Compile>
@@ -93,17 +98,27 @@
       <DependentUpon>ShellWindowToolbar.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\ViewPartControl.cs" />
+    <Compile Include="ViewParts\Binary8BitViewPart.xaml.cs">
+      <DependentUpon>Binary8BitViewPart.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewParts\DealienViewPart.xaml.cs">
+      <DependentUpon>DealienViewPart.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewParts\HexDumpViewPart.xaml.cs">
       <DependentUpon>HexDumpViewPart.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewParts\ViewPart.cs" />
     <Compile Include="ViewParts\ViewPartService.cs" />
-    <Compile Include="WpfExtensions.cs" />
+    <Compile Include="_ObjectExtensions.cs" />
     <Page Include="ExceptionWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MainWindow.xaml">
+    <Page Include="ViewParts\TestViewPart.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="_Legacy\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -111,11 +126,11 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MainWindow.xaml.cs">
+    <Compile Include="_Legacy\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="MaskBitmapWindow.xaml">
+    <Page Include="_Legacy\MaskBitmapWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -143,6 +158,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Themes\Styles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Toolbar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\ViewPartControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -151,13 +174,21 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="ViewParts\Binary8BitViewPart.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ViewParts\DealienViewPart.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ViewParts\HexDumpViewPart.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MainWindowViewModel.cs" />
+    <Compile Include="_Legacy\MainWindowViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

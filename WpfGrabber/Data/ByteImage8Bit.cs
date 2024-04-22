@@ -15,6 +15,8 @@
 
         public void SetPixel(int x, int y, byte value)
         {
+            if (x >= Width || y >= Height)
+                return;
             Data[x, y] = value;
         }
         public byte GetPixel(int x, int y)

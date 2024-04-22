@@ -6,11 +6,16 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using WpfGrabber.Controls;
 
 namespace WpfGrabber.ViewParts
 {
     public class ViewPart : UserControl
     {
+        static ViewPart()
+        {
+            //DefaultStyleKeyProperty.OverrideMetadata(typeof(ViewPartControl), new FrameworkPropertyMetadata(typeof(ViewPartControl)));
+        }
         public string Title { get; protected set; }
         public ViewPart()
         {

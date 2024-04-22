@@ -7,11 +7,12 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media.Imaging;
 
 namespace WpfGrabber
 {
-    public static class WpfExtensions
+    public static class ObjectExtensions
     {
         public static void SaveToPngFile(this BitmapSource source, string fileName)
         {
@@ -64,6 +65,19 @@ namespace WpfGrabber
                     return i;
             }
             return -1;
+        }
+
+        public static int GetFirstValid(this FrameworkElement e, params double[] n)
+        {
+            foreach (var v in n)
+            {
+                if (double.IsNaN(v))
+                    continue;
+                if (v == 0)
+                    continue;
+                return (int)v;
+            }
+            return 0;
         }
     }
 }

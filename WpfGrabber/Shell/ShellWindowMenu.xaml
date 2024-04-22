@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WpfGrabber.Shell"
+             xmlns:vp="clr-namespace:WpfGrabber.ViewParts"
              mc:Ignorable="d" 
              
              d:DesignHeight="26.5" d:DesignWidth="138"
@@ -11,23 +12,26 @@
     <Grid>
         <Menu>
             <MenuItem Header="File">
-                <MenuItem Header="Open..." Click="OnOpenMenu_Click" Command="ApplicationCommands.Open"/>
+                <MenuItem Header="Open..." Command="ApplicationCommands.Open"/>
                 <MenuItem Header="Recent" ItemsSource="{Binding RecentFiles}">
                     <MenuItem.ItemContainerStyle>
                         <Style TargetType="MenuItem">
+                            <Setter Property="Command" Value="local:ShellWindowMenu.OpenRecentCommand" />
                             <Setter Property="CommandParameter" Value="{Binding .}" />
-                            <EventSetter Event="Click" Handler="OnRecentMenu_Click"/>
                         </Style>
                     </MenuItem.ItemContainerStyle>
                 </MenuItem>
                 <Separator/>
-                <MenuItem Header="Exit" Click="OnExitMenu_Click"/>
+                <MenuItem Header="Exit" Command="ApplicationCommands.Close"/>
             </MenuItem>
-            <MenuItem Header="Viewer">
-                <MenuItem Header="Binary 8bit"/>
-                <MenuItem Header="Binary 8bit mask"/>
-                <MenuItem Header="Hex dump" Click="OnViewHexDump_Click"/>
-                <MenuItem Header="Dealien"/>
+            <MenuItem Header="Viewer" ItemsSource="{Binding ViewParts}">
+                <MenuItem.ItemContainerStyle>
+                    <Style TargetType="MenuItem">
+                        <Setter Property="Command" Value="local:ShellWindowMenu.ShowViewPartCommand" />
+                        <Setter Property="Header" Value="{Binding Title}" />
+                        <Setter Property="CommandParameter" Value="{Binding .}" />
+                    </Style>
+                </MenuItem.ItemContainerStyle>
             </MenuItem>
             <MenuItem Header="Tools">
                 <MenuItem Header="Main window" Click="MainWindow_Click"/>

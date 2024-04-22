@@ -28,7 +28,7 @@ namespace WpfGrabber.ViewParts
         public HexDumpViewPart()
         {
             Title = "Hex dump";
-            DataContext = new VM();
+            DataContext = new HexDumpVM();
             InitializeComponent();
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
         }
@@ -40,8 +40,8 @@ namespace WpfGrabber.ViewParts
             ShowData();
         }
 
-        public VM ViewModel => DataContext as VM;
-        public class VM : SimpleDataObject
+        public HexDumpVM ViewModel => DataContext as HexDumpVM;
+        public class HexDumpVM : SimpleDataObject
         {
 
             #region ShowAddr property

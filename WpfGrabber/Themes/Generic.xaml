@@ -5,6 +5,7 @@
 
 
     <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/WpfGrabber;component/Themes/Styles.xaml"/>
         <ResourceDictionary Source="/WpfGrabber;component/Themes/ViewPartControl.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

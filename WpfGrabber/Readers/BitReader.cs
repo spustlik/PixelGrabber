@@ -2,23 +2,19 @@
 
 namespace WpfGrabber
 {
-    internal class BitReader
+    public class BitReader
     {
         private readonly byte[] bytes;
         private int _posbit;
         public int Position
         {
-            get
-            {
-                return _posbit / 8;
-            }
-            set
-            {
-                _posbit = value * 8;
-            }
+            get => _posbit / 8;
+            set => _posbit = value * 8;
         }
 
         public bool ReverseByte { get; set; } = true;
+        public int DataLength => bytes.Length;
+
         public BitReader(byte[] bytes)
         {
             this.bytes = bytes;
