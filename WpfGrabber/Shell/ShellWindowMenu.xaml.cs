@@ -61,7 +61,9 @@ namespace WpfGrabber.Shell
                 new ViewPartDef<HexDumpViewPart>(){Title = "Hex dump" },
                 new ViewPartDef<DealienViewPart>(){Title = "Dealien"},
                 new ViewPartDef<MaskedImagesViewPart>(){Title = "Binary masked images"},
-                new ViewPartDef<TestViewPart>(){Title = "Test"}
+                new ViewPartDef<TestViewPart>(){Title = "Test"},
+                new ViewPartDef<TestViewPart>(){Title = "(Z80 disasm)"},
+                new ViewPartDef<TestViewPart>(){Title = "(Font viewer)"},
             });
             ViewModel.ShellVm = App.Current?.ServiceProvider?.GetService<ShellVm>();
 

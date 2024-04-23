@@ -10,12 +10,12 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="boolToVisi"/>
         <Style TargetType="Grid" x:Key="disableGrid">
-            <Setter Property="IsEnabled" Value="true" />
+            <!--<Setter Property="IsEnabled" Value="true" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding DataLength}" Value="0">
                     <Setter Property="IsEnabled" Value="false" />
                 </DataTrigger>
-            </Style.Triggers>
+            </Style.Triggers>-->
         </Style>
     </UserControl.Resources>
     <Grid Style="{StaticResource disableGrid}">

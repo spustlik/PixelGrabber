@@ -67,6 +67,8 @@
     </Compile>
     <Compile Include="Data\Interval.cs" />
     <Compile Include="Readers\MaskReader.cs" />
+    <Compile Include="Readers\Z80\Z80Instruction.cs" />
+    <Compile Include="Readers\Z80\Z80Reader.cs" />
     <Compile Include="Themes\ResourceEvents.cs" />
     <Compile Include="ViewParts\MaskedImagesViewPart.xaml.cs">
       <DependentUpon>MaskedImagesViewPart.xaml</DependentUpon>

@@ -5,6 +5,8 @@ VisualStudioVersion = 17.9.34607.119
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfGrabber", "WpfGrabber\WpfGrabber.csproj", "{BD4E61EE-0254-424D-971D-7BA0FB2194EC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{D3DDF773-AB13-4DD0-94A2-471F33D5DB50}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{BD4E61EE-0254-424D-971D-7BA0FB2194EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD4E61EE-0254-424D-971D-7BA0FB2194EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD4E61EE-0254-424D-971D-7BA0FB2194EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3DDF773-AB13-4DD0-94A2-471F33D5DB50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3DDF773-AB13-4DD0-94A2-471F33D5DB50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3DDF773-AB13-4DD0-94A2-471F33D5DB50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3DDF773-AB13-4DD0-94A2-471F33D5DB50}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

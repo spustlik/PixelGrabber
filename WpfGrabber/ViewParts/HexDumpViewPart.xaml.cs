@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Xml.Serialization;
 using WpfGrabber.Readers;
 using WpfGrabber.Shell;
 
@@ -70,6 +71,7 @@ namespace WpfGrabber.ViewParts
             }
             #endregion
 
+            [XmlIgnore]
             public ObservableCollection<string> HexLines { get; private set; } = new ObservableCollection<string>();
         }
 
