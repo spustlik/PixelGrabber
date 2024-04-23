@@ -20,7 +20,7 @@ namespace WpfGrabber.ViewParts
     /// </summary>
     public partial class TestViewPart : ViewPartDataViewer<TestViewPartVM>
     {
-        public TestViewPart():base("Test view")
+        public TestViewPart():base()
         {
             InitializeComponent();
         }

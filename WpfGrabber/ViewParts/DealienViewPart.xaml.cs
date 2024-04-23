@@ -43,7 +43,7 @@ namespace WpfGrabber.ViewParts
     }
     public class DealienViewPartBase : ViewPartDataViewer<DealienViewPartVM>
     {
-        public DealienViewPartBase() : base("Dealien") { }
+        public DealienViewPartBase() : base() { }
     }
 
     /// <summary>

@@ -22,7 +22,7 @@ namespace WpfGrabber.ViewParts
 
     public class MaskedImagesViewPartBase : ViewPartDataViewer<MaskedImagesVM>
     {
-        public MaskedImagesViewPartBase() : base("Binary masked image") { }
+        public MaskedImagesViewPartBase() : base() { }
     }
 
     public partial class MaskedImagesViewPart : MaskedImagesViewPartBase

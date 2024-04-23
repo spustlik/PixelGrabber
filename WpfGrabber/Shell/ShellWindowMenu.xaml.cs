@@ -77,6 +77,7 @@ namespace WpfGrabber.Shell
             var part = vp.Create();
             var vps = App.GetService<IViewPartService>();
             vps.Add(part);
+            vps.SetOptions(part, vp.Title);
         }
 
         private void OnCloseExecuted(object sender, ExecutedRoutedEventArgs e)

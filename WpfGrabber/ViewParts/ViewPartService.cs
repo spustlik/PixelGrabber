@@ -10,6 +10,8 @@ namespace WpfGrabber.ViewParts
     {
         void Add(ViewPart viewPart);
         void Remove(ViewPart viewPart);
+        void RemoveAll();
+        void SetOptions(ViewPart viewPart, string title);
 
     }
 }

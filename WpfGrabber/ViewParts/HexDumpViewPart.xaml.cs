@@ -27,7 +27,6 @@ namespace WpfGrabber.ViewParts
 
         public HexDumpViewPart()
         {
-            Title = "Hex dump";
             DataContext = new HexDumpVM();
             InitializeComponent();
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;

@@ -48,6 +48,8 @@ namespace WpfGrabber.Shell
             var last = partsGrid.ColumnDefinitions.LastOrDefault();
             //if(last!=null && last.Width.Value!=)
         }
+
+        public IEnumerable<ViewPart> ViewParts => partsGrid.Children.OfType<ViewPartControl>().Select(x => x.Content).OfType<ViewPart>();
         private int GetViewPartControlIndex(ViewPart viewPart)
         {
             for (int i = 0; i < partsGrid.Children.Count; i++)
@@ -61,7 +63,7 @@ namespace WpfGrabber.Shell
 
         void IViewPartService.Add(ViewPart viewPart)
         {
-            if (GetViewPartControlIndex(viewPart)>=0)
+            if (GetViewPartControlIndex(viewPart) >= 0)
                 return;
             var vpc = new ViewPartControl();
             vpc.Content = viewPart;
@@ -71,13 +73,18 @@ namespace WpfGrabber.Shell
                 Grid.SetColumn(c, partsGrid.Children.Count);
                 partsGrid.Children.Add(c);
             }
-            add(new ViewPartControl() { Content = viewPart, Title = viewPart.Title }, new GridLength(300));
+            add(new ViewPartControl() { Content = viewPart }, new GridLength(300));
             add(new GridSplitter(), GridLength.Auto);
             viewPart.OnInitialize();
             UpdateGrid();
         }
 
         void IViewPartService.Remove(ViewPart viewPart)
+        {
+            RemoveViewPart(viewPart);
+        }
+
+        private void RemoveViewPart(ViewPart viewPart)
         {
             var i = GetViewPartControlIndex(viewPart);
             if (i < 0)
@@ -86,6 +93,24 @@ namespace WpfGrabber.Shell
             partsGrid.Children.RemoveAt(i); //remove viewPartControl
             partsGrid.Children.RemoveAt(i); //remove splitter
             UpdateGrid();
+        }
+
+        void IViewPartService.RemoveAll()
+        {
+            foreach (var vp in ViewParts.Reverse())
+            {
+                RemoveViewPart(vp);
+            }
+        }
+        void IViewPartService.SetOptions(ViewPart viewPart, string title)
+        {
+            var i = GetViewPartControlIndex(viewPart);
+            if (i < 0)
+                return;
+            var vpc = partsGrid.Children[i] as ViewPartControl;
+            if (vpc == null)
+                return;
+            vpc.Title = title;
         }
 
         #endregion

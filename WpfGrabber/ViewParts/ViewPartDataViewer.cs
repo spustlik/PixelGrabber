@@ -11,10 +11,9 @@ namespace WpfGrabber.ViewParts
     public abstract class ViewPartDataViewer<TVM> : ViewPart where TVM:SimpleDataObject,new()
     {
         public ShellVm ShellVm { get; private set; }
-        protected ViewPartDataViewer(string title)
+        protected ViewPartDataViewer()
         {
             DataContext = new TVM();
-            Title = title;
         }
         public TVM ViewModel => DataContext as TVM;
 

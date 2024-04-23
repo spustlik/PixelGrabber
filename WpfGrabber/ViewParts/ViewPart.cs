@@ -16,10 +16,8 @@ namespace WpfGrabber.ViewParts
         {
             //DefaultStyleKeyProperty.OverrideMetadata(typeof(ViewPartControl), new FrameworkPropertyMetadata(typeof(ViewPartControl)));
         }
-        public string Title { get; protected set; }
         public ViewPart()
         {
-            Title = GetType().Name.Split('.').Last();
         }
         public virtual void OnDataChanged(DataChangedArgs args)
         {

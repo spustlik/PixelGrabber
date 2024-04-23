@@ -17,7 +17,6 @@ namespace WpfGrabber.ViewParts
         private ShellVm shellVm;
         public Binary8BitViewPart()
         {
-            Title = "Binary 8 bit";
             DataContext = new Binary8BitVM();
             ViewModel.Width = 64;
             ViewModel.Reversed = true;
