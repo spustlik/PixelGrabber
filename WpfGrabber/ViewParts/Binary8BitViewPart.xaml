@@ -1,4 +1,4 @@
-﻿<local:ViewPart x:Class="WpfGrabber.ViewParts.Binary8BitViewPart"
+﻿<local:Binary8BitViewPartBase x:Class="WpfGrabber.ViewParts.Binary8BitViewPart"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -44,4 +44,4 @@
             </Border>
         </ScrollViewer>
     </Grid>
-</local:ViewPart>
+</local:Binary8BitViewPartBase>

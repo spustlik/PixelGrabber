@@ -9,10 +9,35 @@ using WpfGrabber.Shell;
 
 namespace WpfGrabber.ViewParts
 {
-    /// <summary>
-    /// Interaction logic for Binary8BitViewPart.xaml
-    /// </summary>
-    public partial class Binary8BitViewPart : ViewPart
+    public class Binary8BitVM : SimpleDataObject
+    {
+
+        #region Reversed property
+        private bool _reversed;
+        public bool Reversed
+        {
+            get => _reversed;
+            set => Set(ref _reversed, value);
+        }
+        #endregion
+
+        #region Width property
+        private int _width;
+        public int Width
+        {
+            get => _width;
+            set => Set(ref _width, value);
+        }
+        #endregion
+
+    }
+
+    public class Binary8BitViewPartBase : ViewPartDataViewer<Binary8BitVM>
+    {
+
+    }
+
+    public partial class Binary8BitViewPart : Binary8BitViewPartBase
     {
         private ShellVm shellVm;
         public Binary8BitViewPart()
@@ -23,53 +48,13 @@ namespace WpfGrabber.ViewParts
             InitializeComponent();
         }
 
-        public Binary8BitVM ViewModel => DataContext as Binary8BitVM;
-        public class Binary8BitVM : SimpleDataObject
-        {
 
-            #region Reversed property
-            private bool _reversed;
-            public bool Reversed
-            {
-                get => _reversed;
-                set => Set(ref _reversed, value);
-            }
-            #endregion
-
-            #region Width property
-            private int _width;
-            public int Width
-            {
-                get => _width;
-                set => Set(ref _width, value);
-            }
-            #endregion
-
-        }
-        public override void OnInitialize()
-        {
-            base.OnInitialize();
-            shellVm = App.GetService<ShellVm>();
-            shellVm.PropertyChanged += ShellVm_PropertyChanged;
-            ViewModel.PropertyChanged += ViewModel_PropertyChanged;
-            ShowData();
-        }
-
-        private void ShellVm_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            ShowData();
-        }
-
-        private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            ShowData();
-        }
         private void BorderSize_Changed(object sender, SizeChangedEventArgs e)
         {
             ShowData();
         }
 
-        private void ShowData()
+        protected override void OnShowData()
         {
             if (shellVm.DataLength == 0)
                 return;
