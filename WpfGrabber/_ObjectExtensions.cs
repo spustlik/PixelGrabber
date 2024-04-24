@@ -50,13 +50,13 @@ namespace WpfGrabber
             return serviceProvider.GetService(typeof(T)) as T;
         }
 
-        public static void AddService<T>(this IServiceContainer serviceContainer, T service) 
+        public static void AddService<T>(this IServiceContainer serviceContainer, T service)
             where T : class
         {
             serviceContainer.AddService(typeof(T), service);
         }
 
-        public static int FindIndex<T>(this IEnumerable<T> data, Func<T,bool> predicate) 
+        public static int FindIndex<T>(this IEnumerable<T> data, Func<T, bool> predicate)
         {
             int i = 0;
             foreach (var item in data)
@@ -79,5 +79,23 @@ namespace WpfGrabber
             }
             return 0;
         }
+
+        public static byte[] GetRange(this byte[] data, int start, int count)
+        {
+            var result = new byte[count];
+            for (int i = 0; i < count; i++)
+            {
+                if (start + i < data.Length)
+                    result[i] = data[start + i];
+            }
+            return result;
+        }
+
+        public static string ToHex(this byte[] data, string separator = " ")
+        {
+            return String.Join(separator, data.Select(x => x.ToString("X2")));
+        }
+
+
     }
 }

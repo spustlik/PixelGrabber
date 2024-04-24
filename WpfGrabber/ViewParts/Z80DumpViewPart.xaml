@@ -1,0 +1,51 @@
+﻿<local:Z80DumpViewPartBase x:Class="WpfGrabber.ViewParts.Z80DumpViewPart"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfGrabber.ViewParts"
+             mc:Ignorable="d" 
+             d:DesignHeight="350" d:DesignWidth="300"
+             Background="LightYellow"
+             >
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <ItemsControl Style="{StaticResource toolbar}">
+            <CheckBox Content="Address" IsChecked="{Binding ShowAddr}"/>
+            <Separator/>
+            <CheckBox Content="Op codes" IsChecked="{Binding ShowOpcodes}"/>
+            <Separator/>
+            <Button Style="{StaticResource dropDown}" Content="Save...">
+                <Button.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem  Header="Save as text..." Click="SaveText_Click"/>
+                    </ContextMenu>
+                </Button.ContextMenu>
+            </Button>
+        </ItemsControl>
+
+        <!--<ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding DumpLines}" FontFamily="Courier New" FontSize="10"/>
+        </ScrollViewer>-->
+
+        <TabControl Grid.Row="1" TabIndex="0">
+            <TabItem Header="Text">
+                <TextBox IsReadOnly="True"  
+                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                 FontFamily="Courier New" FontSize="10" Text="{Binding DumpText}"/>
+            </TabItem>
+            <TabItem Header="Structure">
+                <RichTextBox IsReadOnly="True"  
+                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                 FontFamily="Courier New" FontSize="10"
+                 x:Name="richTextBox" IsVisibleChanged="RichTextBoxVisible_Changed">
+                </RichTextBox>
+            </TabItem>
+        </TabControl>
+        
+    </Grid>
+</local:Z80DumpViewPartBase>

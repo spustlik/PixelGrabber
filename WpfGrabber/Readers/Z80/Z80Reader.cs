@@ -256,7 +256,7 @@ namespace WpfGrabber.Readers.Z80
                         default: throw new InvalidOperationException();
                     }
                 case 6: return ReadAlu(opcode.y, $"0x{ReadByte():X2}");
-                case 7: return CreateInstr(Z80Op.ByParam, "RST", $"0x{opcode.y * 8}:X2");
+                case 7: return CreateInstr(Z80Op.ByParam, "RST", $"0x{opcode.y * 8:X2}");
                 default: throw new InvalidOperationException();
             }
         }

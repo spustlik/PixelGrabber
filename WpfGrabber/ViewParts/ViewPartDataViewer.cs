@@ -24,17 +24,32 @@ namespace WpfGrabber.ViewParts
             ShellVm = App.GetService<ShellVm>();
             ShellVm.PropertyChanged += ShellVm_PropertyChanged;
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
-            OnShowData();
+            ShowData();
         }
 
         protected virtual void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            OnShowData();
+            ShowData();
         }
 
         protected virtual void ShellVm_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            OnShowData();
+            ShowData();
+        }
+
+        private bool _showingData = false;
+        protected void ShowData()
+        {
+            if (_showingData)
+                return;
+            _showingData = true;
+            Dispatcher.BeginInvoke((Action)InvokeShowData);
+        }
+
+        private void InvokeShowData()
+        {
+            this.OnShowData();
+            _showingData = false;
         }
 
         protected virtual void OnShowData()

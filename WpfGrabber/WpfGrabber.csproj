@@ -76,6 +76,9 @@
     <Compile Include="ViewParts\FontBinaryViewPart.xaml.cs">
       <DependentUpon>FontBinaryViewPart.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewParts\Z80DumpViewPart.xaml.cs">
+      <DependentUpon>Z80DumpViewPart.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewParts\MaskedImagesViewPart.xaml.cs">
       <DependentUpon>MaskedImagesViewPart.xaml</DependentUpon>
     </Compile>
@@ -134,6 +137,10 @@
     <Page Include="ViewParts\FontBinaryViewPart.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ViewParts\Z80DumpViewPart.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="ViewParts\MaskedImagesViewPart.xaml">
       <SubType>Designer</SubType>
