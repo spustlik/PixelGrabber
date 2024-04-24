@@ -21,6 +21,8 @@
         }
         public byte GetPixel(int x, int y)
         {
+            if (x >= Width || y >= Height)
+                return 0;
             return Data[x, y];
         }
 
