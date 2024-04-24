@@ -131,27 +131,7 @@ namespace WpfGrabber.ViewParts
 
         private static string HEXNUM = @"[0-9A-F]{4}";
         private static Regex _regex = new Regex($"(0x{HEXNUM})|(L{HEXNUM})", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        public static IEnumerable<Inline> CreateLineInlines(string line)
-        {
-            //find 0x1234 and L1234 patterns and make them clickable
-            var matches = _regex.Matches(line);
-            if (matches == null || matches.Count == 0)
-                yield return new Run(line);
-            else
-            {
-                var lastpos = 0;
-                for (int i = 0; i < matches.Count; i++)
-                {
-                    var m = matches[i];
-                    if (m.Index > lastpos)
-                        yield return new Run(line.Substring(lastpos, m.Index - lastpos));
-                    yield return new Hyperlink(new Run(m.Value)) { DataContext = m.Value };
-                    lastpos = m.Index + m.Length;
-                }
-                if (lastpos < line.Length)
-                    yield return new Run(line.Substring(lastpos));
-            }
-        }
+
 
         private void SaveText_Click(object sender, RoutedEventArgs e)
         {
@@ -228,7 +208,7 @@ namespace WpfGrabber.ViewParts
             if (s.StartsWith("L"))
                 s = s.Substring(1);
             var addr = int.Parse(s, System.Globalization.NumberStyles.HexNumber);
-            MessageBox.Show(addr.ToString("X4") + " " + ViewModel.GoToAddrText, "Go to");
+            //MessageBox.Show(addr.ToString("X4") + " " + ViewModel.GoToAddrText, "Go to");
         }
 
 
