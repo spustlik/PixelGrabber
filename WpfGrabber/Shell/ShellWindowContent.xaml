@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:WpfGrabber.Shell" xmlns:controls="clr-namespace:WpfGrabber.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="222" d:DesignWidth="338">
-    <Grid Margin="3" x:Name="partsGrid">
+    <Grid Margin="3" x:Name="partsGrid" FocusManager.IsFocusScope="True">
         <Grid.Resources>
             <Style TargetType="Border">
                 <Setter Property="Background" Value="White"/>
@@ -28,7 +28,7 @@
             <Border CornerRadius="10" Background="Pink" Width="50" Height="50"/>
         </controls:ViewPartControl>
         <GridSplitter Grid.Column="1"/>
-        <controls:ViewPartControl Grid.Column="2" Title="Hex dump">
+        <controls:ViewPartControl Grid.Column="2" Title="Hex dump" >
             <ListBox/>
         </controls:ViewPartControl>
         <GridSplitter Grid.Column="3"/>
