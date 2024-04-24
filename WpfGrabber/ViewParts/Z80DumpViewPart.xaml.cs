@@ -83,6 +83,7 @@ namespace WpfGrabber.ViewParts
                 base.ShellVm_PropertyChanged(sender, e);
             }
         }
+        Dictionary<int,int> _addressMap = new Dictionary<int, int>();
         protected override void OnShowData()
         {
             if (ShellVm.DataLength <= 0)
@@ -93,6 +94,7 @@ namespace WpfGrabber.ViewParts
             var result = new StringBuilder();
             var dumpLines = new List<string>();
             var z80 = new Z80Reader(ShellVm.Data, ShellVm.Offset);
+            _addressMap.Clear();
             while (z80.Addr < z80.Data.Length)
             {
                 var sb = new StringBuilder();
@@ -111,6 +113,7 @@ namespace WpfGrabber.ViewParts
                           .Append(" ");
                     }
                     sb.Append(instr.ToString());
+                    _addressMap[instr.Start] = dumpLines.Count;
                 }
                 catch (Exception e)
                 {
@@ -209,6 +212,9 @@ namespace WpfGrabber.ViewParts
                 s = s.Substring(1);
             var addr = int.Parse(s, System.Globalization.NumberStyles.HexNumber);
             //MessageBox.Show(addr.ToString("X4") + " " + ViewModel.GoToAddrText, "Go to");
+            if (!_addressMap.TryGetValue(addr, out var line))
+                return;
+            textBox.ScrollToLine(line);
         }
 
 
