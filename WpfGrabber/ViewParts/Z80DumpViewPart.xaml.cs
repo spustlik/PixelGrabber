@@ -7,7 +7,9 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Media;
 using System.Xml.Serialization;
 using WpfGrabber.Readers.Z80;
 using WpfGrabber.Shell;
@@ -35,7 +37,6 @@ namespace WpfGrabber.ViewParts
         }
         #endregion
 
-
         #region DumpText property
         private string _dumptext;
         public string DumpText
@@ -44,6 +45,17 @@ namespace WpfGrabber.ViewParts
             set => Set(ref _dumptext, value);
         }
         #endregion
+
+        [XmlIgnore]
+        #region GoToAddrText property
+        private string _gotoAddrText;
+        public string GoToAddrText
+        {
+            get => _gotoAddrText;
+            set => Set(ref _gotoAddrText, value);
+        }
+        #endregion
+
 
         [XmlIgnore]
         public ObservableCollection<string> DumpLines { get; private set; } = new ObservableCollection<string>();
@@ -89,21 +101,21 @@ namespace WpfGrabber.ViewParts
                     var instr = z80.ReadInstruction();
                     var line = new StringBuilder();
                     if (ViewModel.ShowAddr)
-                        sb.Append(instr.Start.ToString("X4")).Append(":\t");
+                        sb.Append(instr.Start.ToString("X4")).Append(": ");
                     if (ViewModel.ShowOpcodes)
                     {
                         var code = z80.Data.GetRange(instr.Start, instr.Len);
                         var os = code.ToHex();
                         sb.Append(os)
                           .Append(new string(' ', 3 * (6 - code.Length)))
-                          .Append("\t");
+                          .Append(" ");
                     }
                     sb.Append(instr.ToString());
                 }
                 catch (Exception e)
                 {
                     if (ViewModel.ShowAddr)
-                        sb.Append(z80.Addr.ToString("X4")).Append(":\t");
+                        sb.Append(z80.Addr.ToString("X4")).Append(": ");
                     var b = z80.ReadByte();//skip byte
                     sb.Append(b.ToString("X2"));
                     sb.Append(" ");
@@ -114,40 +126,31 @@ namespace WpfGrabber.ViewParts
                 result.AppendLine(sb.ToString());
             }
             ViewModel.DumpText = result.ToString(); //to use from TextBox Text={Binding DumpText}
-            ViewModel.DumpLines.Clear();
-            ViewModel.DumpLines.AddRange(dumpLines);
+            ViewModel.DumpLines.AddRange(dumpLines, clear: true);
+        }
 
-            if (richTextBox.IsVisible)
+        private static string HEXNUM = @"[0-9A-F]{4}";
+        private static Regex _regex = new Regex($"(0x{HEXNUM})|(L{HEXNUM})", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        public static IEnumerable<Inline> CreateLineInlines(string line)
+        {
+            //find 0x1234 and L1234 patterns and make them clickable
+            var matches = _regex.Matches(line);
+            if (matches == null || matches.Count == 0)
+                yield return new Run(line);
+            else
             {
-                FlowDocument doc = richTextBox.Document ?? new FlowDocument();
-                var para = new Paragraph();
-                foreach (var line in ViewModel.DumpLines)
+                var lastpos = 0;
+                for (int i = 0; i < matches.Count; i++)
                 {
-                    para.Inlines.AddRange(CreateLineInlines(line));
-                    para.Inlines.Add(new LineBreak());
+                    var m = matches[i];
+                    if (m.Index > lastpos)
+                        yield return new Run(line.Substring(lastpos, m.Index - lastpos));
+                    yield return new Hyperlink(new Run(m.Value)) { DataContext = m.Value };
+                    lastpos = m.Index + m.Length;
                 }
-                doc.Blocks.Clear();
-                doc.Blocks.Add(para);
-                richTextBox.Document = doc;
-
-                //var position = doc.ContentStart;
-                //position.getpo
-
+                if (lastpos < line.Length)
+                    yield return new Run(line.Substring(lastpos));
             }
-        }
-
-        private static Regex _regex = new Regex(@"(0x[0-9a-f]{4})|(L[0-9a-f]{4})", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        private IEnumerable<Inline> CreateLineInlines(string line)
-        {
-            //TODO:find 0x1234 and L1234 patterns and make them clickable
-            //para.Inlines.Add(new Run(line));
-            yield return new Run(line);
-        }
-
-        private void RichTextBoxVisible_Changed(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            if (richTextBox.IsVisible)
-                ShowData();
         }
 
         private void SaveText_Click(object sender, RoutedEventArgs e)
@@ -159,5 +162,79 @@ namespace WpfGrabber.ViewParts
             File.WriteAllText(dlg.FileName, ViewModel.DumpText);
         }
 
+        private void TextBoxSelection_Changed(object sender, RoutedEventArgs e)
+        {
+            if (String.IsNullOrEmpty(textBox.SelectedText))
+                return;
+            var match = _regex.Match(textBox.SelectedText);
+            if (!match.Success)
+            {
+                ViewModel.GoToAddrText = null;
+                return;
+            }
+            //+ matches[0].Index .. +Length
+            ViewModel.GoToAddrText = match.Value;
+            ShowHyperLink(textBox.SelectionStart + match.Index, match);
+        }
+        private void TextBox_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            if (textBox.SelectedText.Length > 0)
+                return;
+            //TODO: wait for moment ?
+            var pos = e.GetPosition(textBox);
+            var textpos = textBox.GetCharacterIndexFromPoint(pos, snapToText: false);
+            if (textpos < 0)
+                return;
+            var startLineTextPos = textBox.GetCharacterIndexFromPoint(new Point(0, pos.Y), snapToText: true);
+            if (startLineTextPos < 0)
+                return;
+            var lineIndex = textBox.GetLineIndexFromCharacterIndex(textpos);
+            var line = textBox.GetLineText(lineIndex);
+            var mousePos = textpos - startLineTextPos;
+
+            var matches = _regex.Match(line, mousePos);
+            while (!matches.Success)
+            {
+                mousePos--;
+                if (mousePos < 0)
+                    break;
+                matches = _regex.Match(line, mousePos);
+            }
+            if (!matches.Success)
+                return;
+
+            ViewModel.GoToAddrText = matches.Captures[0].Value;
+            ShowHyperLink(startLineTextPos, matches);
+        }
+
+        private void ShowHyperLink(int startLineTextPos, Match matches)
+        {
+            var b1 = textBox.GetRectFromCharacterIndex(startLineTextPos + matches.Captures[0].Index);
+            var b2 = textBox.GetRectFromCharacterIndex(startLineTextPos + matches.Captures[0].Index + matches.Captures[0].Length);
+            var p1 = textBox.TranslatePoint(b1.TopLeft, hyperLinkCanvas);
+            var p2 = textBox.TranslatePoint(b2.BottomRight, hyperLinkCanvas);
+            Canvas.SetLeft(hyperLinkSimulation, p1.X);
+            Canvas.SetTop(hyperLinkSimulation, p1.Y);
+            hyperLinkSimulation.Width = p2.X - p1.X;
+            hyperLinkSimulation.Height = p2.Y - p1.Y;
+            hyperLinkCanvas.Visibility = Visibility.Visible;
+        }
+
+        private void GoToAddress_Click(object sender, RoutedEventArgs e)
+        {
+            var s = ViewModel.GoToAddrText;
+            if (s.StartsWith("0x"))
+                s = s.Substring(2);
+            if (s.StartsWith("L"))
+                s = s.Substring(1);
+            var addr = int.Parse(s, System.Globalization.NumberStyles.HexNumber);
+            MessageBox.Show(addr.ToString("X4") + " " + ViewModel.GoToAddrText, "Go to");
+        }
+
+
+        private void textBox_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            hyperLinkSimulation.Height = 0;
+        }
     }
 }
