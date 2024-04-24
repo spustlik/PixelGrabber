@@ -22,6 +22,8 @@ namespace WpfGrabber.Shell
     /// </summary>
     public partial class ShellWindowContent : UserControl, IViewPartService
     {
+        private const int DEFAULT_WIDTH = 300;
+
         public ShellWindowContent()
         {
             InitializeComponent();
@@ -39,14 +41,21 @@ namespace WpfGrabber.Shell
         #region IViewPartService
         private void UpdateGrid()
         {
+            //fix column definitions to be same as children
+            while (partsGrid.ColumnDefinitions.Count > partsGrid.Children.Count)
+                partsGrid.ColumnDefinitions.Remove(partsGrid.ColumnDefinitions.Last());
+            while (partsGrid.ColumnDefinitions.Count < partsGrid.Children.Count)
+                partsGrid.ColumnDefinitions.Add(new ColumnDefinition() {  Width = new GridLength(DEFAULT_WIDTH) });
+            //fix Width of coldef[0]
+            //fix Grid.Column of control to index
             for (int i = 0; i < partsGrid.ColumnDefinitions.Count; i++)
             {
                 var c = partsGrid.ColumnDefinitions[i];
                 if (i == 0)
                     c.Width = new GridLength(1, GridUnitType.Star);
+                var control = partsGrid.Children[i];
+                Grid.SetColumn(control, i);
             }
-            var last = partsGrid.ColumnDefinitions.LastOrDefault();
-            //if(last!=null && last.Width.Value!=)
         }
 
         public IEnumerable<ViewPart> ViewParts => partsGrid.Children.OfType<ViewPartControl>().Select(x => x.Content).OfType<ViewPart>();
@@ -73,7 +82,7 @@ namespace WpfGrabber.Shell
                 Grid.SetColumn(c, partsGrid.Children.Count);
                 partsGrid.Children.Add(c);
             }
-            add(new ViewPartControl() { Content = viewPart }, new GridLength(300));
+            add(new ViewPartControl() { Content = viewPart }, new GridLength(DEFAULT_WIDTH));
             add(new GridSplitter(), GridLength.Auto);
             viewPart.OnInitialize();
             UpdateGrid();
