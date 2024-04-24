@@ -56,8 +56,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\CharConverter.cs" />
     <Compile Include="Converters\HexStringConverter.cs" />
     <Compile Include="Data\ByteBitmap8Bit.cs" />
+    <Compile Include="Data\FontData.cs" />
     <Compile Include="Readers\AlienReader.cs" />
     <Compile Include="Readers\BitImageReader.cs" />
     <Compile Include="Readers\BitReader.cs" />
@@ -66,10 +68,14 @@
       <DependentUpon>ExceptionWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Data\Interval.cs" />
+    <Compile Include="Readers\FontReader.cs" />
     <Compile Include="Readers\MaskReader.cs" />
     <Compile Include="Readers\Z80\Z80Instruction.cs" />
     <Compile Include="Readers\Z80\Z80Reader.cs" />
     <Compile Include="Themes\ResourceEvents.cs" />
+    <Compile Include="ViewParts\FontBinaryViewPart.xaml.cs">
+      <DependentUpon>FontBinaryViewPart.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewParts\MaskedImagesViewPart.xaml.cs">
       <DependentUpon>MaskedImagesViewPart.xaml</DependentUpon>
     </Compile>
@@ -122,6 +128,10 @@
     <Compile Include="ViewParts\ViewPartService.cs" />
     <Compile Include="_ObjectExtensions.cs" />
     <Page Include="ExceptionWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ViewParts\FontBinaryViewPart.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

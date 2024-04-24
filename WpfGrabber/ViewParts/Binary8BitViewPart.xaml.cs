@@ -74,7 +74,8 @@ namespace WpfGrabber.ViewParts
             if (shellVm.DataLength == 0)
                 return;
             var reader = new BitReader(shellVm.Data);
-            reader.Position = shellVm.Offset;
+            reader.BytePosition = shellVm.Offset;
+            reader.ReverseByte = ViewModel.Reversed;
             var w = ViewModel.Width;
            
             var total_w = this.GetFirstValid(imageBorder.ActualWidth, imageBorder.Width, Width, 100);
@@ -108,7 +109,7 @@ namespace WpfGrabber.ViewParts
             dlg.OverwritePrompt = true;
             dlg.FileName = $"{Path.GetFileName(shellVm.FileName)}-{shellVm.Offset}-{shellVm.Offset:X4}-{ViewModel.Width}.data.png";
             var bir = new BitImageReader();
-            var bmp2 = bir.ReadBitmap(new BitReader(shellVm.Data) { Position = shellVm.Offset },
+            var bmp2 = bir.ReadBitmap(new BitReader(shellVm.Data) { BytePosition = shellVm.Offset },
                 ViewModel.Width,
                 (shellVm.DataLength - shellVm.Offset) / (ViewModel.Width / 8),
                 ViewModel.Width, 10);

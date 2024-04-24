@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using WpfGrabber.Shell;
 
 namespace WpfGrabber.ViewParts
@@ -39,6 +40,15 @@ namespace WpfGrabber.ViewParts
         protected virtual void OnShowData()
         {
 
+        }
+
+        protected (int width, int height) GetDataImageSize(FrameworkElement imageBorder)
+        {
+            var h = this.GetFirstValid(imageBorder.ActualHeight, imageBorder.Height, base.Height, 300);
+            h = (int)(h / ShellVm.Zoom);
+            var w = this.GetFirstValid(imageBorder.ActualWidth, imageBorder.Width, base.Width, 500);
+            w = (int)(w / ShellVm.Zoom);
+            return (width: w, height: h);
         }
     }
 }

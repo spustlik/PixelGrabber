@@ -65,17 +65,14 @@ namespace WpfGrabber.ViewParts
             //0x4902
             var images = AlienReader.ReadList(ShellVm.Data, ShellVm.Offset,
                 ViewModel.GetEndPosSafe(ShellVm.DataLength), flipY: ViewModel.FlipVertical);
-            var max_h = this.GetFirstValid(imageBorder.ActualHeight, imageBorder.Height, Height, 300);
-            max_h = (int)(max_h / ShellVm.Zoom);
-            var max_w = this.GetFirstValid(imageBorder.ActualWidth, imageBorder.Width, Width, 500);
-            max_w = (int)(max_w / ShellVm.Zoom);
+            var (max_w, max_h) = GetDataImageSize(imageBorder);
             var rgba = new ByteBitmapRgba(max_w, max_h);
             var posX = 0;
             var posY = 0;
             const int XSPACER = 10;
             const int YSPACER = 0;
             int maxw = 0;
-            foreach (var img in images.Select(a=>a.Bitmap))
+            foreach (var img in images.Select(a => a.Bitmap))
             {
                 if (posY + img.Height > max_h)
                 {
@@ -83,7 +80,7 @@ namespace WpfGrabber.ViewParts
                     posY = 0;
                     maxw = 0;
                 }
-                img.PutToBitmap(rgba, posX, posY);
+                rgba.DrawBitmap(img, posX,posY);
                 posY += img.Height + YSPACER;
                 maxw = Math.Max(maxw, img.Width);
                 if (posX > max_w)
@@ -101,13 +98,13 @@ namespace WpfGrabber.ViewParts
             dlg.FileName = Path.ChangeExtension(ShellVm.FileName, ".png");
             if (dlg.ShowDialog() != true)
                 return;
-            var images = AlienReader.ReadList(ShellVm.Data, ShellVm.Offset, ViewModel.GetEndPosSafe(ShellVm.DataLength), flipY:ViewModel.FlipVertical);
+            var images = AlienReader.ReadList(ShellVm.Data, ShellVm.Offset, ViewModel.GetEndPosSafe(ShellVm.DataLength), flipY: ViewModel.FlipVertical);
             var id = 0;
-            foreach ( var item in images)
-            { 
+            foreach (var item in images)
+            {
                 var img = item.Bitmap;
                 var bmp = new ByteBitmapRgba(img.Width, img.Height);
-                img.PutToBitmap(bmp, 0, 0);
+                bmp.DrawBitmap(img, 0, 0);
                 var bs = bmp.ToBitmapSource();
                 var fileName = Path.ChangeExtension(dlg.FileName, $"{id:00}-{item.Position:X4}-{img.Width}x{img.Height}.png");
                 bs.SaveToPngFile(fileName);

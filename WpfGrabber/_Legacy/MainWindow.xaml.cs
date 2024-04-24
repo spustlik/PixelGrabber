@@ -63,7 +63,7 @@ namespace WpfGrabber
                 Properties.Settings.Default.Save();
             }
             var reader = new BitReader(bytes);
-            reader.Position = ViewModel.Offset;
+            reader.BytePosition = ViewModel.Offset;
             var w = ViewModel.Width;
             var total_w = this.GetFirstValid(imageBorder.ActualWidth, imageBorder.Width, Width);
             var total_h = this.GetFirstValid(imageBorder.ActualHeight, imageBorder.Height, this.Height);
@@ -110,7 +110,7 @@ namespace WpfGrabber
                 return;
             ((BitmapSource)image.Source).SaveToPngFile(dlg.FileName);
             var bir = new BitImageReader();
-            var bmp2 = bir.ReadBitmap(new BitReader(bytes) { Position = ViewModel.Offset },
+            var bmp2 = bir.ReadBitmap(new BitReader(bytes) { BytePosition = ViewModel.Offset },
                 ViewModel.Width,
                 (ViewModel.DataLength - ViewModel.Offset) / (ViewModel.Width / 8),
                 ViewModel.Width, 10);

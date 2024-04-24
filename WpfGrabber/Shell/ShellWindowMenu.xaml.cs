@@ -61,6 +61,7 @@ namespace WpfGrabber.Shell
                 new ViewPartDef<HexDumpViewPart>(){Title = "Hex dump" },
                 new ViewPartDef<DealienViewPart>(){Title = "Dealien"},
                 new ViewPartDef<MaskedImagesViewPart>(){Title = "Binary masked images"},
+                new ViewPartDef<FontBinaryViewPart>(){Title = "Font"},
                 new ViewPartDef<TestViewPart>(){Title = "Test"},
                 new ViewPartDef<TestViewPart>(){Title = "(Z80 disasm)"},
                 new ViewPartDef<TestViewPart>(){Title = "(Font viewer)"},
@@ -80,6 +81,7 @@ namespace WpfGrabber.Shell
             var vps = App.GetService<IViewPartService>();
             vps.Add(part);
             vps.SetOptions(part, vp.Title);
+            e.Handled = true;
         }
 
         private void OnCloseExecuted(object sender, ExecutedRoutedEventArgs e)

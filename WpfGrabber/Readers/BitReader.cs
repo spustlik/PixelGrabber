@@ -6,7 +6,7 @@ namespace WpfGrabber
     {
         private readonly byte[] bytes;
         private int _posbit;
-        public int Position
+        public int BytePosition
         {
             get => _posbit / 8;
             set => _posbit = value * 8;
@@ -32,5 +32,21 @@ namespace WpfGrabber
             _posbit++;
             return bit == 1;
         }
+
+        public static byte GetFlippedX(byte b)
+        {
+            byte r = 0;
+            for (int i = 0; i < 8; i++)
+            {
+                r = (byte)(r << 1);
+                if ((b & 1) == 1)
+                {
+                    r = (byte)(r | 1);
+                }
+                b = (byte)(b >> 1);
+            }
+            return r;
+        }
+
     }
 }

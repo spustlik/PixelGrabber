@@ -1,0 +1,119 @@
+﻿<local:FontBinaryViewPartBase x:Class="WpfGrabber.ViewParts.FontBinaryViewPart"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfGrabber.ViewParts" xmlns:c="clr-namespace:WpfGrabber.Controls" 
+                              mc:Ignorable="d" d:DesignHeight="216.62" d:DesignWidth="382.314" >
+    <d:DesignerProperties.DesignStyle>
+        <Style TargetType="UserControl">
+            <Setter Property="Background" Value="White" />
+        </Style>
+    </d:DesignerProperties.DesignStyle>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <ItemsControl Style="{StaticResource toolbar}">
+            <ItemsControl.Resources>
+                <Style TargetType="StackPanel">
+                    <Setter Property="Orientation" Value="Horizontal" />
+                </Style>
+            </ItemsControl.Resources>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <StackPanel>
+                <Label>Space</Label>
+                <c:NumberEditor Value="{Binding SpaceX}" Maximum="10" Width="70" SliderWidth="0"/>
+            </StackPanel>
+            <Separator/>
+            <StackPanel>
+                <Label>Height</Label>
+                <c:NumberEditor Value="{Binding Height}" Maximum="40" Width="70" SliderWidth="0"/>
+            </StackPanel>
+            <Separator/>
+            <CheckBox IsChecked="{Binding FlipX}">FlipX</CheckBox>
+            <Separator/>
+            <CheckBox IsChecked="{Binding FlipY}">FlipY</CheckBox>
+            <Separator/>
+            <Button Content="Save" Style="{StaticResource dropDown}">
+                <Button.ContextMenu>
+                    <ContextMenu Placement="Bottom">
+                        <MenuItem Header="Save font image..." Click="OnButtonSaveImage_Click"/>
+                    </ContextMenu>
+                </Button.ContextMenu>
+            </Button>
+        </ItemsControl>
+        <StackPanel Grid.Row="1" Orientation="Vertical">
+            <StackPanel.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="Background" Value="LightBlue" />
+                    <Setter Property="Padding" Value="10,5" />
+                    <Setter Property="Margin" Value="0,2" />
+                </Style>
+                <Style TargetType="Label">
+                    <Setter Property="Margin" Value="0" />
+                    <Setter Property="Height" Value="23" />
+                </Style>
+                <Style TargetType="Button">
+                    <Setter Property="Height" Value="23" />
+                </Style>
+            </StackPanel.Resources>
+            <Border>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Label>Font characters: </Label>
+                    <TextBox Grid.Column="1" Text="{Binding FontCharacters, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Grid.Column="2" Style="{StaticResource dropDown}" Content="">
+                        <Button.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="ASCII" Click="SetFontCharsAscii_Click"/>
+                                <MenuItem Header="Simple" Click="SetFontCharsSimple_Click"/>
+                            </ContextMenu>
+                        </Button.ContextMenu>
+                    </Button>
+                </Grid>
+            </Border>
+            <Border>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Label>Test text:</Label>
+                    <TextBox Grid.Column="1" Text="{Binding TestText, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Grid.Column="2" Style="{StaticResource dropDown}" Content="">
+                        <Button.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="ASCII" Click="SetAsciiTestText_Click"/>
+                                <MenuItem Header="Lorem ipsum" Click="SetLoremTestText_Click"/>
+                            </ContextMenu>
+                        </Button.ContextMenu>
+                    </Button>
+                </Grid>
+            </Border>
+
+        </StackPanel>
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+            <Border x:Name="imageBorder" 
+                    SizeChanged="BorderSize_Changed"
+                    Style="{StaticResource checkerBorder}">
+                <Canvas Margin="10">
+                    <Image x:Name="image" Stretch="None" RenderOptions.BitmapScalingMode="NearestNeighbor"
+                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                </Canvas>
+            </Border>
+        </ScrollViewer>
+    </Grid>
+
+</local:FontBinaryViewPartBase>

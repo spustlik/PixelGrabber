@@ -28,7 +28,7 @@ namespace WpfGrabber.Readers
                     for (int x = 0; x < w; x++)
                     {
                         var bit = reader.ReadBit();
-                        if (reader.Position >= reader.DataLength)
+                        if (reader.BytePosition >= reader.DataLength)
                             break;
                         var dest = y * total_w + x + columnX;
                         if (dest >= pixels.Length)

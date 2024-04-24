@@ -56,5 +56,49 @@ namespace WpfGrabber
                 return 0x00000000;
             return Data[x + y * Width];
         }
+
+        public void DrawBitmap(ByteBitmap8Bit src, int posX,int posY, Func<byte, uint> colorizer = null)
+        {
+            if (colorizer == null)
+            {
+                colorizer = GetColor01Gray;
+            }
+            for (int y = 0; y < src.Width; y++)
+            {
+                for (int x = 0; x < src.Width; x++)
+                {
+                    var b = src.GetPixel(x, y);
+                    var c = colorizer(b);
+                    SetPixel(posX + x, posY + y, c);
+                }
+            }
+        }
+
+        public static uint GetColor01Gray(byte b)
+        {
+            switch (b)
+            {
+                case 0: return 0xFFFFFFFF;
+                case 1: return 0;
+                default: return GetColorGray(b);
+            }
+        }
+
+        public static uint GetColorBlack(byte b)
+        {
+            if (b == 0) return 0;
+            return 0xFF000000;
+        }
+        public static uint GetColorWhite(byte b)
+        {
+            if (b == 0) return 0;
+            return 0xFFFFFFFF;
+        }
+        public static uint GetColorGray(byte b)
+        {
+            var d = (uint)b;
+            return 0xff000000 | d | d >> 8 | d >> 16;
+        }
+
     }
 }
