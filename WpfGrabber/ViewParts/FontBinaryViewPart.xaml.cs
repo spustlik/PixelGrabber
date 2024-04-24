@@ -141,6 +141,19 @@ namespace WpfGrabber.ViewParts
 
             bmp.ToBitmapSource().SaveToPngFile(dlg.FileName);
         }
+        private void OnButtonSaveSampleTextImage_Click(object sender, RoutedEventArgs e)
+        {
+            var dlg = new SaveFileDialog();
+            dlg.DefaultExt = "png";
+            dlg.FileName = Path.GetFileNameWithoutExtension(ShellVm.FileName) + "-text.png";
+            if (dlg.ShowDialog() != true)
+                return;
+            var font = CreateFont();
+            var bmp = new ByteBitmapRgba(ViewModel.TestText.Length * font.Letters.First().Width, font.Letters.Max(x=>x.Height));
+            font.DrawString(bmp, 0, 0, ViewModel.TestText, 0xFFFFFFFF);
+            bmp.ToBitmapSource().SaveToPngFile(dlg.FileName);
+
+        }
 
         private void SetFontCharsAscii_Click(object sender, RoutedEventArgs e)
         {
@@ -161,5 +174,7 @@ namespace WpfGrabber.ViewParts
         {
             ViewModel.TestText = "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Nulla pulvinar eleifend sem.";
         }
+
+
     }
 }

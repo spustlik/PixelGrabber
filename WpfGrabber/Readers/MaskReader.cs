@@ -12,13 +12,6 @@ namespace WpfGrabber.Readers
 {
     public class MaskReader
     {
-        public void Process(BitmapImage source, int itemHeight, int itemsCount)
-        {
-            var src = ByteBitmapRgba.FromBitmapSource(source);
-            var dst = new ByteBitmapRgba(src.Width, src.Height);
-            ProcessMask(src, dst, itemHeight, itemsCount);
-            dst.ToBitmapSource();
-        }
 
         private void ProcessMask(ByteBitmapRgba src, ByteBitmapRgba dst, int itemHeight, int itemsCount)
         {

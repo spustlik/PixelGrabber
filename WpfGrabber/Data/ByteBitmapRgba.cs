@@ -33,7 +33,12 @@ namespace WpfGrabber
             bmp.WritePixels(new Int32Rect(0, 0, Width, Height), Data, Width * 4, 0);
             return bmp;
         }
-
+        public byte[] ToBytes()
+        {
+            var bytes= new byte[Data.Length*sizeof(uint)];
+            Array.Copy(Data, bytes, Data.Length);
+            return bytes;
+        }
         public static ByteBitmapRgba FromBitmapSource(BitmapSource src)
         {
             int width = (int)src.Width;
@@ -63,7 +68,7 @@ namespace WpfGrabber
             {
                 colorizer = GetColor01Gray;
             }
-            for (int y = 0; y < src.Width; y++)
+            for (int y = 0; y < src.Height; y++)
             {
                 for (int x = 0; x < src.Width; x++)
                 {

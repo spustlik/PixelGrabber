@@ -45,6 +45,7 @@
                 <Button.ContextMenu>
                     <ContextMenu Placement="Bottom">
                         <MenuItem Header="Save font image..." Click="OnButtonSaveImage_Click"/>
+                        <MenuItem Header="Save sample text image..." Click="OnButtonSaveSampleTextImage_Click"/>
                     </ContextMenu>
                 </Button.ContextMenu>
             </Button>

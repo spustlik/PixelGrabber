@@ -34,7 +34,7 @@ namespace WpfGrabber.Readers
                 }
                 yield return letter;
                 counter++;
-                if (counter > count)
+                if (counter >= count)
                     break;
             }
         }

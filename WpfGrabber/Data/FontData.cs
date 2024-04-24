@@ -27,14 +27,14 @@ namespace WpfGrabber.Data
             font.TryGetValue(c, out var r);
             return r;
         }
-        public void DrawString(ByteBitmapRgba target, int x, int y, string text)
+        public void DrawString(ByteBitmapRgba target, int x, int y, string text, uint color = 0xFF000000)
         {
             for (int i = 0; i < text.Length; i++)
             {
                 var c = GetCharBmp(text[i]);
                 if (c != null)
                 {
-                    DrawLetter(target, x, y, c);
+                    DrawLetter(target, x, y, c, color);
                     x += c.Width;
                 }
                 else
