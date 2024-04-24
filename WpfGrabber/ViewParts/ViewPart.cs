@@ -19,10 +19,7 @@ namespace WpfGrabber.ViewParts
         public ViewPart()
         {
         }
-        public virtual void OnDataChanged(DataChangedArgs args)
-        {
-
-        }
+        
         public virtual void OnInitialize()
         {
 

@@ -1,4 +1,4 @@
-﻿<local:ViewPart x:Class="WpfGrabber.ViewParts.HexDumpViewPart"
+﻿<local:HexDumpViewPartBase x:Class="WpfGrabber.ViewParts.HexDumpViewPart"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -26,4 +26,4 @@
             <ItemsControl ItemsSource="{Binding HexLines}" FontFamily="Courier New" FontSize="10"/>
         </ScrollViewer>
     </Grid>
-</local:ViewPart>
+</local:HexDumpViewPartBase>

@@ -19,92 +19,72 @@ using WpfGrabber.Shell;
 
 namespace WpfGrabber.ViewParts
 {
-    /// <summary>
-    /// Interaction logic for HexDumpViewPart.xaml
-    /// </summary>
-    public partial class HexDumpViewPart : ViewPart
+    public class HexDumpVM : SimpleDataObject
     {
-        private ShellVm shellVm;
+
+        #region ShowAddr property
+        private bool _showAddr;
+        public bool ShowAddr
+        {
+            get => _showAddr;
+            set => Set(ref _showAddr, value);
+        }
+        #endregion
+
+        #region ShowAscii property
+        private bool _showAscii;
+        public bool ShowAscii
+        {
+            get => _showAscii;
+            set => Set(ref _showAscii, value);
+        }
+        #endregion
+
+        #region ShowHex property
+        private bool _showHex = true;
+        public bool ShowHex
+        {
+            get => _showHex;
+            set => Set(ref _showHex, value);
+        }
+        #endregion
+
+        [XmlIgnore]
+        public ObservableCollection<string> HexLines { get; private set; } = new ObservableCollection<string>();
+    }
+
+    public class HexDumpViewPartBase : ViewPartDataViewer<HexDumpVM>
+    {
+
+    }
+
+    public partial class HexDumpViewPart : HexDumpViewPartBase
+    {
 
         public HexDumpViewPart()
         {
-            DataContext = new HexDumpVM();
             InitializeComponent();
-            ViewModel.PropertyChanged += ViewModel_PropertyChanged;
-        }
-        public override void OnInitialize()
-        {
-            base.OnInitialize();
-            shellVm = App.GetService<ShellVm>();
-            shellVm.PropertyChanged += ShellVm_PropertyChanged;
-            ShowData();
         }
 
-        public HexDumpVM ViewModel => DataContext as HexDumpVM;
-        public class HexDumpVM : SimpleDataObject
+        protected override void ShellVm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-
-            #region ShowAddr property
-            private bool _showAddr;
-            public bool ShowAddr
-            {
-                get => _showAddr;
-                set => Set(ref _showAddr, value);
-            }
-            #endregion
-
-            #region ShowAscii property
-            private bool _showAscii;
-            public bool ShowAscii
-            {
-                get => _showAscii;
-                set => Set(ref _showAscii, value);
-            }
-            #endregion
-
-            #region ShowHex property
-            private bool _showHex = true;
-            public bool ShowHex
-            {
-                get => _showHex;
-                set => Set(ref _showHex, value);
-            }
-            #endregion
-
-            [XmlIgnore]
-            public ObservableCollection<string> HexLines { get; private set; } = new ObservableCollection<string>();
-        }
-
-        private void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            ShowData();
-        }
-        private void ShellVm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(ShellVm.Data)
-                || e.PropertyName == nameof(ShellVm.Offset)
+            if (e.PropertyName == nameof(Shell.ShellVm.Data)
+                || e.PropertyName == nameof(Shell.ShellVm.Offset)
                 )
             {
-                ShowData();
+                base.ShellVm_PropertyChanged(sender, e);
             }
         }
-
-
-        private void ShowData()
+        protected override void OnShowData()
         {
-            if (shellVm.DataLength <= 0)
+            if (ShellVm.DataLength <= 0)
                 return;
-            var rd = new HexReader(shellVm.Data, shellVm.Offset);
+            var rd = new HexReader(ShellVm.Data, ShellVm.Offset);
             ViewModel.HexLines.AddRange(rd.ReadLines(
                 showAddr: ViewModel.ShowAddr,
                 showAscii: ViewModel.ShowAscii,
                 showHex: ViewModel.ShowHex)
                 .Take(100), clear: true);
-        }
-
-        public override void OnDataChanged(DataChangedArgs args)
-        {
-            base.OnDataChanged(args);
         }
 
     }
