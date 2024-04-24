@@ -51,7 +51,7 @@ namespace WpfGrabber.ViewParts
 
         private void BorderSize_Changed(object sender, SizeChangedEventArgs e)
         {
-            ShowData();
+            OnShowData();
         }
 
         protected override void OnShowData()
