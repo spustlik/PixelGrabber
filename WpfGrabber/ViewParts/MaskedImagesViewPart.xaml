@@ -3,8 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:WpfGrabber.ViewParts"
-             mc:Ignorable="d" 
+             xmlns:local="clr-namespace:WpfGrabber.ViewParts" xmlns:c="clr-namespace:WpfGrabber.Controls"
+                                mc:Ignorable="d" 
              d:DesignHeight="452.516" d:DesignWidth="367.195">
     <d:DesignerProperties.DesignStyle>
         <Style TargetType="UserControl">
@@ -17,8 +17,15 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <ItemsControl Style="{StaticResource toolbar}">
-            <!--<Label Content="End pos"/>
-            <c:NumberEditor Value="{Binding EndPos}" Maximum="{Binding ShellVm.DataLength, ElementName=root}" Width="160"/>
+            <CheckBox Content="Flip X" IsChecked="{Binding FlipX}"/>
+            <Separator/>
+            <CheckBox Content="Flip Y" IsChecked="{Binding FlipY}"/>
+            <Separator/>
+            <Label Content="Width"/>
+            <c:NumberEditor Value="{Binding WidthBytes}" Minimum="1" Width="70"/>
+            <Separator/>
+            <Label Content="Height"/>
+            <c:NumberEditor Value="{Binding Height}" Minimum="1" Width="70"/>
             <Separator/>
             <Button Content="Save" Style="{StaticResource dropDown}">
                 <Button.ContextMenu>
@@ -27,7 +34,7 @@
                         <MenuItem Header="Save to one image..." Click="OnButtonSave_Click"/>
                     </ContextMenu>
                 </Button.ContextMenu>
-            </Button>-->
+            </Button>
         </ItemsControl>
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <Border x:Name="imageBorder" 
@@ -36,7 +43,6 @@
                 <Canvas Margin="10">
                     <Image x:Name="image" Stretch="None" RenderOptions.BitmapScalingMode="NearestNeighbor"
                             HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-                    <Label Content="Not implemented"/>
                 </Canvas>
             </Border>
         </ScrollViewer>

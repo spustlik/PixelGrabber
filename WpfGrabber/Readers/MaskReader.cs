@@ -10,8 +10,70 @@ using System.Xaml;
 
 namespace WpfGrabber.Readers
 {
+    // vzdy dva byte DATA,MASK, nejaka vyska a (sirka v bytech)
     public class MaskReader
     {
+        public byte[] Data { get; }
+        public int DataLength =>Data.Length;
+        public int Position { get; set; }
+        public int WidthBytes { get; set; } = 3;
+        public int Height { get; set; } = 16;
+        public bool FlipX { get;set; }
+        public bool FlipY { get;set; }
+        public MaskReader(byte[] data)
+        {
+            Data = data;
+        }
+
+        protected byte ReadByte()
+        {
+            if (Position >= DataLength)
+                return 0;
+            return Data[Position++];
+        }
+
+        public ByteBitmap8Bit Read()
+        {
+            var result = new ByteBitmap8Bit(WidthBytes * 8, Height);
+            for (var y = 0; y < Height; y++)
+            {
+                var posY = y;
+                if (FlipY)
+                    posY = Height - y;
+                for (int x = 0; x < WidthBytes; x++)
+                {
+                    var data = ReadByte();
+                    if (FlipX)
+                        data = BitReader.GetFlippedX(data);
+                    var mask = ReadByte();
+                    if (FlipX)
+                        mask = BitReader.GetFlippedX(mask);
+                    for(var i = 0; i < 8; i++)
+                    {
+                       byte b = 0;
+                        if ((mask & 1) != 0)
+                        {
+                            if ((data & 1) == 0)
+                                b = 1;
+                            else
+                                b = 2;
+                        }
+                        result.SetPixel(x * 8 + i, posY, b);
+                        data = (byte)(data >> 1);
+                        mask = (byte)(mask >> 1);
+                    }
+                }
+            }
+            return result;
+        }
+
+        public void Process(BitmapImage source, int itemHeight, int itemsCount)
+        {
+            var src = ByteBitmapRgba.FromBitmapSource(source);
+            var dst = new ByteBitmapRgba(src.Width, src.Height);
+            ProcessMask(src, dst, itemHeight, itemsCount);
+            dst.ToBitmapSource();
+        }
 
         private void ProcessMask(ByteBitmapRgba src, ByteBitmapRgba dst, int itemHeight, int itemsCount)
         {

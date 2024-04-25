@@ -39,10 +39,10 @@ namespace WpfGrabber
         {
             var src = new BitmapImage();
             src.LoadFromFile(ViewModel.FileName);
-            var p = new MaskReader();
-            var bmp = p.ProcessMask(src, ViewModel.Height, ViewModel.ItemsCount);
-            image.RenderTransform = new ScaleTransform(ViewModel.Zoom, ViewModel.Zoom);
-            image.Source = bmp;
+            //var p = new MaskReader();
+            //var bmp = p.ProcessMask(src, ViewModel.Height, ViewModel.ItemsCount);
+            //image.RenderTransform = new ScaleTransform(ViewModel.Zoom, ViewModel.Zoom);
+            //image.Source = bmp;
         }
 
 
@@ -65,9 +65,9 @@ namespace WpfGrabber
             if(dlg.ShowDialog() != true) 
                 return;
             var src = new BitmapImage(new Uri(ViewModel.FileName));
-            var rd = new MaskReader();
-            var bmp = rd.ProcessMask(src, ViewModel.Height, ViewModel.ItemsCount);
-            bmp.SaveToPngFile(dlg.FileName);
+            //var rd = new MaskReader();
+            //var bmp = rd.ProcessMask(src, ViewModel.Height, ViewModel.ItemsCount);
+            //bmp.SaveToPngFile(dlg.FileName);
         }
     }
 }
