@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
@@ -52,6 +53,21 @@ namespace WpfGrabber.Shell
         }
         #endregion
 
+
+        #region Zoom100 property
+        public double Zoom100
+        {
+            get => Zoom * 100;
+            set => Zoom = value / 100;
+        }
+        #endregion
+        protected override void DoPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            base.DoPropertyChanged(propertyName);
+            if (propertyName == nameof(Zoom))
+                base.DoPropertyChanged(nameof(Zoom100));
+        }
+
         [XmlIgnore]
         public byte[] Data { get; private set; }
         public void LoadData(string fileName)
@@ -82,7 +98,7 @@ namespace WpfGrabber.Shell
 
         private void AddRecentFile(string fileName)
         {
-            var i = RecentFiles.FindIndex(x=>String.Compare(x, fileName, StringComparison.OrdinalIgnoreCase) == 0);
+            var i = RecentFiles.FindIndex(x => String.Compare(x, fileName, StringComparison.OrdinalIgnoreCase) == 0);
             if (i >= 0)
                 return;
             RecentFiles.Add(fileName);

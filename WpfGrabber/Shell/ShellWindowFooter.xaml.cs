@@ -24,5 +24,22 @@ namespace WpfGrabber.Shell
         {
             InitializeComponent();
         }
+
+        public ShellVm ShellVm { get; private set; }
+
+        protected override void OnInitialized(EventArgs e)
+        {
+            base.OnInitialized(e);
+            ShellVm = App.Current.ServiceProvider.GetService<ShellVm>();
+        }
+        private void ZoomMinus_Click(object sender, RoutedEventArgs e)
+        {
+            ShellVm.Zoom = ShellVm.Zoom / 2;
+        }
+
+        private void ZoomPlus_Click(object sender, RoutedEventArgs e)
+        {
+            ShellVm.Zoom = ShellVm.Zoom * 2;
+        }
     }
 }

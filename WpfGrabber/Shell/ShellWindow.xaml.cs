@@ -38,7 +38,12 @@ namespace WpfGrabber.Shell
 
         private void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            AppConfig.Save(ViewModel);
+            Dispatcher.BeginInvoke((Action)delegate
+            {
+                AppConfig.Save(ViewModel);
+            });
+
+            
         }
 
     }

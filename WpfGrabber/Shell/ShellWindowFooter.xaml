@@ -3,18 +3,54 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:WpfGrabber.Shell" xmlns:controls="clr-namespace:WpfGrabber.Controls"
+             xmlns:local="clr-namespace:WpfGrabber.Shell" xmlns:controls="clr-namespace:WpfGrabber.Controls" xmlns:s="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
-             d:DesignHeight="50" d:DesignWidth="800">
+             d:DesignHeight="50" d:DesignWidth="800"
+             FocusManager.IsFocusScope="True">
     <StatusBar>
+        <StatusBar.Resources>
+            <ZoomPercentageConverter x:Key="zoomConv"/>
+            <Style TargetType="Button">
+                <Setter Property="Width" Value="22" />
+            </Style>
+            <Style TargetType="Path">
+                <Setter Property="Stroke" Value="{Binding Foreground,RelativeSource={RelativeSource AncestorType=Button}}" />
+            </Style>
+        </StatusBar.Resources>
         <StatusBarItem>
             <TextBlock Text="{Binding StatusBarMessage}"/>
         </StatusBarItem>
         <StatusBarItem HorizontalAlignment="Right">
             <StackPanel Grid.Column="1" Orientation="Horizontal" >
-                <Label Content="Zoom" Padding="5,0"/>
-                <TextBlock Text="{Binding Zoom, StringFormat=0.00}" Padding="5,0"/>
-                <Slider Minimum="0.1" Maximum="16" Width="120" Value="{Binding Zoom}"/>
+                <Label Content="Zoom " Padding="5,0" VerticalAlignment="Center"/>
+                <Button Click="ZoomMinus_Click">
+                    <Path Data="M0,0 L10,0" StrokeThickness="2"/>
+                </Button>
+                <ComboBox IsEditable="True" 
+                          Text="{Binding Zoom100, Converter={StaticResource zoomConv}}"
+                          MinWidth="60"
+                          >
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding ., Converter={StaticResource zoomConv}}"/>
+                            <!--<Run Text="{Binding .}"/>
+                            <Run Text=" %"/>-->
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                    <s:Double>25</s:Double>
+                    <s:Double>50</s:Double>
+                    <s:Double>75</s:Double>
+                    <s:Double>100</s:Double>
+                    <s:Double>125</s:Double>
+                    <s:Double>150</s:Double>
+                    <s:Double>200</s:Double>
+                    <s:Double>300</s:Double>
+                    <s:Double>400</s:Double>
+                    <s:Double>500</s:Double>
+                </ComboBox>
+                <Button Click="ZoomPlus_Click">
+                    <Path Data="M5,0 L5,10 M0,5 L10,5" StrokeThickness="2"/>
+                </Button>
             </StackPanel>
 
         </StatusBarItem>
