@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:WpfGrabber.Shell" xmlns:c="clr-namespace:WpfGrabber.Controls"
              mc:Ignorable="d" 
              HorizontalAlignment="Stretch"
+             FocusManager.IsFocusScope="true"
              Height="30" d:DesignWidth="414.944">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="boolToVisi"/>

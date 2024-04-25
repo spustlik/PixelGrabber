@@ -18,6 +18,7 @@
                 </Setter>
             </Style>
         </Style.Resources>
+        <Setter Property="FocusManager.IsFocusScope" Value="true" />
         <Setter Property="ItemsPanel">
             <Setter.Value>
                 <ItemsPanelTemplate>

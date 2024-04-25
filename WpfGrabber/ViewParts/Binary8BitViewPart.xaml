@@ -21,7 +21,7 @@
             <!--<TextBox Text="{Binding Width}"/>-->
             <c:NumberEditor Maximum="256" Value="{Binding Width}" Minimum="1" Width="200" SliderWidth="120"/>
             <Separator/>
-            <CheckBox Content="Reversed" IsChecked="{Binding Reversed}"/>
+            <CheckBox Content="Flip X" IsChecked="{Binding Reversed}"/>
             <Separator/>
             <Button Content="Save..." Style="{StaticResource dropDown}">
                 <Button.ContextMenu>

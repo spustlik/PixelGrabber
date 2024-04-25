@@ -50,11 +50,30 @@ namespace WpfGrabber.Shell
             //fix Grid.Column of control to index
             for (int i = 0; i < partsGrid.ColumnDefinitions.Count; i++)
             {
-                var c = partsGrid.ColumnDefinitions[i];
-                if (i == 0)
-                    c.Width = new GridLength(1, GridUnitType.Star);
-                var control = partsGrid.Children[i];
-                Grid.SetColumn(control, i);
+                var col = partsGrid.ColumnDefinitions[i];
+                var con = partsGrid.Children[i];
+                if (i == partsGrid.Children.Count-1)
+                {
+                    //last viewpart - star
+                    col.Width = new GridLength(1, GridUnitType.Star);
+                }
+                else
+                {
+                    if(i%2==1)
+                    {
+                        //splitter
+                        col.Width = GridLength.Auto;
+                    }
+                    else
+                    {
+                        //convert star viewpart to implicit width
+                        if (col.Width.IsStar)
+                            if (con is ViewPartControl vpc)
+                                //if (!double.IsNaN(vpc.ActualWidth))
+                                    col.Width = new GridLength(DEFAULT_WIDTH);
+                    }
+                }
+                Grid.SetColumn(con, i);
             }
         }
 
@@ -74,18 +93,13 @@ namespace WpfGrabber.Shell
         {
             if (GetViewPartControlIndex(viewPart) >= 0)
                 return;
-            var vpc = new ViewPartControl();
-            vpc.Content = viewPart;
-            void add(Control c, GridLength width)
-            {
-                partsGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = width });
-                Grid.SetColumn(c, partsGrid.Children.Count);
-                partsGrid.Children.Add(c);
-            }
-            add(new ViewPartControl() { Content = viewPart }, new GridLength(DEFAULT_WIDTH));
-            add(new GridSplitter(), GridLength.Auto);
-            viewPart.OnInitialize();
+
+            //add ([splitter] if not first)[viewpart]
+            if (partsGrid.Children.Count > 0)
+                partsGrid.Children.Add(new GridSplitter());
+            partsGrid.Children.Add(new ViewPartControl() { Content = viewPart });
             UpdateGrid();
+            viewPart.OnInitialize();
         }
 
         void IViewPartService.Remove(ViewPart viewPart)
