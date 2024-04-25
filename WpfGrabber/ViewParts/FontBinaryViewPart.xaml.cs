@@ -65,8 +65,6 @@ namespace WpfGrabber.ViewParts
             set => Set(ref _fontCharacters, value);
         }
         #endregion
-
-
     }
 
     public class FontBinaryViewPartBase : ViewPartDataViewer<FontBinaryVM>
@@ -157,7 +155,7 @@ namespace WpfGrabber.ViewParts
 
         private void SetFontCharsAscii_Click(object sender, RoutedEventArgs e)
         {
-            ViewModel.FontCharacters = CharRange(' ', (char)127);
+            ViewModel.FontCharacters = CharRange(' ', (char)126); // \u007f is some invisible char which is hardly to delete from string
         }
 
         private void SetFontCharsSimple_Click(object sender, RoutedEventArgs e)
@@ -167,7 +165,7 @@ namespace WpfGrabber.ViewParts
 
         private void SetAsciiTestText_Click(object sender, RoutedEventArgs e)
         {
-            ViewModel.TestText = CharRange(' ', (char)127);
+            ViewModel.TestText = CharRange(' ', (char)126);
         }
 
         private void SetLoremTestText_Click(object sender, RoutedEventArgs e)

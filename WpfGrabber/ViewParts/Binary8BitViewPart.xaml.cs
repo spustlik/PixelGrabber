@@ -92,6 +92,8 @@ namespace WpfGrabber.ViewParts
             dlg.DefaultExt = "png";
             dlg.OverwritePrompt = true;
             dlg.FileName = $"{Path.GetFileName(ShellVm.FileName)}-{ShellVm.Offset}-{ShellVm.Offset:X4}-{ViewModel.Width}.data.png";
+            if(dlg.ShowDialog() != true) 
+                return;
             var bir = new BitImageReader();
             var bmp2 = bir.ReadBitmap(new BitReader(ShellVm.Data) { BytePosition = ShellVm.Offset },
                 ViewModel.Width,
