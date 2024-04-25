@@ -23,7 +23,7 @@ namespace WpfGrabber.ViewParts
     {
 
         #region ShowAddr property
-        private bool _showAddr;
+        private bool _showAddr = true;
         public bool ShowAddr
         {
             get => _showAddr;
@@ -32,7 +32,7 @@ namespace WpfGrabber.ViewParts
         #endregion
 
         #region ShowAscii property
-        private bool _showAscii;
+        private bool _showAscii = true;
         public bool ShowAscii
         {
             get => _showAscii;
@@ -51,6 +51,17 @@ namespace WpfGrabber.ViewParts
 
         [XmlIgnore]
         public ObservableCollection<string> HexLines { get; private set; } = new ObservableCollection<string>();
+
+        [XmlIgnore]
+        #region HexDump property
+        private string _hexDump;
+        public string HexDump
+        {
+            get => _hexDump;
+            set => Set(ref _hexDump, value);
+        }
+        #endregion
+
     }
 
     public class HexDumpViewPartBase : ViewPartDataViewer<HexDumpVM>
@@ -80,11 +91,14 @@ namespace WpfGrabber.ViewParts
             if (ShellVm.DataLength <= 0)
                 return;
             var rd = new HexReader(ShellVm.Data, ShellVm.Offset);
-            ViewModel.HexLines.AddRange(rd.ReadLines(
+            var lines = rd.ReadLines(
                 showAddr: ViewModel.ShowAddr,
                 showAscii: ViewModel.ShowAscii,
                 showHex: ViewModel.ShowHex)
-                .Take(100), clear: true);
+                .Take(100)
+                .ToArray();
+            ViewModel.HexDump = string.Join("\n", lines);
+            ViewModel.HexLines.AddRange(lines, clear: true);
         }
 
     }

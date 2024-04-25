@@ -194,6 +194,8 @@ namespace WpfGrabber.ViewParts
         {
             var b1 = textBox.GetRectFromCharacterIndex(startLineTextPos + matches.Captures[0].Index);
             var b2 = textBox.GetRectFromCharacterIndex(startLineTextPos + matches.Captures[0].Index + matches.Captures[0].Length);
+            if (b1.Top != b2.Top || b1.Left > b2.Left)
+                return;
             var p1 = textBox.TranslatePoint(b1.TopLeft, hyperLinkCanvas);
             var p2 = textBox.TranslatePoint(b2.BottomRight, hyperLinkCanvas);
             Canvas.SetLeft(hyperLinkSimulation, p1.X);
