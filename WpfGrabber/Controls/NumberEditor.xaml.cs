@@ -78,6 +78,17 @@ namespace WpfGrabber.Controls
             DependencyProperty.Register("SliderWidth", typeof(double), typeof(NumberEditor), new PropertyMetadata(0.0d));
         #endregion
 
+        #region LargeChange
+        public int LargeChange
+        {
+            get { return (int)GetValue(LargeChangeProperty); }
+            set { SetValue(LargeChangeProperty, value); }
+        }
+
+        public static readonly DependencyProperty LargeChangeProperty =
+            DependencyProperty.Register("LargeChange", typeof(int), typeof(NumberEditor), new PropertyMetadata(8));
+        #endregion
+
 
 
         private void ButtonMinus_Click(object sender, RoutedEventArgs e)
@@ -88,6 +99,19 @@ namespace WpfGrabber.Controls
         private void ButtonPlus_Click(object sender, RoutedEventArgs e)
         {
             Value += 1;
+        }
+
+        private void ButtonPageSize_Click(object sender, RoutedEventArgs e)
+        {
+            var mi = sender as MenuItem;
+            if (mi == null)
+                return;
+            var s = mi.Header as string;
+            if (String.IsNullOrEmpty(s))
+                return;
+            if (!int.TryParse(s, out var page))
+                return;
+            LargeChange = page;
         }
     }
 }

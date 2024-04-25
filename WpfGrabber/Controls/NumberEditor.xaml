@@ -42,11 +42,25 @@
             <Path Data="M5,0 L5,10 M0,5 L10,5" 
                   StrokeThickness="2"/>
         </RepeatButton>
-        <Slider Grid.Column="2" VerticalAlignment="Center" 
+        <Slider Grid.Column="2" VerticalAlignment="Center" Margin="-2,0,-4,0"
                 Width="{Binding SliderWidth, ElementName=root}"
                 Value="{Binding Value, ElementName=root}" 
-                Minimum="{Binding Minimum, ElementName=root}"
-                Maximum="{Binding Maximum, ElementName=root}" LargeChange="8"
-                />
+                Minimum="{Binding Minimum, ElementName=root}"                
+                Maximum="{Binding Maximum, ElementName=root}"
+                LargeChange="{Binding LargeChange, ElementName=root}"
+                >
+            <Slider.ContextMenu>
+                <ContextMenu >
+                    <MenuItem Header="Page size">
+                        <MenuItem Header="1" Click="ButtonPageSize_Click"/>
+                        <MenuItem Header="8" Click="ButtonPageSize_Click"/>
+                        <MenuItem Header="16" Click="ButtonPageSize_Click"/>
+                        <MenuItem Header="32" Click="ButtonPageSize_Click"/>
+                        <MenuItem Header="64" Click="ButtonPageSize_Click"/>
+                        <MenuItem Header="128" Click="ButtonPageSize_Click"/>
+                    </MenuItem>
+                </ContextMenu>
+            </Slider.ContextMenu>
+        </Slider>
     </Grid>
 </UserControl>
