@@ -51,14 +51,14 @@
                 >
             <Slider.ContextMenu>
                 <ContextMenu >
-                    <MenuItem Header="Page size">
-                        <MenuItem Header="1" Click="ButtonPageSize_Click"/>
-                        <MenuItem Header="8" Click="ButtonPageSize_Click"/>
-                        <MenuItem Header="16" Click="ButtonPageSize_Click"/>
-                        <MenuItem Header="32" Click="ButtonPageSize_Click"/>
-                        <MenuItem Header="64" Click="ButtonPageSize_Click"/>
-                        <MenuItem Header="128" Click="ButtonPageSize_Click"/>
-                    </MenuItem>
+                    <MenuItem Header="Page size:" IsEnabled="False"/>
+                    <MenuItem Header="1" Click="ButtonPageSize_Click"/>
+                    <MenuItem Header="8" Click="ButtonPageSize_Click"/>
+                    <MenuItem Header="16" Click="ButtonPageSize_Click"/>
+                    <MenuItem Header="32" Click="ButtonPageSize_Click"/>
+                    <MenuItem Header="64" Click="ButtonPageSize_Click"/>
+                    <MenuItem Header="128" Click="ButtonPageSize_Click"/>
+
                 </ContextMenu>
             </Slider.ContextMenu>
         </Slider>
