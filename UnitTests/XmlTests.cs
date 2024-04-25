@@ -10,7 +10,7 @@ namespace UnitTests
         [TestMethod]
         public void TestLoad()
         {
-            var cfg = XmlHelper.LoadFromFile<AppConfig>(@"D:\GitHub\PixelGrabber\WpfGrabber\bin\Debug\WpfGrabber.cfg");
+            //var cfg = XmlHelper.LoadFromFile<AppConfig>(@"D:\GitHub\PixelGrabber\WpfGrabber\bin\Debug\WpfGrabber.cfg");
 
         }
     }

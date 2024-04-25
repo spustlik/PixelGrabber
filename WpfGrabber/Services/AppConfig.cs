@@ -28,6 +28,7 @@ namespace WpfGrabber.Services
             data.Zoom = vm.Zoom;
             data.LastFile = vm.FileName;
             XmlHelper.SerializeToFile(AppConfigFileName, data);
+            //XmlHelper.SaveToFile(Path.ChangeExtension(AppConfigFileName,".config"), data);
         }
 
         public static void Load(ShellVm vm)
@@ -39,6 +40,7 @@ namespace WpfGrabber.Services
             vm.RecentFiles.AddRange(data.RecentFiles, clear: true);
             if (!string.IsNullOrEmpty(data.LastFile) && data.OpenLastFile)
                 vm.LoadData(data.LastFile);
+            //var data2 = XmlHelper.LoadFromFile<AppConfig>(Path.ChangeExtension(AppConfigFileName, ".config"));
         }
     }
 }
