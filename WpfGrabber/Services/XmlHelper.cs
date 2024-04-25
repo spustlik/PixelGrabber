@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -15,43 +16,50 @@ namespace WpfGrabber.Services
 {
     public static class XmlHelper
     {
-        public static void SaveToConfig<T>(string fileName, T data) where T : class
+        public static void SerializeToFile<T>(string fileName, T data) where T : class
         {
-            var s = new XmlSerializer(typeof(T));
-            using (var st = new FileStream(fileName, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read))
+            var ser = new XmlSerializer(typeof(T));
+            using (var st = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.Read))
             {
                 using (var xw = XmlWriter.Create(st, new XmlWriterSettings() { Indent = true }))
                 {
-                    s.Serialize(xw, data);
+                    ser.Serialize(xw, data);
                 }
             }
         }
 
-        public static T LoadFromConfig<T>(string fileName) where T : class
+        public static T SerializeFromFile<T>(string fileName) where T : class
         {
-            if (!File.Exists(fileName))
-                return default;
-            var s = new XmlSerializer(typeof(T));
+            var ser = new XmlSerializer(typeof(T));
             using (var st = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 using (var xr = XmlReader.Create(st))
                 {
-                    var data = s.Deserialize(xr) as T;
+                    var data = ser.Deserialize(xr) as T;
                     return data;
                 }
             }
         }
 
+        public static void SaveToFile<T>(string fileName, T data) where T : class
+        {
+            var root = new XElement(typeof(T).Name);
+            SaveProperties(root, data);
+            root.Save(fileName);
+        }
+
+        public static T LoadFromFile<T>(string fileName) where T : class, new()
+        {
+            if (!File.Exists(fileName))
+                return default;
+            var doc = XDocument.Load(fileName);
+            var data = new T();
+            LoadProperties(doc.Root, data);
+            return data;
+        }
+
         public static object GetAttrValue(this XElement e, string name, Type t)
         {
-            //if ()
-            //{
-            //    foreach (var ele in e.Elements(name))
-            //    {
-
-            //    }
-            //    return null; //do not set
-            //}
             var at = e.Attribute(name);
             if (at == null)
                 return null;
@@ -73,8 +81,7 @@ namespace WpfGrabber.Services
             if (t == typeof(string)) return v == null ? null : v.ToString();
             throw new NotSupportedException($"Type {t} is not supported");
         }
-
-
+        
         public static void LoadProperties(this XElement e, object o)
         {
             var props = o.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
@@ -82,11 +89,6 @@ namespace WpfGrabber.Services
             {
                 if (p.GetCustomAttribute<XmlIgnoreAttribute>() != null)
                     continue;
-                if (IsList(p.PropertyType, out var itemType))
-                {
-                    LoadList(e, o, p, itemType);
-                    continue;
-                }
                 var v = e.GetAttrValue(p.Name, p.PropertyType);
                 if (v != null)
                     p.SetValue(o, v);
@@ -100,56 +102,63 @@ namespace WpfGrabber.Services
             {
                 if (p.GetCustomAttribute<XmlIgnoreAttribute>() != null)
                     continue;
-                if (IsList(p.PropertyType, out var itemType))
-                {
-                    SaveList(e, o, p, itemType);
-                    continue;
-                }
                 var s = ConvertToString(p.GetValue(o), p.PropertyType);
                 e.SetAttributeValue(p.Name, s);
             }
 
         }
 
-        private static void SaveList(XElement e, object o, PropertyInfo p, Type itemType)
+        public static void LoadColection<T>(this XElement parent, string collectionElementName, IList<T> collection) where T:class,new()
         {
-            var list = p.GetValue(o) as System.Collections.IList;
-            foreach (var item in list)
+            LoadList(parent, collectionElementName, (e) =>
             {
-                if (itemType.IsPrimitive)
-                {
-                    var v = ConvertToString(item, itemType);
-                    e.Add(new XElement(p.Name, v));
-                }
-                else
-                    throw new NotSupportedException($"List {itemType} is not supported");
+                var o = new T();
+                LoadProperties(e, o);
+                collection.Add(o);
+            });
+        }
+        public static void SaveCollection<T>(this XElement parent, string collectionElementName, IEnumerable<T> collection) where T : class
+        {
+            SaveList(parent, collectionElementName, collection, (e, item) =>
+            {
+                SaveProperties(e, item);
+            });
+        }
+
+        public static T[] LoadArray<T>(this XElement parent, string collectionElementName)
+        {
+            var data = new List<T>();
+            LoadList(parent, collectionElementName, (e) =>
+            {
+                var v = (T)ConvertFromString(e.Value, typeof(T));
+                data.Add(v);
+            });
+            return data.ToArray();
+        }
+        public static void SaveArray<T>(this XElement parent, string collectionElementName, T[] data)
+        {
+            SaveList(parent, collectionElementName, data, (e, item) =>
+            {
+                e.Value = ConvertToString(item, typeof(T));
+            });
+        }
+        public static void LoadList(XElement parent, string collectionElementName, Action<XElement> adder)
+        {
+            foreach (var ele in parent.Elements(collectionElementName))
+            {
+                adder(ele);
+            }
+        }
+        public static void SaveList<T>(XElement parent, string collectionElementName, IEnumerable<T> data, Action<XElement, T> saver)
+        {
+            foreach (var item in data)
+            {
+                var t = new XElement(collectionElementName);
+                parent.Add(t);
+                saver(t, item);
             }
         }
 
-        private static void LoadList(XElement e, object o, PropertyInfo p, Type itemType)
-        {
-            var list = p.GetValue(o) as System.Collections.IList;
-            foreach (var ele in e.Elements(p.Name))
-            {
-                if (itemType.IsPrimitive)
-                {
-                    var v = ConvertFromString(ele.Value, itemType);
-                    list.Add(v);
-                }
-                else
-                    throw new NotSupportedException($"List {itemType} is not supported");
-            }
-        }
 
-        private static bool IsList(Type t, out Type itemType)
-        {
-            if (t.IsGenericType && t.GetGenericTypeDefinition().IsAssignableFrom(typeof(IList<>)))
-            {
-                itemType = t.GetGenericArguments()[0];
-                return true;
-            }
-            itemType = null;
-            return false;
-        }
     }
 }

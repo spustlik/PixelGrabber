@@ -42,8 +42,6 @@ namespace WpfGrabber.Shell
             {
                 AppConfig.Save(ViewModel);
             });
-
-            
         }
 
     }

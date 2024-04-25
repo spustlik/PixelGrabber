@@ -27,12 +27,12 @@ namespace WpfGrabber.Services
             data.RecentFiles = vm.RecentFiles.ToArray();
             data.Zoom = vm.Zoom;
             data.LastFile = vm.FileName;
-            XmlHelper.SaveToConfig(AppConfigFileName, data);
+            XmlHelper.SerializeToFile(AppConfigFileName, data);
         }
 
         public static void Load(ShellVm vm)
         {
-            var data = XmlHelper.LoadFromConfig<AppConfig>(AppConfigFileName);
+            var data = XmlHelper.SerializeFromFile<AppConfig>(AppConfigFileName);
             if (data == null)
                 return;
             vm.Zoom = data.Zoom;
