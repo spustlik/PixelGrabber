@@ -30,7 +30,6 @@
         </Style.Resources>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <!--<Setter Property="Background" Value="Red" />-->
                 <Setter Property="Foreground" Value="DodgerBlue" />
             </Trigger>
         </Style.Triggers>
