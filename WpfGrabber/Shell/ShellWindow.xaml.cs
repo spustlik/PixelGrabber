@@ -33,16 +33,17 @@ namespace WpfGrabber.Shell
         {
             base.OnInitialized(e);
             AppConfig.Load(this.ViewModel);
-            ViewModel.PropertyChanged += ViewModel_PropertyChanged;
-        }
-
-        private void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            Dispatcher.BeginInvoke((Action)delegate
+            _configSaver = Throthler.Create(TimeSpan.FromMilliseconds(50), () =>
             {
                 AppConfig.Save(ViewModel);
             });
+            ViewModel.PropertyChanged += ViewModel_PropertyChanged;
         }
 
+        private Throthler _configSaver;
+        private void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            _configSaver.Start();
+        }
     }
 }
