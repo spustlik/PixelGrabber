@@ -59,7 +59,7 @@ namespace WpfGrabber.ViewParts
                 return;
             var reader = new BitReader(ShellVm.Data);
             reader.BytePosition = ShellVm.Offset;
-            reader.ReverseByte = ViewModel.Reversed;
+            reader.FlipX = ViewModel.Reversed;
             var w = ViewModel.Width;
            
             var total_w = this.GetFirstValid(imageBorder.ActualWidth, imageBorder.Width, Width, 100);

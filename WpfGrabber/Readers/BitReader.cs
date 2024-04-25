@@ -4,7 +4,7 @@ namespace WpfGrabber
 {
     public class BitReader
     {
-        private readonly byte[] bytes;
+        public byte[] Data { get; }
         private int _posbit;
         public int BytePosition
         {
@@ -12,21 +12,29 @@ namespace WpfGrabber
             set => _posbit = value * 8;
         }
 
-        public bool ReverseByte { get; set; } = true;
-        public int DataLength => bytes.Length;
+        public bool FlipX { get; set; } = true;
+        public int DataLength => Data.Length;
 
         public BitReader(byte[] bytes)
         {
-            this.bytes = bytes;
+            this.Data = bytes;
         }
-
+        public byte ReadByte()
+        {
+            if (BytePosition >= DataLength)
+                return 0;
+            var b = Data[BytePosition++];
+            if (FlipX)
+                b = GetFlippedX(b);
+            return b;
+        }
         public Boolean ReadBit()
         {
-            if (_posbit / 8 >= bytes.Length)
+            if (BytePosition >= Data.Length)
                 return false;
-            var b = bytes[_posbit / 8];
+            var b = Data[BytePosition];
             int shift = (_posbit % 8);
-            if (ReverseByte)
+            if (FlipX)
                 shift = 7 - shift; 
             var bit = (b >> shift) & 1;
             _posbit++;

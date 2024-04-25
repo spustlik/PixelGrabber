@@ -98,7 +98,7 @@ namespace WpfGrabber.ViewParts
 
         private FontData CreateFont()
         {
-            var br = new BitReader(ShellVm.Data) { BytePosition = ShellVm.Offset, ReverseByte = ViewModel.FlipX };
+            var br = new BitReader(ShellVm.Data) { BytePosition = ShellVm.Offset, FlipX = ViewModel.FlipX };
             var fr = new FontReader(ViewModel.Height)
             {
                 FlipY = ViewModel.FlipY,

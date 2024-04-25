@@ -33,7 +33,7 @@ namespace WpfGrabber.Readers
                 if (c < 0x20 || c >= 0x7f)
                     c = ' ';
                 asciiLine.Append(c);
-                hexline.Append(b.ToString("X2"));
+                hexline.Append(ToHex(b,2));
                 hexline.Append(" ");
                 if (x == 7)
                 {
@@ -56,7 +56,7 @@ namespace WpfGrabber.Readers
             {
                 var sb = new StringBuilder();
                 if (showAddr)
-                    sb.Append(Position.ToString("X4")).Append(": ");
+                    sb.Append(ToHex(Position)).Append(": ");
                 var line = ReadLineStr();
                 if (showHex)
                     sb.Append(line.Hex);
@@ -68,5 +68,16 @@ namespace WpfGrabber.Readers
             }
         }
 
+        public static string ToHex(int x, int len = 4)
+        {
+            const string _HEX = "0123456789ABCDEF";
+            var s = new char[len];
+            for (int i = len - 1; i >= 0; i--)
+            {
+                s[i] = _HEX[ x & 0x0F];
+                x = x >> 4;
+            }
+            return new string(s);
+        }
     }
 }
