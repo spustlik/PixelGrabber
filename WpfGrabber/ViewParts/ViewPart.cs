@@ -30,10 +30,4 @@ namespace WpfGrabber.ViewParts
         }
     }
 
-    public class DataChangedArgs
-    {
-        public byte[] Data { get; set; }
-        public int Offset { get; set; }
-        public string FileName { get; set; }
-    }
 }

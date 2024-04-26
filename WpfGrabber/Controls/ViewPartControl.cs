@@ -19,6 +19,7 @@ namespace WpfGrabber.Controls
     public class ViewPartControl : ContentControl
     {
         public static RoutedCommand CommandClose = new RoutedCommand();
+        public static RoutedCommand CommandMove = new RoutedCommand();
         static ViewPartControl()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ViewPartControl), new FrameworkPropertyMetadata(typeof(ViewPartControl)));
@@ -27,10 +28,16 @@ namespace WpfGrabber.Controls
         protected override void OnInitialized(EventArgs e)
         {
             base.OnInitialized(e);
-            CommandBindings.Add(new CommandBinding(CommandClose, OnCloseCommandExecuted));
+            CommandBindings.Add(new CommandBinding(CommandMove, MoveCommand_Executed));
+            CommandBindings.Add(new CommandBinding(CommandClose, CloseCommand_Executed));
         }
 
-        private void OnCloseCommandExecuted(object sender, ExecutedRoutedEventArgs e)
+        private void MoveCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            //TODO:?
+        }
+
+        private void CloseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             var vps = App.Current.ServiceProvider.GetService<IViewPartService>();
             vps.Remove(this.Content as ViewPart);
