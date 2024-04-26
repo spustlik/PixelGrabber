@@ -3,11 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using WpfGrabber._Legacy;
 using WpfGrabber.ViewParts;
 
 namespace WpfGrabber.Shell
@@ -102,12 +100,6 @@ namespace WpfGrabber.Shell
             ViewModel.ShellVm.LoadData(dlg.FileName);
         }
 
-        private void MainWindow_Click(object sender, RoutedEventArgs e)
-        {
-            var w = new MainWindow();
-            w.Show();
-        }
-
         private void OnTestData_Click(object sender, RoutedEventArgs e)
         {
             ViewModel.ShellVm.FileName = "...test data...";
@@ -120,17 +112,5 @@ namespace WpfGrabber.Shell
             ViewModel.ShellVm.SetData(data.ToArray());
         }
 
-        private void OnTestDropdown_Click(object sender, RoutedEventArgs e)
-        {
-            var wnd = new DropDownTestWindow();
-            wnd.Show();
-        }
-
-        private void ButtonMask_Click(object sender, RoutedEventArgs e)
-        {
-            var w = new MaskBitmapWindow();
-            w.Owner = Application.Current.MainWindow;
-            w.Show();
-        }
     }
 }

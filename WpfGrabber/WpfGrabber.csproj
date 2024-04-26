@@ -88,13 +88,6 @@
       <DependentUpon>TestViewPart.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewParts\ViewPartDataViewer.cs" />
-    <Compile Include="_Legacy\DropDownTestWindow.xaml.cs">
-      <DependentUpon>DropDownTestWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="_Legacy\MaskBitmapWindow.xaml.cs">
-      <DependentUpon>MaskBitmapWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="_Legacy\MaskBitmapWindowViewModel.cs" />
     <Compile Include="Controls\NumberEditor.xaml.cs">
       <DependentUpon>NumberEditor.xaml</DependentUpon>
     </Compile>
@@ -152,26 +145,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="_Legacy\DropDownTestWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="_Legacy\MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="_Legacy\MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Page Include="_Legacy\MaskBitmapWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Controls\NumberEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -226,7 +203,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="_Legacy\MainWindowViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
