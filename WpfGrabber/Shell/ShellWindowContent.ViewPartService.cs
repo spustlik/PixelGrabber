@@ -23,24 +23,47 @@ namespace WpfGrabber.Shell
 		#region IViewPartService
 		public IEnumerable<ViewPart> ViewParts => partsGrid.Children.OfType<ViewPartControl>().Select(x => x.Content).OfType<ViewPart>();
 
-		void IViewPartService.Add(ViewPart viewPart)
+		public void Add(ViewPart viewPart)
 		{
-			AddViewPart(viewPart);
-		}
+            if (GetViewPartControl(viewPart).index >= 0)
+                return;
 
-		void IViewPartService.Remove(ViewPart viewPart)
+            //add ([splitter] if not first)[viewpart]
+            if (partsGrid.Children.Count > 0)
+                partsGrid.Children.Add(new GridSplitter());
+            partsGrid.Children.Add(new ViewPartControl() { Content = viewPart });
+            FixGridLayout();
+            viewPart.OnInitialize();
+        }
+
+		public void Remove(ViewPart viewPart)
 		{
-			RemoveViewPart(viewPart);
-		}
+            var i = GetViewPartControl(viewPart).index;
+            if (i < 0)
+                return;
+            viewPart.OnClose();
 
-		void IViewPartService.RemoveAll()
+            partsGrid.Children.RemoveAt(i); //remove viewPartControl
+                                            // []  [{VP,} GS,VP] [VP,GS,{VP}] [{VP,} GS, VP, GS, VP]  [VP, GS, {VP,} GS, VP] [VP, GS, VP, GS, {VP}] ...
+            if (i == 0 && partsGrid.Children.Count > 0)
+            {
+                partsGrid.Children.RemoveAt(0); //remove splitter after first VP
+            }
+            else if (i > 1)
+            {
+                partsGrid.Children.RemoveAt(i - 1); //remove splitter before deleted VP
+            }
+            FixGridLayout();
+        }
+
+		public void RemoveAll()
 		{
 			foreach (var vp in ViewParts.Reverse())
 			{
-				RemoveViewPart(vp);
+				Remove(vp);
 			}
 		}
-		void IViewPartService.SetOptions(ViewPart viewPart, string title)
+		public void SetOptions(ViewPart viewPart, string title)
 		{
 			var (vpc, i) = GetViewPartControl(viewPart);
 			if (i < 0)
@@ -58,40 +81,6 @@ namespace WpfGrabber.Shell
 					return (control: vpc, index: i);
 			}
 			return (control: null, index: -1);
-		}
-
-
-		private void AddViewPart(ViewPart viewPart)
-		{
-			if (GetViewPartControl(viewPart).index >= 0)
-				return;
-
-			//add ([splitter] if not first)[viewpart]
-			if (partsGrid.Children.Count > 0)
-				partsGrid.Children.Add(new GridSplitter());
-			partsGrid.Children.Add(new ViewPartControl() { Content = viewPart });
-			FixGridLayout();
-			viewPart.OnInitialize();
-		}
-
-		private void RemoveViewPart(ViewPart viewPart)
-		{
-			var i = GetViewPartControl(viewPart).index;
-			if (i < 0)
-				return;
-			viewPart.OnClose();
-
-			partsGrid.Children.RemoveAt(i); //remove viewPartControl
-											// []  [{VP,} GS,VP] [VP,GS,{VP}] [{VP,} GS, VP, GS, VP]  [VP, GS, {VP,} GS, VP] [VP, GS, VP, GS, {VP}] ...
-			if (i == 0 && partsGrid.Children.Count > 0)
-			{
-				partsGrid.Children.RemoveAt(0); //remove splitter after first VP
-			}
-			else if (i > 1)
-			{
-				partsGrid.Children.RemoveAt(i - 1); //remove splitter before deleted VP
-			}
-			FixGridLayout();
 		}
 
 		private void FixGridLayout()

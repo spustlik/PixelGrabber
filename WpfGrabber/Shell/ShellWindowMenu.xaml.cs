@@ -55,7 +55,7 @@ namespace WpfGrabber.Shell
 
         private void OnShowViewPartExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            var vp = e.Parameter as ViewPartDef;
+            var vp = (ViewPartDef)e.Parameter;
             var part = vp.Create();
             var vps = App.GetService<IViewPartService>();
             vps.Add(part);
@@ -97,18 +97,13 @@ namespace WpfGrabber.Shell
         private void LoadLayout_Click(object sender, RoutedEventArgs e)
         {
             var lsvc = App.Current?.ServiceProvider.GetService<ILayoutManagerService>();
-            //var fileName = 
-            //vps.LoadLayout(e);
+            lsvc.LoadLayoutFile();
         }
 
         private void SaveLayout_Click(object sender, RoutedEventArgs e)
         {
-            var fileName = Path.Combine(Path.GetDirectoryName(ViewModel.ShellVm.FileName), ".pixelgrabber");
-            var doc = File.Exists(fileName) ? XDocument.Load(fileName) : new XDocument(new XElement("Layouts"));
             var lsvc = App.Current?.ServiceProvider.GetService<ILayoutManagerService>();
-
-            lsvc.SaveLayout(doc.Root);
-            doc.Save(fileName);
+            lsvc.SaveLayoutFile();
         }
     }
 }
