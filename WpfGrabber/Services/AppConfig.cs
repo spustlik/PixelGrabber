@@ -21,13 +21,17 @@ namespace WpfGrabber.Services
         public bool OpenLastFile { get; set; } = true;
         public double Zoom { get; set; }
 
+        public bool AutoLoadLayout { get; set; } = true;
+
         public static void Save(ShellVm vm)
         {
             var data = new AppConfig();
             data.RecentFiles = vm.RecentFiles.ToArray();
             data.Zoom = vm.Zoom;
             data.LastFile = vm.FileName;
+            data.AutoLoadLayout = vm.AutoLoadLayout;
             XmlHelper.SerializeToFile(AppConfigFileName, data);
+            //string[] is not supported
             //XmlHelper.SaveToFile(Path.ChangeExtension(AppConfigFileName,".config"), data);
         }
 
@@ -37,6 +41,7 @@ namespace WpfGrabber.Services
             if (data == null)
                 return;
             vm.Zoom = data.Zoom;
+            vm.AutoLoadLayout = data.AutoLoadLayout;
             vm.RecentFiles.AddRange(data.RecentFiles, clear: true);
             if (!string.IsNullOrEmpty(data.LastFile) && data.OpenLastFile)
                 vm.LoadData(data.LastFile);

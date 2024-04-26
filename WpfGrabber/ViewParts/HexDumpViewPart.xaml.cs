@@ -52,9 +52,10 @@ namespace WpfGrabber.ViewParts
         [XmlIgnore]
         public ObservableCollection<string> HexLines { get; private set; } = new ObservableCollection<string>();
 
-        [XmlIgnore]
+        
         #region HexDump property
         private string _hexDump;
+        [XmlIgnore]
         public string HexDump
         {
             get => _hexDump;

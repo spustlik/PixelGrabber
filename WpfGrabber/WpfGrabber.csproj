@@ -74,10 +74,12 @@
     <Compile Include="Readers\Z80\Z80Instruction.cs" />
     <Compile Include="Readers\Z80\Z80Reader.cs" />
     <Compile Include="Services\Throthler.cs" />
+    <Compile Include="Shell\ShellWindowContent.LayoutManagerService.cs" />
     <Compile Include="Themes\ResourceEvents.cs" />
     <Compile Include="ViewParts\FontBinaryViewPart.xaml.cs">
       <DependentUpon>FontBinaryViewPart.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewParts\ViewPartFactory.cs" />
     <Compile Include="ViewParts\Z80DumpViewPart.xaml.cs">
       <DependentUpon>Z80DumpViewPart.xaml</DependentUpon>
     </Compile>
@@ -123,7 +125,6 @@
       <DependentUpon>HexDumpViewPart.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewParts\ViewPart.cs" />
-    <Compile Include="ViewParts\ViewPartService.cs" />
     <Compile Include="_ObjectExtensions.cs" />
     <Page Include="ExceptionWindow.xaml">
       <SubType>Designer</SubType>
@@ -224,6 +225,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <Compile Include="Shell\ShellWindowContent.ViewPartService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

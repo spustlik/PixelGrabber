@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Xml.Linq;
+using WpfGrabber.Services;
 using WpfGrabber.Shell;
 
 namespace WpfGrabber.ViewParts
@@ -64,6 +66,16 @@ namespace WpfGrabber.ViewParts
             var w = this.GetFirstValid(imageBorder.ActualWidth, imageBorder.Width, base.Width, 500);
             w = (int)(w / ShellVm.Zoom);
             return (width: w, height: h);
+        }
+
+        public override void OnSaveLayout(XElement ele)
+        {
+            ele.SaveProperties(ViewModel);
+        }
+
+        public override void OnLoadLayout(XElement ele)
+        {
+            ele.LoadProperties(ViewModel);
         }
     }
 }

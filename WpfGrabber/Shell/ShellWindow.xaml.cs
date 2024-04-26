@@ -26,6 +26,7 @@ namespace WpfGrabber.Shell
         {
             DataContext = new ShellVm();
             App.Current.ServiceContainer.AddService(ViewModel);
+            App.Current.ServiceContainer.AddService(new ViewParts.ViewPartFactory());
             InitializeComponent();
         }
 

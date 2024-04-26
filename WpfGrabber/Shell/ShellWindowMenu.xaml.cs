@@ -2,10 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Xml.Linq;
 using WpfGrabber.ViewParts;
 
 namespace WpfGrabber.Shell
@@ -38,31 +40,11 @@ namespace WpfGrabber.Shell
             #endregion
 
         }
-        public abstract class ViewPartDef
-        {
-            public string Title { get; set; }
-            public virtual Type ViewPartType { get; }
-            public abstract ViewPart Create();
-        }
-        public class ViewPartDef<T> : ViewPartDef where T : ViewPart, new()
-        {
-            public override Type ViewPartType => typeof(T);
-            public override ViewPart Create() => new T();
-        }
 
         protected override void OnInitialized(EventArgs e)
         {
             base.OnInitialized(e);
-            ViewModel.ViewParts.AddRange(new ViewPartDef[]
-            {
-                new ViewPartDef<Binary8BitViewPart>(){Title = "Binary 8bit" },
-                new ViewPartDef<HexDumpViewPart>(){Title = "Hex dump" },
-                new ViewPartDef<DealienViewPart>(){Title = "Dealien"},
-                new ViewPartDef<MaskedImagesViewPart>(){Title = "Binary masked images"},
-                new ViewPartDef<FontBinaryViewPart>(){Title = "Font"},
-                new ViewPartDef<Z80DumpViewPart>(){Title = "Z80 disasm"},
-                new ViewPartDef<TestViewPart>(){Title = "(Test)"},
-            });
+            ViewModel.ViewParts.AddRange(App.Current?.ServiceProvider?.GetService<ViewPartFactory>().Definitions);
             ViewModel.ShellVm = App.Current?.ServiceProvider?.GetService<ShellVm>();
 
             CommandBindings.Add(new CommandBinding(ApplicationCommands.Open, OnOpenFileExecuted));
@@ -112,5 +94,21 @@ namespace WpfGrabber.Shell
             ViewModel.ShellVm.SetData(data.ToArray());
         }
 
+        private void LoadLayout_Click(object sender, RoutedEventArgs e)
+        {
+            var lsvc = App.Current?.ServiceProvider.GetService<ILayoutManagerService>();
+            //var fileName = 
+            //vps.LoadLayout(e);
+        }
+
+        private void SaveLayout_Click(object sender, RoutedEventArgs e)
+        {
+            var fileName = Path.Combine(Path.GetDirectoryName(ViewModel.ShellVm.FileName), ".pixelgrabber");
+            var doc = File.Exists(fileName) ? XDocument.Load(fileName) : new XDocument(new XElement("Layouts"));
+            var lsvc = App.Current?.ServiceProvider.GetService<ILayoutManagerService>();
+
+            lsvc.SaveLayout(doc.Root);
+            doc.Save(fileName);
+        }
     }
 }

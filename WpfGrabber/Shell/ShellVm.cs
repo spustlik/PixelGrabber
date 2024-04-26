@@ -53,7 +53,6 @@ namespace WpfGrabber.Shell
         }
         #endregion
 
-
         #region Zoom100 property
         [XmlIgnore]
         public double Zoom100
@@ -68,6 +67,15 @@ namespace WpfGrabber.Shell
             if (propertyName == nameof(Zoom))
                 base.DoPropertyChanged(nameof(Zoom100));
         }
+
+        #region AutoLoadLayout property
+        private bool _autoLoadLayout;
+        public bool AutoLoadLayout
+        {
+            get => _autoLoadLayout;
+            set => Set(ref _autoLoadLayout, value);
+        }
+        #endregion
 
         [XmlIgnore]
         public byte[] Data { get; private set; }
@@ -87,6 +95,7 @@ namespace WpfGrabber.Shell
             Offset = 0;
             DataLength = Data.Length;
             DoPropertyChanged(nameof(Data));
+            //TODO: load layout if AutoLoad
         }
 
         public void SetData(byte[] data)

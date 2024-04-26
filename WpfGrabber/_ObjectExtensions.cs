@@ -47,6 +47,17 @@ namespace WpfGrabber
 
         public static T GetService<T>(this IServiceProvider serviceProvider) where T : class
         {
+            if (serviceProvider != null)
+            {
+                var svc = serviceProvider.FindService<T>();
+                if (svc != default)
+                    return svc;
+            }
+            throw new ApplicationException($"Service {typeof(T).Name} not found");
+        }
+
+        public static T FindService<T>(this IServiceProvider serviceProvider) where T : class
+        {
             return serviceProvider.GetService(typeof(T)) as T;
         }
 

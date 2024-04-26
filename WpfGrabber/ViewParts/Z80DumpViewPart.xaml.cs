@@ -46,9 +46,10 @@ namespace WpfGrabber.ViewParts
         }
         #endregion
 
-        [XmlIgnore]
+        
         #region GoToAddrText property
         private string _gotoAddrText;
+        [XmlIgnore]
         public string GoToAddrText
         {
             get => _gotoAddrText;

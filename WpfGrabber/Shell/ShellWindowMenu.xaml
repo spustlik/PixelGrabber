@@ -7,7 +7,7 @@
              xmlns:vp="clr-namespace:WpfGrabber.ViewParts"
              mc:Ignorable="d" 
              x:Name="root"
-             d:DesignHeight="26.5" d:DesignWidth="138"
+             d:DesignHeight="30.5" d:DesignWidth="406.222"
              >
     <Grid>
         <Menu>
@@ -33,7 +33,12 @@
                     </Style>
                 </MenuItem.ItemContainerStyle>
             </MenuItem>
-            
+            <MenuItem Header="Layout">
+                <MenuItem Header="Auto load" IsCheckable="True" IsChecked="{Binding AutoLoadLayout}"/>
+                <MenuItem Header="Load" Click="LoadLayout_Click"/>
+                <MenuItem Header="Save" Click="SaveLayout_Click"/>
+            </MenuItem>
+
             <MenuItem Header="Tools">
                 <MenuItem Header="Test data" Click="OnTestData_Click"/>
             </MenuItem>

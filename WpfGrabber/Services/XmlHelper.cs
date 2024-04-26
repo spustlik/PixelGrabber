@@ -105,6 +105,24 @@ namespace WpfGrabber.Services
             return false;
         }
 
+
+        public static void SaveToFile<T>(string fileName, T data) where T : class
+        {
+            var root = new XElement(typeof(T).Name);
+            SaveProperties(root, data);
+            root.Save(fileName);
+        }
+
+        public static T LoadFromFile<T>(string fileName) where T : class, new()
+        {
+            if (!File.Exists(fileName))
+                return default;
+            var doc = XDocument.Load(fileName);
+            var data = new T();
+            LoadProperties(doc.Root, data);
+            return data;
+        }
+
         /*
         public static void SaveToFile<T>(string fileName, T data) where T : class
         {

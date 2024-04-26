@@ -6,11 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Xml.Linq;
 using WpfGrabber.Controls;
 
 namespace WpfGrabber.ViewParts
 {
-    public class ViewPart : UserControl
+    public abstract class ViewPart : UserControl
     {
         static ViewPart()
         {
@@ -27,6 +28,14 @@ namespace WpfGrabber.ViewParts
         public virtual void OnClose()
         {
 
+        }
+
+        public virtual void OnSaveLayout(XElement ele)
+        {
+        }
+
+        public virtual void OnLoadLayout(XElement ele)
+        {
         }
     }
 
