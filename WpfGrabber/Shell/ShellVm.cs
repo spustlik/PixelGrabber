@@ -55,6 +55,7 @@ namespace WpfGrabber.Shell
 
 
         #region Zoom100 property
+        [XmlIgnore]
         public double Zoom100
         {
             get => Zoom * 100;

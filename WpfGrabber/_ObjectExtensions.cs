@@ -63,6 +63,7 @@ namespace WpfGrabber
             {
                 if (predicate(item))
                     return i;
+                i++;
             }
             return -1;
         }
