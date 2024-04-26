@@ -22,8 +22,8 @@ namespace WpfGrabber.ViewParts
 
         public override void OnInitialize()
         {
-            base.OnInitialize();
             ShellVm = App.GetService<ShellVm>();
+            base.OnInitialize();
             ShellVm.PropertyChanged += ShellVm_PropertyChanged;
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
             ShowData();

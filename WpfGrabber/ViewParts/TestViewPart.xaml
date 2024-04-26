@@ -5,10 +5,43 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:WpfGrabber.ViewParts"
+             xmlns:local="clr-namespace:WpfGrabber.ViewParts" 
+             xmlns:converters="clr-namespace:WpfGrabber.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-            
+        <Grid.Resources>
+            <converters:EnumItemsConverter x:Key="eumItems"/>
+        </Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <ItemsControl Style="{StaticResource toolbar}">
+            <CheckBox Content="Bool" IsChecked="{Binding TestBool}"/>
+            <Separator/>
+            <ComboBox ItemsSource="{Binding TestEnum, Converter={StaticResource eumItems}, Mode=OneTime}"
+                      SelectedValuePath="Value"
+                      DisplayMemberPath="Description"
+                      SelectedValue="{Binding TestEnum, UpdateSourceTrigger=PropertyChanged}" 
+                      />
+            <Separator/>
+            <Button Style="{StaticResource dropDown}" Content="Menu...">
+                <Button.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem  Header="Test menu..." Click="TestMenu_Click"/>
+                    </ContextMenu>
+                </Button.ContextMenu>
+            </Button>
+        </ItemsControl>
+        <Border Grid.Row="1" Margin="100" CornerRadius="20">
+            <Border.Background>
+                <RadialGradientBrush>
+                    <GradientStop Color="White" Offset="0"/>
+                    <GradientStop Color="DodgerBlue" Offset="1"/>
+                </RadialGradientBrush>
+            </Border.Background>
+        </Border>
     </Grid>
 </local:ViewPartDataViewer>

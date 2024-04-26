@@ -9,6 +9,8 @@ using System.Windows.Data;
 
 namespace WpfGrabber
 {
+    [ValueConversion(typeof(char), typeof(int))]
+
     public class CharConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

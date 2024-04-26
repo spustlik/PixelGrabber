@@ -26,6 +26,7 @@ namespace WpfGrabber.Shell
         private const string ATTR_OFFSET = "Offset";
         private const string ELE_VIEWPART = "View";
         private const string ATTR_TYPE = "Type";
+        private const string ATTR_WIDTH = "Width";
         private const string ELE_LAYOUT = "Layout";
 
         private string GetProjectFileName()
@@ -72,6 +73,7 @@ namespace WpfGrabber.Shell
             {
                 LoadViewPart(e);
             }
+            FixGridLayout();
         }
 
         private void LoadViewPart(XElement ele)
@@ -82,8 +84,11 @@ namespace WpfGrabber.Shell
                 return;
             var viewPart = def.Create();
             Add(viewPart);
-            SetOptions(viewPart, def.Title);
-            viewPart.OnLoadLayout(ele);
+            var width = (int?)ele.Attribute(ATTR_WIDTH) ?? DEFAULT_WIDTH;
+            SetOptions(viewPart, new ViewPartOptions() { Title = def.Title, Width = width });
+            var le = ele.Element(ELE_LAYOUT);
+            if (le != null)
+                viewPart.OnLoadLayout(le);
         }
 
         private void SaveLayout(XElement parent)
@@ -114,7 +119,7 @@ namespace WpfGrabber.Shell
             var (vpc, index) = GetViewPartControl(viewPart);
             ele = new XElement(ELE_VIEWPART,
                 new XAttribute(ATTR_TYPE, def.TypeId),
-                new XAttribute(nameof(Width), vpc.ActualWidth)
+                new XAttribute(ATTR_WIDTH, (int)vpc.ActualWidth)
                 );
             parent.Add(ele);
             var le = new XElement(ELE_LAYOUT);

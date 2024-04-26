@@ -22,14 +22,22 @@ namespace WpfGrabber.ViewParts
         }
         #endregion
 
-        public int GetEndPosSafe(int dataLen)
+        public int GetEndPosSafe()
         {
             var end = EndPos;
-            if (end == 0 || end > dataLen)
-                end = dataLen - 1;
+            if (end == 0 || end > EndPosMax)
+                end = EndPosMax - 1;
             return end;
         }
 
+        #region EndPosMax property
+        private int _endPosMax;
+        public int EndPosMax
+        {
+            get => _endPosMax;
+            set => Set(ref _endPosMax, value);
+        }
+        #endregion
 
         #region FlipVertical property
         private bool _flipVertical;
@@ -56,6 +64,11 @@ namespace WpfGrabber.ViewParts
             InitializeComponent();
         }
 
+        public override void OnInitialize()
+        {
+            base.OnInitialize();
+            ViewModel.EndPosMax = ShellVm.DataLength;
+        }
         private void BorderSize_Changed(object sender, SizeChangedEventArgs e)
         {
             OnShowData();
@@ -63,8 +76,18 @@ namespace WpfGrabber.ViewParts
         protected override void OnShowData()
         {
             //0x4902
-            var images = AlienReader.ReadList(ShellVm.Data, ShellVm.Offset,
-                ViewModel.GetEndPosSafe(ShellVm.DataLength), flipY: ViewModel.FlipVertical);
+            //0x466E
+            if (ViewModel.EndPos < ShellVm.Offset)
+                ViewModel.EndPos = ShellVm.Offset;
+            if (ViewModel.EndPosMax > ShellVm.DataLength)
+                ViewModel.EndPosMax -= ShellVm.DataLength;
+            var images = AlienReader
+                .ReadList(
+                    ShellVm.Data, 
+                    ShellVm.Offset,
+                    ViewModel.GetEndPosSafe(), 
+                    flipY: ViewModel.FlipVertical
+                );
             var (max_w, max_h) = GetDataImageSize(imageBorder);
             var rgba = new ByteBitmapRgba(max_w, max_h);
             var posX = 0;
@@ -98,7 +121,7 @@ namespace WpfGrabber.ViewParts
             dlg.FileName = Path.ChangeExtension(ShellVm.FileName, ".png");
             if (dlg.ShowDialog() != true)
                 return;
-            var images = AlienReader.ReadList(ShellVm.Data, ShellVm.Offset, ViewModel.GetEndPosSafe(ShellVm.DataLength), flipY: ViewModel.FlipVertical);
+            var images = AlienReader.ReadList(ShellVm.Data, ShellVm.Offset, ViewModel.GetEndPosSafe(), flipY: ViewModel.FlipVertical);
             var id = 0;
             foreach (var item in images)
             {

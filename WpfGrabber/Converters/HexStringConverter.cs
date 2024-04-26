@@ -9,6 +9,7 @@ using System.Windows.Data;
 
 namespace WpfGrabber
 {
+    [ValueConversion(typeof(string), typeof(int))]
     public class HexStringConverter : IValueConverter
     {
         /// <summary>

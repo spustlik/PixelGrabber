@@ -87,7 +87,7 @@ namespace WpfGrabber.ViewParts
                 FlipX = ViewModel.FlipX,
                 FlipY = ViewModel.FlipY,
                 Height = ViewModel.Height,
-                WidthBytes = ViewModel.WidthBytes,
+                WidthBytes = ViewModel.WidthBytes <=0 ? 1 : ViewModel.WidthBytes,
                 Position = ShellVm.Offset
             };
             while (rd.Position < rd.DataLength)

@@ -55,11 +55,9 @@ namespace WpfGrabber.Shell
 
         private void OnShowViewPartExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            var vp = (ViewPartDef)e.Parameter;
-            var part = vp.Create();
+            var def = (ViewPartDef)e.Parameter;
             var vps = App.GetService<IViewPartService>();
-            vps.Add(part);
-            vps.SetOptions(part, vp.Title);
+            vps.AddNewPart(def);
             e.Handled = true;
         }
 

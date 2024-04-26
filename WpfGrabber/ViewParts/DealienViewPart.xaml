@@ -4,8 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WpfGrabber.ViewParts" xmlns:c="clr-namespace:WpfGrabber.Controls"
-                          x:Name="root"
-                          mc:Ignorable="d" 
+             x:Name="root"
+             mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="400">
     <d:DesignerProperties.DesignStyle>
         <Style TargetType="UserControl">
@@ -19,7 +19,9 @@
         </Grid.RowDefinitions>
         <ItemsControl Style="{StaticResource toolbar}">
             <Label Content="End pos"/>
-            <c:NumberEditor Value="{Binding EndPos}" Maximum="{Binding ShellVm.DataLength, ElementName=root}" Width="160" SliderWidth="80"/>
+            <c:NumberEditor Value="{Binding EndPos}" 
+                            Maximum="{Binding EndPosMax}"
+                            Width="160" SliderWidth="80"/>
             <Separator/>
             <CheckBox Content="Flip V" IsChecked="{Binding FlipVertical}"/>
             <Separator/>

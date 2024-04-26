@@ -11,6 +11,8 @@ using System.Xaml;
 namespace WpfGrabber.Readers
 {
     // vzdy dva byte DATA,MASK, nejaka vyska a (sirka v bytech)
+    //varianta 2 - vzdy WidthBytes Data, pak WidthBytes Mask
+    //varianta 3 - vzdy cely obr (WidthBuytes*Height) Data, cely obr mask
     public class MaskReader
     {
         public byte[] Data { get; }

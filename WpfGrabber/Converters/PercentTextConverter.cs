@@ -10,6 +10,8 @@ using System.Windows.Data;
 
 namespace WpfGrabber
 {
+    [ValueConversion(typeof(string), typeof(string))]
+
     public class PercentTextConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

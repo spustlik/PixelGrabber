@@ -30,6 +30,8 @@ namespace WpfGrabber
 
         public static IEnumerable<AlienImage> ReadList(byte[] bytes, int pos, int endpos, bool flipY)
         {
+            if (endpos <= 0)
+                endpos = bytes.Length;
             var ar = new AlienReader(bytes) { Position = pos, FlipY = flipY };
             var images = new List<AlienImage>();
             while (true)
@@ -39,7 +41,7 @@ namespace WpfGrabber
                     break;
                 if (!ar.TryRead(out var w, out var h))
                     break;
-                if (endpos < 0 && (w >= 64 || h >= 64))
+                if (pos>endpos || w >= 64 || h >= 64)
                     break;
                 var aimg = ar.ReadMaskedImage();
                 images.Add(new AlienImage() { Bitmap = aimg, Position = start });

@@ -24,10 +24,40 @@ namespace WpfGrabber.ViewParts
         {
             InitializeComponent();
         }
+
+        private void TestMenu_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 
     public class TestViewPartVM : SimpleDataObject
     {
 
+        #region TestEnum property
+        private TestViewPartEnum _testEnum;
+        public TestViewPartEnum TestEnum
+        {
+            get => _testEnum;
+            set => Set(ref _testEnum, value);
+        }
+        #endregion
+
+        #region TestBool property
+        private bool _testBool;
+        public bool TestBool
+        {
+            get => _testBool;
+            set => Set(ref _testBool, value);
+        }
+        #endregion
+
+    }
+
+    public enum TestViewPartEnum
+    {
+        None,
+        Done,
+        Waiting
     }
 }

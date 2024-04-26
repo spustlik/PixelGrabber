@@ -93,11 +93,15 @@ namespace WpfGrabber.Controls
 
         private void ButtonMinus_Click(object sender, RoutedEventArgs e)
         {
+            if (Value == 0)
+                return;
             Value -= 1;
         }
 
         private void ButtonPlus_Click(object sender, RoutedEventArgs e)
         {
+            if (Value >= Maximum)
+                return;
             Value += 1;
         }
 

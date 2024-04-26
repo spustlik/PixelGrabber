@@ -10,13 +10,6 @@ using WpfGrabber.ViewParts;
 
 namespace WpfGrabber.Shell
 {
-	public interface IViewPartService
-	{
-		void Add(ViewPart viewPart);
-		void Remove(ViewPart viewPart);
-		void RemoveAll();
-		void SetOptions(ViewPart viewPart, string title);
-	}
 
 	partial class ShellWindowContent : IViewPartService
 	{
@@ -63,12 +56,14 @@ namespace WpfGrabber.Shell
 				Remove(vp);
 			}
 		}
-		public void SetOptions(ViewPart viewPart, string title)
+		public void SetOptions(ViewPart viewPart, ViewPartOptions options)
 		{
 			var (vpc, i) = GetViewPartControl(viewPart);
 			if (i < 0)
 				return;
-			vpc.Title = title;
+			vpc.Title = options.Title;
+			if (options.Width > 0)
+				partsGrid.ColumnDefinitions[i].Width = new GridLength(options.Width);
 		}
 		#endregion
 
