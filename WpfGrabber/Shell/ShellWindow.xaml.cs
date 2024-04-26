@@ -28,6 +28,7 @@ namespace WpfGrabber.Shell
             App.Current.ServiceContainer.AddService(ViewModel);
             App.Current.ServiceContainer.AddService(new ViewParts.ViewPartFactory());
             InitializeComponent();
+            ExceptionWindow.StartHandlingExceptions();
         }
 
         protected override void OnInitialized(EventArgs e)
