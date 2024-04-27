@@ -133,7 +133,7 @@ namespace WpfGrabber.ViewParts
             if (dlg.ShowDialog() != true)
                 return;
             var font = CreateFont();
-            var bmp = new ByteBitmapRgba(font.Letters.First().Width, font.Letters.Sum(l => l.Height));
+            var bmp = new ByteBitmapRgba(font.Letters.First().WidthPixels, font.Letters.Sum(l => l.Height));
             var y = 0;
             for (var i = 0; i < font.Letters.Count(); i++)
             {
@@ -166,7 +166,7 @@ namespace WpfGrabber.ViewParts
             if (dlg.ShowDialog() != true)
                 return;
             var font = CreateFont();
-            var bmp = new ByteBitmapRgba(ViewModel.TestText.Length * font.Letters.First().Width, font.Letters.Max(x=>x.Height));
+            var bmp = new ByteBitmapRgba(ViewModel.TestText.Length * font.Letters.First().WidthPixels, font.Letters.Max(x=>x.Height));
             font.DrawString(bmp, 0, 0, ViewModel.TestText, 0xFFFFFFFF);
             bmp.ToBitmapSource().SaveToPngFile(dlg.FileName);
         }

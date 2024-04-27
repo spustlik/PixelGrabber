@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
+using WpfGrabber.Data;
 
 namespace WpfGrabber
 {
@@ -66,15 +67,44 @@ namespace WpfGrabber
 
         public void DrawBitmap(ByteBitmap8Bit src, int posX, int posY, Colorizer colorizer = null)
         {
+            DrawBitmapByFunc(
+                src.Width,
+                src.Height,
+                posX,
+                posY,
+                (x, y) => src.GetPixel(x, y),
+                colorizer);
+        }
+
+        public void DrawBitmap(BitBitmap src, int posX, int posY, Colorizer colorizer = null)
+        {
+            DrawBitmapByFunc(
+                src.WidthPixels,
+                src.Height,
+                posX,
+                posY,
+                (x, y) => src.GetPixel(x, y) ? (byte)1:(byte)0,
+                colorizer);
+        }
+
+
+        public void DrawBitmapByFunc(
+            int width,
+            int height,
+            int posX,
+            int posY,
+            Func<int, int, byte> getPixel,
+            Colorizer colorizer = null)
+        {
             if (colorizer == null)
             {
                 colorizer = GetColor01Gray;
             }
-            for (int y = 0; y < src.Height; y++)
+            for (int y = 0; y < height; y++)
             {
-                for (int x = 0; x < src.Width; x++)
+                for (int x = 0; x < width; x++)
                 {
-                    var b = src.GetPixel(x, y);
+                    var b = getPixel(x, y);
                     var c = colorizer(b);
                     SetPixel(posX + x, posY + y, c);
                 }

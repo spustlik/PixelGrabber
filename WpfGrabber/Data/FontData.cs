@@ -10,10 +10,10 @@ namespace WpfGrabber.Data
 {
     public class FontData
     {
-        public ByteBitmap8Bit[] Letters { get; }
+        public BitBitmap[] Letters { get; }
         public int SpaceX { get; }
-        private Dictionary<char, ByteBitmap8Bit> font = new Dictionary<char, ByteBitmap8Bit>();
-        public FontData(IEnumerable<ByteBitmap8Bit> letters, int spaceX, string fontCharacters)
+        private Dictionary<char, BitBitmap> font = new Dictionary<char, BitBitmap>();
+        public FontData(IEnumerable<BitBitmap> letters, int spaceX, string fontCharacters)
         {
             Letters = letters.ToArray();
             SpaceX = spaceX;
@@ -24,7 +24,7 @@ namespace WpfGrabber.Data
             }
         }
 
-        public ByteBitmap8Bit GetCharBmp(char c)
+        public BitBitmap GetCharBmp(char c)
         {
             font.TryGetValue(c, out var r);
             return r;
@@ -37,7 +37,7 @@ namespace WpfGrabber.Data
                 if (c != null)
                 {
                     DrawLetter(target, x, y, c, color);
-                    x += c.Width;
+                    x += c.WidthPixels;
                 }
                 else
                 {
@@ -47,13 +47,13 @@ namespace WpfGrabber.Data
             }
         }
 
-        public void DrawLetter(ByteBitmapRgba target, int posx, int posy, ByteBitmap8Bit c, uint color = 0xFF000000)
+        public void DrawLetter(ByteBitmapRgba target, int posx, int posy, BitBitmap c, uint color = 0xFF000000)
         {
             for (var y = 0; y < c.Height; y++)
             {
-                for (var x = 0; x < c.Width; x++)
+                for (var x = 0; x < c.WidthPixels; x++)
                 {
-                    if (c.GetPixel(x, y) != 0)
+                    if (c.GetPixel(x, y))
                         target.SetPixel(posx + x, posy + y, 0xFF000000 | color);
                 }
             }
@@ -78,8 +78,10 @@ namespace WpfGrabber.Data
             }
         }
 
-        public static byte[] GetLetterData(ByteBitmap8Bit letter)
+        public static byte[] GetLetterData(BitBitmap letter)
         {
+            return letter.Data;
+            /*
             var data = new byte[letter.Width * letter.Height];
             for (int y = 0; y < letter.Height; y++)
             {
@@ -89,6 +91,7 @@ namespace WpfGrabber.Data
                 }
             }
             return data;
+            */
         }
     }
 }

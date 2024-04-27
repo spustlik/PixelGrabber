@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using WpfGrabber.Data;
+using WpfGrabber;
 
 namespace UnitTests
 {

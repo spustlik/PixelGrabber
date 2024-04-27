@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WpfGrabber.Data;
 
 namespace WpfGrabber.Readers
 {
@@ -15,13 +16,13 @@ namespace WpfGrabber.Readers
             Height = height;
         }
 
-        public IEnumerable<ByteBitmap8Bit> ReadImages(BitReader br, int count = 256)
+        public IEnumerable<BitBitmap> ReadImages(BitReader br, int count = 256)
         {
             const int width = 8;
             int counter = 0;
             while (br.BytePosition < br.DataLength)
             {
-                var letter = new ByteBitmap8Bit(width, Height);
+                var letter = new BitBitmap(width, Height);
                 for (int y = 0; y < Height; y++)
                 {
                     var ly = FlipY ? Height - y : y;
@@ -29,7 +30,7 @@ namespace WpfGrabber.Readers
                     {
                         var b = br.ReadBit();
                         if (b)
-                            letter.SetPixel(x, ly, 1);
+                            letter.SetPixel(x, ly, true);
                     }
                 }
                 yield return letter;
