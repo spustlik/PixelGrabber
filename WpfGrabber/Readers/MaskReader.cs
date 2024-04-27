@@ -26,6 +26,8 @@ namespace WpfGrabber.Readers
     public enum MaskReaderPreambule
     {
         None,
+        [Description("Width & Height")]
+        WidthHeight,
         [Description("Width & Height 8 bits")]
         WidthHeight8,
         [Description("Width & Height 16 bits")]
@@ -73,6 +75,12 @@ namespace WpfGrabber.Readers
             {
                 case MaskReaderPreambule.None:
                     break;
+                case MaskReaderPreambule.WidthHeight:
+                    {
+                        width = BitReader.ReadByte();
+                        height = BitReader.ReadByte();
+                        break;
+                    }
                 case MaskReaderPreambule.WidthHeight8:
                     {
                         width = BitReader.ReadByte() / 8;

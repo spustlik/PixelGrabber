@@ -92,14 +92,14 @@ namespace WpfGrabber.ViewParts
             const int XSPACER = 10;
             const int YSPACER = 4;
 
-            //var font = AppFont.Get();
+            var font = AppData.GetFont();
             var posX = 0;
             var posY = 0;
             var maxW = 0;
             foreach (var img in ReadImages())
             {
                 rgba.DrawBitmap(img, posX, posY, ByteBitmapRgba.GetColor01Gray);
-                //font.DrawString(rgba, posX, posY, $"{img.Width}x{img.Height}");
+                //font.DrawString(rgba, posX, posY, $"{img.Width}X{img.Height}", 0xFF4040FF);
                 posY += img.Height + YSPACER;
                 maxW = Math.Max(img.Width, maxW);
                 if (posY >= max_h)
@@ -119,7 +119,7 @@ namespace WpfGrabber.ViewParts
             BitReader bitReader = new BitReader(ShellVm.Data)
             {
                 BytePosition = ShellVm.Offset,
-                //FlipX = ReverseByte
+                FlipX = false //!!needed fore preambule-reading
             };
             var rd = new MaskReader(bitReader)
             {
