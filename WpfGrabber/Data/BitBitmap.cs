@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WpfGrabber.Readers;
 
 namespace WpfGrabber
 {
@@ -44,7 +45,7 @@ namespace WpfGrabber
             if (x < 0 || x >= WidthPixels || y < 0 || y >= Height)
                 return false;
             byte b = GetPixelByte(x, y, out var bitIndex, out var pos);
-            b = (byte)(b << bitIndex);
+            b = (byte)(b >> bitIndex);
             return (b & 1) == 1;
         }
 
@@ -55,6 +56,23 @@ namespace WpfGrabber
                 bitIndex = 8 - bitIndex;
             pos = (x / 8) + y * WidthBytes;
             return Data[pos];
+        }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            for (int y = 0; y < Height; y++)
+            {
+                for (int x = 0; x < WidthBytes; x++)
+                {
+                    if (x != 0)
+                        sb.Append(" ");
+                    GetPixelByte(x*8, y, out _, out var pos);
+                    sb.Append(HexReader.ToHex(Data[pos], 2));
+                }
+                sb.AppendLine();
+            }
+            return sb.ToString();
         }
     }
 }

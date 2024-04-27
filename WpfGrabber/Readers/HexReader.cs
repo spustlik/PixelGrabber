@@ -33,7 +33,7 @@ namespace WpfGrabber.Readers
                 if (c < 0x20 || c >= 0x7f)
                     c = ' ';
                 asciiLine.Append(c);
-                hexline.Append(ToHex(b,2));
+                hexline.Append(ToHex(b, 2));
                 hexline.Append(" ");
                 if (x == 7)
                 {
@@ -74,7 +74,7 @@ namespace WpfGrabber.Readers
             var s = new char[len];
             for (int i = len - 1; i >= 0; i--)
             {
-                s[i] = _HEX[ x & 0x0F];
+                s[i] = _HEX[x & 0x0F];
                 x = x >> 4;
             }
             return new string(s);
