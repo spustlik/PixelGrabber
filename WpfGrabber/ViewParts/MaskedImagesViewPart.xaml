@@ -17,16 +17,46 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <ItemsControl Style="{StaticResource toolbar}">
+            <ItemsControl.Resources>
+                <Style TargetType="StackPanel">
+                    <Setter Property="Orientation" Value="Horizontal" />
+                </Style>
+            </ItemsControl.Resources>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
             <CheckBox Content="Flip X" IsChecked="{Binding FlipX}"/>
             <Separator/>
             <CheckBox Content="Flip Y" IsChecked="{Binding FlipY}"/>
             <Separator/>
-            <Label Content="Width"/>
-            <c:NumberEditor Value="{Binding WidthBytes}" Minimum="1" Width="70"/>
-            <Separator/>
-            <Label Content="Height"/>
-            <c:NumberEditor Value="{Binding Height}" Minimum="1" Width="70"/>
-            <Separator/>
+            <StackPanel>
+                <Label Content="Type"/>
+                <ComboBox Style="{StaticResource enumCombo}" 
+                      ItemsSource="{Binding ReaderType, Converter={StaticResource eumItems}, Mode=OneTime}"
+                      SelectedValue="{Binding ReaderType, UpdateSourceTrigger=PropertyChanged}" 
+                      />
+                <Separator/>
+            </StackPanel>
+            <StackPanel>
+                <Label Content="Preambule"/>
+                <ComboBox Style="{StaticResource enumCombo}" 
+                      ItemsSource="{Binding Preambule, Converter={StaticResource eumItems}, Mode=OneTime}"
+                      SelectedValue="{Binding Preambule, UpdateSourceTrigger=PropertyChanged}" 
+                      />
+                <Separator/>
+            </StackPanel>
+            <StackPanel>
+                <Label Content="Width"/>
+                <c:NumberEditor Value="{Binding Width}" Minimum="1" Width="70"/>
+                <Separator/>
+            </StackPanel>
+            <StackPanel>
+                <Label Content="Height"/>
+                <c:NumberEditor Value="{Binding Height}" Minimum="1" Width="70"/>
+                <Separator/>
+            </StackPanel>
             <Button Content="Save" Style="{StaticResource dropDown}">
                 <Button.ContextMenu>
                     <ContextMenu Placement="Bottom">

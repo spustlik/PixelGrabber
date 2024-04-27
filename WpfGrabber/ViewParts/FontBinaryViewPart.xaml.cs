@@ -2,10 +2,15 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
 using System.Windows;
+using System.Windows.Markup;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
+using System.Xml;
 using WpfGrabber.Data;
 using WpfGrabber.Readers;
+using WpfGrabber.Services;
 
 namespace WpfGrabber.ViewParts
 {
@@ -136,9 +141,23 @@ namespace WpfGrabber.ViewParts
                 font.DrawLetter(bmp, 0, y, letter, 0xFFFFFFFF);
                 y += letter.Height;
             }
-
             bmp.ToBitmapSource().SaveToPngFile(dlg.FileName);
         }
+
+        private void OnButtonSaveBinary_Click(object sender, RoutedEventArgs e)
+        {
+            var dlg = new SaveFileDialog();
+            dlg.DefaultExt = "bin";
+            if (dlg.ShowDialog() != true)
+                return;
+            var font = CreateFont();
+            using (var st = new FileStream(dlg.FileName, FileMode.Create, FileAccess.Write, FileShare.Read))
+            {
+                font.WriteToStream(st);
+            }
+        }
+
+
         private void OnButtonSaveSampleTextImage_Click(object sender, RoutedEventArgs e)
         {
             var dlg = new SaveFileDialog();
@@ -150,7 +169,6 @@ namespace WpfGrabber.ViewParts
             var bmp = new ByteBitmapRgba(ViewModel.TestText.Length * font.Letters.First().Width, font.Letters.Max(x=>x.Height));
             font.DrawString(bmp, 0, 0, ViewModel.TestText, 0xFFFFFFFF);
             bmp.ToBitmapSource().SaveToPngFile(dlg.FileName);
-
         }
 
         private void SetFontCharsAscii_Click(object sender, RoutedEventArgs e)
@@ -172,7 +190,6 @@ namespace WpfGrabber.ViewParts
         {
             ViewModel.TestText = "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Nulla pulvinar eleifend sem.";
         }
-
 
     }
 }

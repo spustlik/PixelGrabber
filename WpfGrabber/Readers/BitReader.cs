@@ -28,6 +28,12 @@ namespace WpfGrabber
                 b = GetFlippedX(b);
             return b;
         }
+        public int ReadWord16()
+        {
+            var b1 = ReadByte();
+            var b2 = ReadByte();
+            return b1 | b2 >> 8;
+        }
         public Boolean ReadBit()
         {
             if (BytePosition >= Data.Length)

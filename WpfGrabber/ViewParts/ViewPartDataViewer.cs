@@ -13,6 +13,8 @@ namespace WpfGrabber.ViewParts
 {
     public abstract class ViewPartDataViewer<TVM> : ViewPart where TVM:SimpleDataObject,new()
     {
+        private Throthler _viewer;
+
         public ShellVm ShellVm { get; private set; }
         protected ViewPartDataViewer()
         {
@@ -26,6 +28,7 @@ namespace WpfGrabber.ViewParts
             base.OnInitialize();
             ShellVm.PropertyChanged += ShellVm_PropertyChanged;
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
+            _viewer = Throthler.Create(TimeSpan.FromMilliseconds(100), OnShowData);
             ShowData();
         }
 
@@ -39,19 +42,9 @@ namespace WpfGrabber.ViewParts
             ShowData();
         }
 
-        private bool _showingData = false;
         protected void ShowData()
         {
-            if (_showingData)
-                return;
-            _showingData = true;
-            Dispatcher.BeginInvoke((Action)InvokeShowData);
-        }
-
-        private void InvokeShowData()
-        {
-            this.OnShowData();
-            _showingData = false;
+            _viewer.Start();
         }
 
         protected virtual void OnShowData()

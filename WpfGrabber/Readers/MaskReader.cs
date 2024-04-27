@@ -1,136 +1,203 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Windows;
-using System.Xaml;
+using System.ComponentModel;
 
 namespace WpfGrabber.Readers
 {
     // vzdy dva byte DATA,MASK, nejaka vyska a (sirka v bytech)
     //varianta 2 - vzdy WidthBytes Data, pak WidthBytes Mask
     //varianta 3 - vzdy cely obr (WidthBuytes*Height) Data, cely obr mask
+
+    public enum MaskReaderType
+    {
+        [Description("Byte")]
+        ByteDataMask,
+        [Description("Line")]
+        LineDataMask,
+        [Description("Image")]
+        ImageDataMask,
+        [Description("Image and mask preambules")]
+        ImageDataMaskWithPreambule,
+
+    }
+
+    public enum MaskReaderPreambule
+    {
+        None,
+        [Description("Width & Height 8 bits")]
+        WidthHeight8,
+        [Description("Width & Height 16 bits")]
+        WidthHeight16,
+        [Description("Height & Width 8 bits")]
+        HeightWidth8,
+        [Description("Height & Width 16 bits")]
+        HeightWidth16,
+
+    }
     public class MaskReader
     {
-        public byte[] Data { get; }
-        public int DataLength =>Data.Length;
-        public int Position { get; set; }
-        public int WidthBytes { get; set; } = 3;
-        public int Height { get; set; } = 16;
-        public bool FlipX { get;set; }
-        public bool FlipY { get;set; }
-        public MaskReader(byte[] data)
+        public BitReader BitReader { get; }
+
+        public MaskReader(BitReader bitReader)
         {
-            Data = data;
+            this.BitReader = bitReader;
         }
 
-        protected byte ReadByte()
-        {
-            if (Position >= DataLength)
-                return 0;
-            return Data[Position++];
-        }
+        public bool FlipX { get; set; }
+        public bool FlipY { get; set; }
+        public int Height { get; set; }
+        public int Width { get; set; }
+        public MaskReaderType Type { get; set; }
+        public MaskReaderPreambule Preambule { get; set; }
 
         public ByteBitmap8Bit Read()
         {
-            var result = new ByteBitmap8Bit(WidthBytes * 8, Height);
-            for (var y = 0; y < Height; y++)
+            var width = this.Width;
+            var height = this.Height;
+            ReadPreambule(ref width, ref height);
+            switch (Type)
             {
-                var posY = y;
-                if (FlipY)
-                    posY = Height - y;
-                for (int x = 0; x < WidthBytes; x++)
-                {
-                    var data = ReadByte();
-                    if (FlipX)
-                        data = BitReader.GetFlippedX(data);
-                    var mask = ReadByte();
-                    if (FlipX)
-                        mask = BitReader.GetFlippedX(mask);
-                    for(var i = 0; i < 8; i++)
+                case MaskReaderType.ByteDataMask: return ReadByteArrayMask(width, height);
+                case MaskReaderType.LineDataMask: return ReadLineDataMask(width, height);
+                case MaskReaderType.ImageDataMask: return ReadImageDataMask(width, height);
+                case MaskReaderType.ImageDataMaskWithPreambule: return ReadImageDataMask(width, height, true);
+                default: throw new NotImplementedException($"Reading mask type {Type}");
+            }
+        }
+
+        private void ReadPreambule(ref int width, ref int height)
+        {
+            switch (Preambule)
+            {
+                case MaskReaderPreambule.None:
+                    break;
+                case MaskReaderPreambule.WidthHeight8:
                     {
-                       byte b = 0;
-                        if ((mask & 1) != 0)
-                        {
-                            if ((data & 1) == 0)
-                                b = 1;
-                            else
-                                b = 2;
-                        }
-                        result.SetPixel(x * 8 + i, posY, b);
-                        data = (byte)(data >> 1);
-                        mask = (byte)(mask >> 1);
+                        width = BitReader.ReadByte() / 8;
+                        height = BitReader.ReadByte();
+                        break;
                     }
+                case MaskReaderPreambule.WidthHeight16:
+                    {
+                        width = BitReader.ReadWord16() / 8;
+                        height = BitReader.ReadWord16();
+                        break;
+                    }
+                case MaskReaderPreambule.HeightWidth8:
+                    {
+                        height = BitReader.ReadByte();
+                        width = (BitReader.ReadByte() / 8) / 2;
+                        break;
+                    }
+                case MaskReaderPreambule.HeightWidth16:
+                    {
+                        height = BitReader.ReadWord16();
+                        width = BitReader.ReadWord16() / 8;
+                        break;
+                    }
+                default:
+                    throw new NotImplementedException($"Reading mask preambule {Preambule}");
+            }
+        }
+
+        private ByteBitmap8Bit ReadImageDataMask(int width, int height, bool maskPreambule = false)
+        {
+            var result = new ByteBitmap8Bit(width * 8, height);
+
+            var dataBytes = ReadBytes(width * height);
+            if(maskPreambule)
+            {
+                ReadPreambule(ref width, ref height);
+            }
+            var maskBytes = ReadBytes(width * height);
+            for (var y = 0; y < height; y++)
+            {
+                var posY = FlipY ? height - y : y;
+                for (int x = 0; x < width; x++)
+                {
+                    WriteByte(result, x, posY, dataBytes[x + y * width], maskBytes[x + y * width]);
                 }
             }
             return result;
         }
 
-        public void Process(BitmapImage source, int itemHeight, int itemsCount)
+        private ByteBitmap8Bit ReadLineDataMask(int width, int height)
         {
-            var src = ByteBitmapRgba.FromBitmapSource(source);
-            var dst = new ByteBitmapRgba(src.Width, src.Height);
-            ProcessMask(src, dst, itemHeight, itemsCount);
-            dst.ToBitmapSource();
+            var result = new ByteBitmap8Bit(width * 8, height);
+            for (var y = 0; y < height; y++)
+            {
+                var posY = FlipY ? height - y : y;
+
+                var dataBytes = ReadBytes(width);
+                var maskBytes = ReadBytes(width);
+
+                for (int x = 0; x < width; x++)
+                {
+                    WriteByte(result, x, posY, dataBytes[x], maskBytes[x]);
+                }
+            }
+            return result;
         }
 
-        private void ProcessMask(ByteBitmapRgba src, ByteBitmapRgba dst, int itemHeight, int itemsCount)
+        private byte[] ReadBytes(int count)
         {
-            var srcposY = 0;
-            var dstposY = 0;
-            for (int i = 0; i < itemsCount; i++)
+            var result = new byte[count];
+            for (int i = 0; i < result.Length; i++)
             {
-                for (int y = 0; y < itemHeight; y++)
-                {
-                    for (int x = 0; x < src.Width; x++)
-                    {
-                        var sbp = src.GetPixel(x, y + srcposY);
-                        var sbm = src.GetPixel(x, srcposY + itemHeight + y);
-                        if ((sbm & 0xFFFFFF) == 0)
-                        {
-                            dst.SetPixel(x, dstposY + y, sbp);
-                        }
-                    }
-                }
-                srcposY += itemHeight * 2;
-                dstposY += itemHeight;
+                result[i] = BitReader.ReadByte();
+            }
+            return result;
+        }
+        private void WriteByte(ByteBitmap8Bit result, int x, int y, byte data, byte mask)
+        {
+            for (var i = 0; i < 8; i++)
+            {
+                byte b = GetBit0Color2(data, mask);
+                var posX = x * 8 + i;
+                if (FlipX)
+                    posX = result.Width - posX;
+                result.SetPixel(posX, y, b);
+                data = (byte)(data >> 1);
+                mask = (byte)(mask >> 1);
             }
         }
 
-        public WriteableBitmap ProcessMask(BitmapImage src, int itemHeight, int itemsCount)
+        private ByteBitmap8Bit ReadByteArrayMask(int width, int height)
         {
-            int width = (int)src.Width;
-            int height = (int)src.Height;
-            var srcpixels = new uint[width * height];
-            src.CopyPixels(srcpixels, stride: width * 4, 0);
-
-            //var src = new ByteBitmapRgba()
-            var dstpixels = new uint[width * height];
-            var srcposY = 0;
-            var dstposY = 0;
-            for (int i = 0; i < itemsCount; i++)
+            var result = new ByteBitmap8Bit(width * 8, height);
+            for (var y = 0; y < height; y++)
             {
-                for (int y = 0; y < itemHeight; y++)
+                var posY = FlipY ? height - y : y;
+
+                for (int x = 0; x < width; x++)
                 {
-                    for (int x = 0; x < width; x++)
-                    {
-                        var sb = srcpixels[(srcposY + y) * width + x];
-                        var sbm = srcpixels[(srcposY + itemHeight + y) * width + x];
-                        if ((sbm & 0xFFFFFF) == 0)
-                        {
-                            dstpixels[(dstposY + y) * width + x] = sb;
-                        }
-                    }
+                    var data = BitReader.ReadByte();
+                    var mask = BitReader.ReadByte();
+                    WriteByte(result, x, posY, data, mask);
                 }
-                srcposY += itemHeight * 2;
-                dstposY += itemHeight;
             }
-            var bmp = new WriteableBitmap(width, height, 96, 96, PixelFormats.Pbgra32, null);
-            bmp.WritePixels(new Int32Rect(0, 0, width, height), dstpixels, width*4, 0);
-            return bmp;
+            return result;
+
         }
+
+        private static byte GetBit0Color(byte data, byte mask)
+        {
+            if ((mask & 1) == 0)
+                return 0; //white
+            if ((data & 1) == 0)
+                return 1; //transparent
+            return 2; //black
+        }
+        private static byte GetBit0Color2(byte data, byte mask)
+        {
+            var colors = new byte[] { 1, 1, 2, 0 };
+            var dm = ((data & 1) << 1) | (mask & 1);
+            var b = colors[dm];
+            return b;
+        }
+
     }
+
 }

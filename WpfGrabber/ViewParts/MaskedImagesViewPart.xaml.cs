@@ -1,17 +1,10 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using WpfGrabber.Readers;
 
 namespace WpfGrabber.ViewParts
@@ -45,12 +38,30 @@ namespace WpfGrabber.ViewParts
         }
         #endregion
 
-        #region WidthBytes property
-        private int _widthBytes = 3;
-        public int WidthBytes
+        #region Width property
+        private int _width = 3;
+        public int Width
         {
-            get => _widthBytes;
-            set => Set(ref _widthBytes, value);
+            get => _width;
+            set => Set(ref _width, value);
+        }
+        #endregion
+
+        #region ReaderType property
+        private MaskReaderType _readerType;
+        public MaskReaderType ReaderType
+        {
+            get => _readerType;
+            set => Set(ref _readerType, value);
+        }
+        #endregion
+
+        #region Preambule property
+        private MaskReaderPreambule _preambule;
+        public MaskReaderPreambule Preambule
+        {
+            get => _preambule;
+            set => Set(ref _preambule, value);
         }
         #endregion
 
@@ -77,28 +88,22 @@ namespace WpfGrabber.ViewParts
         {
             var (max_w, max_h) = GetDataImageSize(imageBorder);
             var rgba = new ByteBitmapRgba(max_w, max_h);
-            var posX = 0;
-            var posY = 0;
             const int XSPACER = 10;
             const int YSPACER = 4;
 
-            var rd = new MaskReader(ShellVm.Data)
+            var posX = 0;
+            var posY = 0;
+            var maxW = 0;
+            foreach (var img in ReadImages())
             {
-                FlipX = ViewModel.FlipX,
-                FlipY = ViewModel.FlipY,
-                Height = ViewModel.Height,
-                WidthBytes = ViewModel.WidthBytes <=0 ? 1 : ViewModel.WidthBytes,
-                Position = ShellVm.Offset
-            };
-            while (rd.Position < rd.DataLength)
-            {
-                var img = rd.Read();
                 rgba.DrawBitmap(img, posX, posY, ByteBitmapRgba.GetColor01Gray);
                 posY += img.Height + YSPACER;
-                if(posY>=max_h)
+                maxW = Math.Max(img.Width, maxW);
+                if (posY >= max_h)
                 {
                     posY = 0;
-                    posX += img.Width + XSPACER;
+                    posX += maxW + XSPACER;
+                    maxW = 0;
                 }
             }
             var bmp = rgba.ToBitmapSource();
@@ -106,14 +111,58 @@ namespace WpfGrabber.ViewParts
             image.RenderTransform = new ScaleTransform(ShellVm.Zoom, ShellVm.Zoom);
         }
 
+        private IEnumerable<ByteBitmap8Bit> ReadImages()
+        {
+            BitReader bitReader = new BitReader(ShellVm.Data)
+            {
+                BytePosition = ShellVm.Offset,
+                //FlipX = ReverseByte
+            };
+            var rd = new MaskReader(bitReader)
+            {
+                FlipX = ViewModel.FlipX,
+                FlipY = ViewModel.FlipY,
+                Height = ViewModel.Height,
+                Width = ViewModel.Width <= 0 ? 1 : ViewModel.Width,
+                Type = ViewModel.ReaderType,
+                Preambule = ViewModel.Preambule
+            };
+            while (rd.BitReader.BytePosition < rd.BitReader.DataLength)
+            {
+                var img = rd.Read();
+                yield return img;
+            }
+        }
         private void OnButtonSaveImages_Click(object sender, RoutedEventArgs e)
         {
-            //TODO:
+            var dlg = new SaveFileDialog();
+            dlg.DefaultExt = ".png";
+            dlg.FileName = "Select folder";
+            if (dlg.ShowDialog() != true)
+                return;
+            int i = 0;
+            foreach (var img in ReadImages())
+            {
+                if (img.Width <= 0 || img.Height <= 0 || img.Width >= 256 || img.Height >= 128)
+                    continue;
+                var rgba = ByteBitmapRgba.FromBitmap(img);
+                string fileName = Path.Combine(
+                    Path.GetDirectoryName(dlg.FileName),
+                    $"{Path.GetFileNameWithoutExtension(dlg.FileName)}-{i:00}.png");
+                rgba.ToBitmapSource().SaveToPngFile(fileName);
+                i++;
+            }
+            ((BitmapSource)image.Source).SaveToPngFile(dlg.FileName);
         }
 
         private void OnButtonSave_Click(object sender, RoutedEventArgs e)
         {
-            //TODO:
+            var dlg = new SaveFileDialog();
+            dlg.DefaultExt = ".png";
+            dlg.FileName = $"{Path.GetFileName(ShellVm.FileName)}-data-{ShellVm.Offset:X4}.{dlg.DefaultExt}";
+            if (dlg.ShowDialog() != true)
+                return;
+            ((BitmapSource)image.Source).SaveToPngFile(dlg.FileName);
         }
     }
 }

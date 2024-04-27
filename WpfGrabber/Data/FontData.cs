@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -55,6 +57,31 @@ namespace WpfGrabber.Data
                         target.SetPixel(posx + x, posy + y, 0xFF000000 | color);
                 }
             }
+        }
+
+        public void WriteToStream(Stream s)
+        {
+            var letters = font.OrderBy(pair => pair.Key).ToArray();
+            var last = letters[0].Key - 1;
+            for (int i = 0; i < letters.Length; i++)
+            {
+                var letter = letters[i];
+                while (letter.Key > last + 1)
+                {
+                    //add empty char
+                    byte[] data = GetLetterData(letter.Value);
+                    Array.Clear(data, 0, data.Length);
+                    s.WriteBytes(data);
+                }
+                s.WriteBytes(GetLetterData(letter.Value));
+            }
+        }
+
+        private static byte[] GetLetterData(ByteBitmap8Bit letter)
+        {
+            var data = new byte[letter.Width * letter.Height];
+            Array.Copy(letter.Data, data, data.Length);
+            return data;
         }
     }
 }

@@ -35,7 +35,7 @@ namespace WpfGrabber
         }
         public byte[] ToBytes()
         {
-            var bytes= new byte[Data.Length*sizeof(uint)];
+            var bytes = new byte[Data.Length * sizeof(uint)];
             Array.Copy(Data, bytes, Data.Length);
             return bytes;
         }
@@ -62,7 +62,9 @@ namespace WpfGrabber
             return Data[x + y * Width];
         }
 
-        public void DrawBitmap(ByteBitmap8Bit src, int posX,int posY, Func<byte, uint> colorizer = null)
+        public delegate uint Colorizer(byte c);
+
+        public void DrawBitmap(ByteBitmap8Bit src, int posX, int posY, Colorizer colorizer = null)
         {
             if (colorizer == null)
             {
@@ -78,6 +80,14 @@ namespace WpfGrabber
                 }
             }
         }
+
+        public static ByteBitmapRgba FromBitmap(ByteBitmap8Bit src, Colorizer colorizer = null)
+        {
+            var result = new ByteBitmapRgba(src.Width, src.Height);
+            result.DrawBitmap(src, 0, 0, colorizer);
+            return result;
+        }
+
 
         public static uint GetColor01Gray(byte b)
         {

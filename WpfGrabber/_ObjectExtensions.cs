@@ -35,6 +35,11 @@ namespace WpfGrabber
             }
         }
 
+        public static void WriteBytes(this Stream s, byte[] data)
+        {
+            s.Write(data, 0, data.Length);
+        }
+
         public static void AddRange<T>(this ObservableCollection<T> collection, IEnumerable<T> data, bool clear = false)
         {
             if (clear)
