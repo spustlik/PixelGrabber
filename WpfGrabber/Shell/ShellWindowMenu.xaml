@@ -34,7 +34,7 @@
                 </MenuItem.ItemContainerStyle>
             </MenuItem>
             <MenuItem Header="Layout">
-                <MenuItem Header="Auto load" IsCheckable="True" IsChecked="{Binding AutoLoadLayout}"/>
+                <MenuItem Header="Auto load" IsCheckable="True" IsChecked="{Binding ShellVm.AutoLoadLayout}"/>
                 <MenuItem Header="Load" Click="LoadLayout_Click"/>
                 <MenuItem Header="Save" Click="SaveLayout_Click"/>
             </MenuItem>

@@ -20,7 +20,6 @@ namespace WpfGrabber.Services
         public string LastFile { get; set; }
         public bool OpenLastFile { get; set; } = true;
         public double Zoom { get; set; }
-
         public bool AutoLoadLayout { get; set; } = true;
 
         public static void Save(ShellVm vm)
