@@ -72,15 +72,22 @@ namespace WpfGrabber.Data
                     byte[] data = GetLetterData(letter.Value);
                     Array.Clear(data, 0, data.Length);
                     s.WriteBytes(data);
+                    last = letter.Key;
                 }
                 s.WriteBytes(GetLetterData(letter.Value));
             }
         }
 
-        private static byte[] GetLetterData(ByteBitmap8Bit letter)
+        public static byte[] GetLetterData(ByteBitmap8Bit letter)
         {
             var data = new byte[letter.Width * letter.Height];
-            Array.Copy(letter.Data, data, data.Length);
+            for (int y = 0; y < letter.Height; y++)
+            {
+                for (int x = 0; x < letter.Width; x++)
+                {
+                    data[y * letter.Width + x] = letter.GetPixel(x,y);
+                }
+            }
             return data;
         }
     }

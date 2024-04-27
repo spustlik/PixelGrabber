@@ -60,6 +60,7 @@
     <Compile Include="Converters\PercentTextConverter.cs" />
     <Compile Include="Converters\CharConverter.cs" />
     <Compile Include="Converters\HexStringConverter.cs" />
+    <Compile Include="Data\BitBitmap.cs" />
     <Compile Include="Data\ByteBitmap8Bit.cs" />
     <Compile Include="Data\FontData.cs" />
     <Compile Include="Readers\AlienReader.cs" />
