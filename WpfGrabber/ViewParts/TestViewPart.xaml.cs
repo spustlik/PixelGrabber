@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WpfGrabber.Shell;
 
 namespace WpfGrabber.ViewParts
 {
@@ -28,6 +29,18 @@ namespace WpfGrabber.ViewParts
         private void TestMenu_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        protected override void OnShowData()
+        {
+            var (max_w, max_h) = GetDataImageSize(imageBorder);
+            var rgba = new ByteBitmapRgba(max_w, max_h);
+            var font = AppData.GetFont();
+
+            font.DrawString(rgba, 0, 0, "TEST TEXT");
+            var bmp = rgba.ToBitmapSource();
+            image.Source = bmp;
+            image.RenderTransform = new ScaleTransform(ShellVm.Zoom, ShellVm.Zoom);
         }
     }
 

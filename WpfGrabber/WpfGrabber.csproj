@@ -76,6 +76,7 @@
     <Compile Include="Readers\Z80\Z80Instruction.cs" />
     <Compile Include="Readers\Z80\Z80Reader.cs" />
     <Compile Include="Services\Throthler.cs" />
+    <Compile Include="Shell\AppData.cs" />
     <Compile Include="Shell\IViewPartService.cs" />
     <Compile Include="Shell\ShellWindowContent.LayoutManagerService.cs" />
     <Compile Include="Themes\ResourceEvents.cs" />
@@ -229,6 +230,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <Compile Include="Shell\ShellWindowContent.ViewPartService.cs" />
+    <None Include="Resources\AppFont.fnt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

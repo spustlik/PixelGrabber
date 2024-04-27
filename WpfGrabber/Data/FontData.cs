@@ -75,6 +75,7 @@ namespace WpfGrabber.Data
                     last = letter.Key;
                 }
                 s.WriteBytes(GetLetterData(letter.Value));
+                last = letter.Key;
             }
         }
 

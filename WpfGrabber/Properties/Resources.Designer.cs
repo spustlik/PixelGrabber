@@ -59,5 +59,15 @@ namespace WpfGrabber.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] AppFont {
+            get {
+                object obj = ResourceManager.GetObject("AppFont", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
     }
 }

@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using WpfGrabber.Readers;
+using WpfGrabber.Shell;
 
 namespace WpfGrabber.ViewParts
 {
@@ -91,12 +92,14 @@ namespace WpfGrabber.ViewParts
             const int XSPACER = 10;
             const int YSPACER = 4;
 
+            //var font = AppFont.Get();
             var posX = 0;
             var posY = 0;
             var maxW = 0;
             foreach (var img in ReadImages())
             {
                 rgba.DrawBitmap(img, posX, posY, ByteBitmapRgba.GetColor01Gray);
+                //font.DrawString(rgba, posX, posY, $"{img.Width}x{img.Height}");
                 posY += img.Height + YSPACER;
                 maxW = Math.Max(img.Width, maxW);
                 if (posY >= max_h)

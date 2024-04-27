@@ -30,13 +30,14 @@
                 </Button.ContextMenu>
             </Button>
         </ItemsControl>
-        <Border Grid.Row="1" Margin="100" CornerRadius="20">
+        <Border Grid.Row="1" Margin="100" CornerRadius="20" x:Name="imageBorder">
             <Border.Background>
                 <RadialGradientBrush>
                     <GradientStop Color="White" Offset="0"/>
                     <GradientStop Color="DodgerBlue" Offset="1"/>
                 </RadialGradientBrush>
             </Border.Background>
+            <Image x:Name="image"/>
         </Border>
     </Grid>
 </local:ViewPartDataViewer>
