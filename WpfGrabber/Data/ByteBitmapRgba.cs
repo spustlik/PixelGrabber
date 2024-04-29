@@ -92,10 +92,12 @@ namespace WpfGrabber
         {
             if (colorizer == null)
                 colorizer = GetColorCopy;
-            DrawBitmapByFunc( src.Width, src.Height,
+            DrawBitmapFunctioned( src.Width, src.Height,
                 (x, y) => src.GetPixel(x,y),
-                (x, y, orig) => {
-
+                (x, y, pixel) => {
+                    uint orig = GetPixel(posX + x, posY + y);
+                    uint c = colorizer(pixel, orig);
+                    SetPixel(posX + x, posY + y, c);
                 });
         }
 
@@ -111,17 +113,16 @@ namespace WpfGrabber
             {
                 colorizer = GetColor01Gray;
             }
-            DrawBitmapByFunc(width, height, 
+            DrawBitmapFunctioned(width, height, 
                 getPixel,
-                (x, y, b) =>
-                {
+                (x, y, pixel) => {
                     uint orig = GetPixel(posX + x, posY + y);
-                    uint c = colorizer(b, orig);
+                    uint c = colorizer(pixel, orig);
                     SetPixel(posX + x, posY + y, c);
                 });
         }
 
-        public void DrawBitmapByFunc(
+        public void DrawBitmapFunctioned(
             int width,
             int height,
             Func<int, int, uint> getPixel,

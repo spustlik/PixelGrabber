@@ -55,6 +55,15 @@ namespace WpfGrabber.ViewParts
         }
         #endregion
 
+        #region ShowLabels property
+        private bool _showLabels;
+        public bool ShowLabels
+        {
+            get => _showLabels;
+            set => Set(ref _showLabels, value);
+        }
+        #endregion
+
         public ObservableCollection<ImageVM> Images { get; } = new ObservableCollection<ImageVM>();
     }
     public class ImageVM : SimpleDataObject
@@ -116,6 +125,7 @@ namespace WpfGrabber.ViewParts
         {
             base.OnInitialize();
             ViewModel.Columns = 1;
+            ViewModel.ShowLabels = true;
             //foreach (var file in Directory.GetFiles(@"E:\GameWork\8bitgames\alien8", "alien8.*.png"))
             foreach (var file in Directory.GetFiles(@"E:\GameWork\_AssetsIso\kenney_isometric-roads\png\roads", "*.png"))
             {
