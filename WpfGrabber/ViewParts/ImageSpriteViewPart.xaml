@@ -1,0 +1,96 @@
+﻿<local:ImageSpriteViewPartBase x:Class="WpfGrabber.ViewParts.ImageSpriteViewPart"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfGrabber.ViewParts" xmlns:c="clr-namespace:WpfGrabber.Controls"
+             mc:Ignorable="d" x:Name="root"
+             d:DesignHeight="452.516" d:DesignWidth="367.195">
+    <d:DesignerProperties.DesignStyle>
+        <Style TargetType="UserControl">
+            <Setter Property="Background" Value="White" />
+        </Style>
+    </d:DesignerProperties.DesignStyle>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <ItemsControl Style="{StaticResource toolbar}">
+            <ItemsControl.Resources>
+                <Style TargetType="StackPanel">
+                    <Setter Property="Orientation" Value="Horizontal" />
+                </Style>
+            </ItemsControl.Resources>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <StackPanel>
+                <Label Content="Columns"/>
+                <c:NumberEditor Value="{Binding Columns}" Minimum="1" Maximum="16" Width="70"/>
+                <Separator/>
+            </StackPanel>
+            <StackPanel>
+                <Label Content="Width"/>
+                <c:NumberEditor Value="{Binding Width}" Minimum="1" Maximum="256" Width="70"/>
+                <Separator/>
+            </StackPanel>
+            <StackPanel>
+                <Label Content="Height"/>
+                <c:NumberEditor Value="{Binding Height}" Minimum="1" Maximum="256" Width="70"/>
+                <Separator/>
+            </StackPanel>
+            <Button Content="Menu" Style="{StaticResource dropDown}">
+                <Button.ContextMenu>
+                    <ContextMenu Placement="Bottom">
+                        <MenuItem Header="Add image files..." Click="OnButtonAddImages_Click"/>
+                        <MenuItem Header="Save image sheet..." Click="OnButtonSave_Click"/>
+                        <Separator/>
+                        <MenuItem Header="Set Width and Height to max" Click="OnSetMax_Click"/>
+                        <MenuItem Header="Load images from data" IsCheckable="true" IsChecked="{Binding LoadFromData}"/>
+
+                    </ContextMenu>
+                </Button.ContextMenu>
+            </Button>
+        </ItemsControl>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <Border x:Name="imageBorder" 
+                    SizeChanged="BorderSize_Changed"
+                    Style="{StaticResource checkerBorder}">
+                <ItemsControl ItemsSource="{Binding Images}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="{Binding Columns}"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type local:ImageVM}">
+                            <Border BorderBrush="DodgerBlue" BorderThickness="1" Margin="0,0,5,5"
+                                    ToolTip="{Binding Description}">
+                                <Grid>
+                                    <Image Source="{Binding Image}" Stretch="None">
+                                        <Image.RenderTransform>
+                                            <ScaleTransform 
+                                                ScaleX="{Binding ShellVm.Zoom, ElementName=root}"
+                                                ScaleY="{Binding ShellVm.Zoom, ElementName=root}"
+                                                />
+                                        </Image.RenderTransform>
+                                    </Image>
+                                    <!--<Canvas Margin="4">
+                                        <Label Margin="2" Foreground="DodgerBlue" Content="{Binding Name}" />
+                                    </Canvas>-->
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <!--<Canvas Margin="10" x:Name="canvas">
+                    <Image x:Name="image" Stretch="None" RenderOptions.BitmapScalingMode="NearestNeighbor"
+                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                </Canvas>-->
+            </Border>
+        </ScrollViewer>
+    </Grid>
+</local:ImageSpriteViewPartBase>

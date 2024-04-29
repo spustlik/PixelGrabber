@@ -62,6 +62,7 @@
     <Compile Include="Converters\HexStringConverter.cs" />
     <Compile Include="Data\BitBitmap.cs" />
     <Compile Include="Data\ByteBitmap8Bit.cs" />
+    <Compile Include="Data\ColorHelper.cs" />
     <Compile Include="Data\FontData.cs" />
     <Compile Include="Readers\AlienReader.cs" />
     <Compile Include="Readers\BitImageReader.cs" />
@@ -82,6 +83,9 @@
     <Compile Include="Themes\ResourceEvents.cs" />
     <Compile Include="ViewParts\FontBinaryViewPart.xaml.cs">
       <DependentUpon>FontBinaryViewPart.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewParts\ImageSpriteViewPart.xaml.cs">
+      <DependentUpon>ImageSpriteViewPart.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewParts\ViewPartFactory.cs" />
     <Compile Include="ViewParts\Z80DumpViewPart.xaml.cs">
@@ -130,6 +134,7 @@
     </Compile>
     <Compile Include="ViewParts\ViewPart.cs" />
     <Compile Include="_ObjectExtensions.cs" />
+    <Compile Include="_WpfExtensions.cs" />
     <Page Include="ExceptionWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -137,6 +142,10 @@
     <Page Include="ViewParts\FontBinaryViewPart.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ViewParts\ImageSpriteViewPart.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="ViewParts\Z80DumpViewPart.xaml">
       <Generator>MSBuild:Compile</Generator>

@@ -5,6 +5,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using WpfGrabber.Data;
+using System.Runtime.InteropServices;
 
 namespace WpfGrabber
 {
@@ -63,7 +64,7 @@ namespace WpfGrabber
             return Data[x + y * Width];
         }
 
-        public delegate uint Colorizer(byte c);
+        public delegate uint Colorizer(uint data, uint orig);
 
         public void DrawBitmap(ByteBitmap8Bit src, int posX, int posY, Colorizer colorizer = null)
         {
@@ -83,30 +84,55 @@ namespace WpfGrabber
                 src.Height,
                 posX,
                 posY,
-                (x, y) => src.GetPixel(x, y) ? (byte)1:(byte)0,
+                (x, y) => src.GetPixel(x, y) ? (byte)1 : (byte)0,
                 colorizer);
         }
 
+        public void DrawBitmap(ByteBitmapRgba src, int posX, int posY, Colorizer colorizer)
+        {
+            if (colorizer == null)
+                colorizer = GetColorCopy;
+            DrawBitmapByFunc( src.Width, src.Height,
+                (x, y) => src.GetPixel(x,y),
+                (x, y, orig) => {
+
+                });
+        }
 
         public void DrawBitmapByFunc(
             int width,
             int height,
             int posX,
             int posY,
-            Func<int, int, byte> getPixel,
+            Func<int, int, uint> getPixel,
             Colorizer colorizer = null)
         {
             if (colorizer == null)
             {
                 colorizer = GetColor01Gray;
             }
+            DrawBitmapByFunc(width, height, 
+                getPixel,
+                (x, y, b) =>
+                {
+                    uint orig = GetPixel(posX + x, posY + y);
+                    uint c = colorizer(b, orig);
+                    SetPixel(posX + x, posY + y, c);
+                });
+        }
+
+        public void DrawBitmapByFunc(
+            int width,
+            int height,
+            Func<int, int, uint> getPixel,
+            Action<int, int, uint> setPixel)
+        {
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
                 {
                     var b = getPixel(x, y);
-                    var c = colorizer(b);
-                    SetPixel(posX + x, posY + y, c);
+                    setPixel(x, y, b);
                 }
             }
         }
@@ -119,29 +145,33 @@ namespace WpfGrabber
         }
 
 
-        public static uint GetColor01Gray(byte b)
+        public static uint GetColorCopy(uint c, uint orig)
+        {
+            return c;
+        }
+
+        public static uint GetColor01Gray(uint b, uint orig)
         {
             switch (b)
             {
                 case 0: return 0xFFFFFFFF;
                 case 1: return 0;
-                default: return GetColorGray(b);
+                default: return GetColorGray(b, orig);
             }
         }
 
-        public static uint GetColorBlack(byte b)
+        public static uint GetColorBlack(uint b, uint orig)
         {
             if (b == 0) return 0;
             return 0xFF000000;
         }
-        public static uint GetColorWhite(byte b)
+        public static uint GetColorWhite(uint b, uint orig)
         {
             if (b == 0) return 0;
             return 0xFFFFFFFF;
         }
-        public static uint GetColorGray(byte b)
+        public static uint GetColorGray(uint d, uint orig)
         {
-            var d = (uint)b;
             return 0xff000000 | d | d >> 8 | d >> 16;
         }
 

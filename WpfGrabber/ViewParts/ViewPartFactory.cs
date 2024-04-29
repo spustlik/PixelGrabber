@@ -19,6 +19,7 @@ namespace WpfGrabber.ViewParts
                 new ViewPartDef<MaskedImagesViewPart>(){Title = "Binary masked images"},
                 new ViewPartDef<FontBinaryViewPart>(){Title = "Font"},
                 new ViewPartDef<Z80DumpViewPart>(){Title = "Z80 disasm"},
+                new ViewPartDef<ImageSpriteViewPart>(){Title = "Image sprite sheet"},
                 new ViewPartDef<TestViewPart>(){Title = "(Test)"},
             });
         }
