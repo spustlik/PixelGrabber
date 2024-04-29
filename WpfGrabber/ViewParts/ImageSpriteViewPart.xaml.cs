@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Windows;
 using System.Windows.Controls;
@@ -65,6 +66,35 @@ namespace WpfGrabber.ViewParts
         #endregion
 
         public ObservableCollection<ImageVM> Images { get; } = new ObservableCollection<ImageVM>();
+
+        #region SelectedImage property
+        private ImageVM _selectedImage;
+        [XmlIgnore]
+        public ImageVM SelectedImage
+        {
+            get => _selectedImage;
+            set => Set(ref _selectedImage, value);
+        }
+        #endregion
+
+        public ImageSpritesVM()
+        {
+            Images.CollectionChanged += (sender, args) =>
+            {
+                DoPropertyChanged(nameof(SelectedIndex));
+            };
+        }
+        protected override void DoPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            base.DoPropertyChanged(propertyName);
+            if (propertyName==nameof(SelectedImage))
+            {
+                DoPropertyChanged(nameof(SelectedIndex));
+            }
+        }
+
+        [XmlIgnore]
+        public int SelectedIndex => Images.FindIndex(x => x == SelectedImage);
     }
     public class ImageVM : SimpleDataObject
     {
@@ -105,6 +135,7 @@ namespace WpfGrabber.ViewParts
             set => Set(ref _image, value);
         }
         #endregion
+
 
     }
 
@@ -167,38 +198,8 @@ namespace WpfGrabber.ViewParts
                 ViewModel.Height = ViewModel.Images.Max(a => a.Image.PixelHeight);
                 return;
             }
-            // else just allow adding images
-            // maybe some editor - move images
 
-            //use Height from data
-            // use it in export - all images same height
-
-            /*
-            var rgba = new ByteBitmapRgba(max_w, max_h);
-            const int XSPACER = 10;
-            const int YSPACER = 4;
-
-            var font = AppData.GetFont();
-            var posX = 0;
-            var posY = 0;
-            var maxW = 0;
-            foreach (var img in ViewModel.Images)
-            {
-                rgba.DrawBitmap(img, posX, posY, ByteBitmapRgba.GetColor01Gray);
-                font.DrawString(rgba, posX, posY, $"{img.Width}X{img.Height}", 0xFF4040FF);
-                posY += img.Height + YSPACER;
-                maxW = Math.Max(img.Width, maxW);
-                if (posY >= max_h)
-                {
-                    posY = 0;
-                    posX += maxW + XSPACER;
-                    maxW = 0;
-                }
-            }
-            var bmp = rgba.ToBitmapSource();
-            image.Source = bmp;
-            image.RenderTransform = new ScaleTransform(ShellVm.Zoom, ShellVm.Zoom);
-            */
+            //images are viewed by Binding to Images collection
         }
 
         private BitmapImage TryGetBitmapFromData()
@@ -273,7 +274,7 @@ namespace WpfGrabber.ViewParts
             var width = (ViewModel.Columns * ViewModel.Images.Max(a => a.Image.PixelWidth));
             var height = ViewModel.Height * ViewModel.Images.Count / ViewModel.Columns;
 
-            var rgba = new ByteBitmapRgba(width,height);
+            var rgba = new ByteBitmapRgba(width, height);
 
             int posX = 0;
             int posY = 0;
@@ -293,5 +294,28 @@ namespace WpfGrabber.ViewParts
             result.SaveToPngFile(dlg.FileName);
         }
 
+        private void OnButtonUp_Click(object sender, RoutedEventArgs e)
+        {
+            var i = ViewModel.Images.FindIndex(x => x == ViewModel.SelectedImage);
+            if (i <= 0)
+                return;
+            ViewModel.Images.Move(i, i - 1);
+        }
+
+        private void OnButtonDown_Click(object sender, RoutedEventArgs e)
+        {
+            var i = ViewModel.Images.FindIndex(x => x == ViewModel.SelectedImage);
+            if (i < 0 || i + 1 >= ViewModel.Images.Count)
+                return;
+            ViewModel.Images.Move(i, i + 1);
+        }
+
+        private void OnButtonDelete_Click(object sender, RoutedEventArgs e)
+        {
+            var i = ViewModel.Images.FindIndex(x => x == ViewModel.SelectedImage);
+            if (i < 0)
+                return;
+            ViewModel.Images.RemoveAt(i);
+        }
     }
 }

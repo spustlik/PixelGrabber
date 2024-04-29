@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WpfGrabber.ViewParts" xmlns:c="clr-namespace:WpfGrabber.Controls"
              mc:Ignorable="d" x:Name="root"
-             d:DesignHeight="452.516" d:DesignWidth="367.195">
+             d:DesignHeight="205.849" d:DesignWidth="602.528">
     <d:DesignerProperties.DesignStyle>
         <Style TargetType="UserControl">
             <Setter Property="Background" Value="White" />
@@ -19,7 +19,12 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <ItemsControl Style="{StaticResource toolbar}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="250"/>
+        </Grid.ColumnDefinitions>
+        <ItemsControl Style="{StaticResource toolbar}" >
             <ItemsControl.Resources>
                 <Style TargetType="StackPanel">
                     <Setter Property="Orientation" Value="Horizontal" />
@@ -54,51 +59,102 @@
                         <MenuItem Header="Set Width and Height to max" Click="OnSetMax_Click"/>
                         <MenuItem Header="Enable loading images from data" IsCheckable="true" IsChecked="{Binding LoadFromData}"/>
                         <MenuItem Header="Show labels" IsCheckable="true" IsChecked="{Binding ShowLabels}"/>
-
                     </ContextMenu>
                 </Button.ContextMenu>
             </Button>
         </ItemsControl>
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <Border x:Name="imageBorder" 
+        <Border x:Name="imageBorder" Grid.Row="1"
                     SizeChanged="BorderSize_Changed"
                     Style="{StaticResource checkerBorder}">
-                <ItemsControl ItemsSource="{Binding Images}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <UniformGrid Columns="{Binding Columns}" HorizontalAlignment="Left"/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate DataType="{x:Type local:ImageVM}">
-                            <Border BorderBrush="DodgerBlue" BorderThickness="1" Margin="0,0,5,5"
+            <ListBox ItemsSource="{Binding Images}" SelectedValue="{Binding SelectedImage}"
+                     Background="Transparent">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="{Binding Columns}" HorizontalAlignment="Left"/>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.Template>
+                    <ControlTemplate TargetType="ListBox">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="1" SnapsToDevicePixels="true">
+                            <ScrollViewer Focusable="false" Padding="{TemplateBinding Padding}">
+                                <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                            </ScrollViewer>
+                        </Border>
+                    </ControlTemplate>
+                </ListBox.Template>
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Padding" Value="0,0,2,2" />
+                        <Setter Property="Margin" Value="0" />
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.LayoutTransform>
+                    <ScaleTransform 
+                        ScaleX="{Binding ShellVm.Zoom, ElementName=root}"
+                        ScaleY="{Binding ShellVm.Zoom, ElementName=root}"
+                        />
+                </ListBox.LayoutTransform>
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type local:ImageVM}">
+                        <Border BorderBrush="DodgerBlue" BorderThickness="1" Margin="0"
                                     ToolTip="{Binding Description}">
-                                <Grid>
-                                    <Image Source="{Binding Image}" Stretch="None" x:Name="image">
-                                        <Image.RenderTransform>
-                                            <ScaleTransform 
-                                                ScaleX="{Binding ShellVm.Zoom, ElementName=root}"
-                                                ScaleY="{Binding ShellVm.Zoom, ElementName=root}"
-                                                />
-                                        </Image.RenderTransform>
-                                    </Image>
-                                    <Canvas Visibility="{Binding DataContext.ShowLabels, ElementName=root, Converter={StaticResource visiConv}}">
-                                        <Border Background="DodgerBlue" Opacity="0.6" 
+                            <Grid>
+                                <Image Source="{Binding Image}" Stretch="None" x:Name="image"/>
+
+                                <Canvas Visibility="{Binding DataContext.ShowLabels, ElementName=root, Converter={StaticResource visiConv}}">
+                                    <Border Background="DodgerBlue" Opacity="0.6" 
                                                 Width="{Binding ActualWidth, ElementName=image}">
-                                            <TextBlock Margin="4,0" Foreground="White" 
+                                        <TextBlock Margin="4,0" Foreground="White" 
                                                    Text="{Binding Name}" FontSize="10"/>
-                                        </Border>
-                                    </Canvas>
-                                </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
+                                    </Border>
+                                </Canvas>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+        <GridSplitter Grid.Column="1" Grid.RowSpan="99" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+        <Border x:Name="properties" Grid.Column="2" Grid.RowSpan="99" 
+                BorderBrush="#a0a0a0" BorderThickness="1"
+                DataContext="{Binding SelectedImage}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Border Background="#606060">
+                    <Label Content="Image properties" Foreground="White"/>
+                </Border>
+                <ItemsControl Grid.Row="1" Style="{StaticResource toolbar}">
+                    <Button Click="OnButtonUp_Click">Up</Button>
+                    <Separator/>
+                    <Button Click="OnButtonDown_Click">Down</Button>
+                    <Separator/>
+                    <Button Click="OnButtonDelete_Click">Remove</Button>
                 </ItemsControl>
-                <!--<Canvas Margin="10" x:Name="canvas">
-                    <Image x:Name="image" Stretch="None" RenderOptions.BitmapScalingMode="NearestNeighbor"
-                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-                </Canvas>-->
-            </Border>
-        </ScrollViewer>
+                <StackPanel Grid.Row="2" Margin="10">
+                    <Label Content="{Binding Name}"/>
+                    <Label Content="{Binding FileName}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Index: </Label>
+                        <Label Content="{Binding DataContext.SelectedIndex, ElementName=root}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Width: </Label>
+                        <Label Content="{Binding Image.PixelWidth}"/>
+                        <Label>Height: </Label>
+                        <Label Content="{Binding Image.PixelHeight}"/>
+                    </StackPanel>
+                </StackPanel>
+                <Border Grid.Row="3" Padding="10" Style="{StaticResource checkerBorder}">
+                    <Image Source="{Binding Image}" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+                </Border>
+            </Grid>
+            
+        </Border>
+
     </Grid>
 </local:ImageSpriteViewPartBase>
