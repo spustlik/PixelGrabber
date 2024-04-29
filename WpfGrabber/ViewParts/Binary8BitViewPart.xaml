@@ -33,15 +33,16 @@
             </Button>
 
         </ItemsControl>
-        
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+
+        <Grid Grid.Row="1">
             <Border x:Name="imageBorder" Style="{StaticResource checkerBorder}"
-                    SizeChanged="BorderSize_Changed">
-                <Canvas Margin="10">
-                    <Image x:Name="image" Stretch="None" RenderOptions.BitmapScalingMode="NearestNeighbor"
-                           HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-                </Canvas>
+                    SizeChanged="BorderSize_Changed" Padding="10">
+                    <Image x:Name="image" 
+                           Stretch="None" RenderOptions.BitmapScalingMode="NearestNeighbor"
+                           HorizontalAlignment="Left" VerticalAlignment="Top"
+                           />
             </Border>
-        </ScrollViewer>
+
+        </Grid>
     </Grid>
 </local:Binary8BitViewPartBase>

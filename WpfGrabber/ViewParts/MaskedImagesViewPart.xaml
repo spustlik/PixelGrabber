@@ -27,6 +27,8 @@
                     <WrapPanel/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
+            <CheckBox Content="Flip image bytes" IsChecked="{Binding FlipBytes}"/>
+            <Separator/>
             <CheckBox Content="Flip X" IsChecked="{Binding FlipX}"/>
             <Separator/>
             <CheckBox Content="Flip Y" IsChecked="{Binding FlipY}"/>
@@ -55,6 +57,15 @@
             <StackPanel>
                 <Label Content="Height"/>
                 <c:NumberEditor Value="{Binding Height}" Minimum="1" Width="70"/>
+                <Separator/>
+            </StackPanel>
+            <Separator/>
+            <StackPanel>
+                <Label Content="Color"/>
+                <ComboBox Style="{StaticResource enumCombo}" 
+                      ItemsSource="{Binding Colorizer, Converter={StaticResource eumItems}, Mode=OneTime}"
+                      SelectedValue="{Binding Colorizer, UpdateSourceTrigger=PropertyChanged}" 
+                      />
                 <Separator/>
             </StackPanel>
             <Button Content="Save" Style="{StaticResource dropDown}">

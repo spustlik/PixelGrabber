@@ -21,6 +21,15 @@ namespace WpfGrabber.ViewParts
         }
         #endregion
 
+        #region FlipBytes property
+        private bool _flipBytes;
+        public bool FlipBytes
+        {
+            get => _flipBytes;
+            set => Set(ref _flipBytes, value);
+        }
+        #endregion
+
         #region FlipY property
         private bool _flipY;
         public bool FlipY
@@ -66,6 +75,25 @@ namespace WpfGrabber.ViewParts
         }
         #endregion
 
+        #region Colorizer property
+        private MaskedImagesColorizer _colorizer;
+        public MaskedImagesColorizer Colorizer
+        {
+            get => _colorizer;
+            set => Set(ref _colorizer, value);
+        }
+        #endregion
+
+    }
+
+    public enum MaskedImagesColorizer
+    {
+        Color01,
+        Color10,
+        Color01Blue,
+        Color10Blue,
+        ColorA,
+        ColorB,
     }
 
     public class MaskedImagesViewPartBase : ViewPartDataViewer<MaskedImagesVM>
@@ -96,9 +124,10 @@ namespace WpfGrabber.ViewParts
             var posX = 0;
             var posY = 0;
             var maxW = 0;
+            var colorizer = GetColorizer();
             foreach (var img in ReadImages())
             {
-                rgba.DrawBitmap(img, posX, posY, ByteBitmapRgba.GetColor01Gray);
+                rgba.DrawBitmap(img, posX, posY, colorizer);
                 //font.DrawString(rgba, posX, posY, $"{img.Width}X{img.Height}", 0xFF4040FF);
                 posY += img.Height + YSPACER;
                 maxW = Math.Max(img.Width, maxW);
@@ -114,16 +143,38 @@ namespace WpfGrabber.ViewParts
             image.RenderTransform = new ScaleTransform(ShellVm.Zoom, ShellVm.Zoom);
         }
 
+        private ByteBitmapRgba.Colorizer GetColorizer()
+        {
+            switch (ViewModel.Colorizer)
+            {
+                case MaskedImagesColorizer.Color01:
+                    return ByteBitmapRgba.GetColor01Gray;
+                case MaskedImagesColorizer.Color10:
+                    return ByteBitmapRgba.GetColor10Gray;
+                case MaskedImagesColorizer.Color01Blue:
+                    return (b, o) => b == 0 ? 0 : b == 1 ? 0xFFFFFFFF : 0xFF0000FF;
+                case MaskedImagesColorizer.Color10Blue:
+                    return (b, o) => b == 1 ? 0 : b == 0 ? 0xFFFFFFFF : 0xFF0000FF;
+                case MaskedImagesColorizer.ColorA:
+                    return (b, o) => b > 1 ? 0 : b == 0 ? 0xFFFFFFFF : 0xFF00FF00;
+                case MaskedImagesColorizer.ColorB:
+                    return (b, o) => b > 1 ? 0 : b == 1 ? 0xFFFFFFFF : 0xFF00FF00;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
         private IEnumerable<ByteBitmap8Bit> ReadImages()
         {
             BitReader bitReader = new BitReader(ShellVm.Data)
             {
                 BytePosition = ShellVm.Offset,
-                FlipX = false //!!needed fore preambule-reading
+                FlipX = false //!!needed for preambule-reading
             };
             var rd = new MaskReader(bitReader)
             {
                 FlipX = ViewModel.FlipX,
+                FlipByte = ViewModel.FlipBytes,
                 FlipY = ViewModel.FlipY,
                 Height = ViewModel.Height,
                 Width = ViewModel.Width <= 0 ? 1 : ViewModel.Width,

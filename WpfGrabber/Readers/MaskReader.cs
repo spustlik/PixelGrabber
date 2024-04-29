@@ -3,6 +3,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Windows;
 using System.ComponentModel;
+using System.Threading;
 
 namespace WpfGrabber.Readers
 {
@@ -16,8 +17,10 @@ namespace WpfGrabber.Readers
         ByteDataMask,
         [Description("Line")]
         LineDataMask,
-        [Description("Image")]
+        [Description("Image data,mask")]
         ImageDataMask,
+        [Description("Image mask,data")]
+        ImageMaskData,
         [Description("Image and mask preambules")]
         ImageDataMaskWithPreambule,
 
@@ -48,6 +51,7 @@ namespace WpfGrabber.Readers
         }
 
         public bool FlipX { get; set; }
+        public bool FlipByte { get; set; }
         public bool FlipY { get; set; }
         public int Height { get; set; }
         public int Width { get; set; }
@@ -64,7 +68,8 @@ namespace WpfGrabber.Readers
                 case MaskReaderType.ByteDataMask: return ReadByteArrayMask(width, height);
                 case MaskReaderType.LineDataMask: return ReadLineDataMask(width, height);
                 case MaskReaderType.ImageDataMask: return ReadImageDataMask(width, height);
-                case MaskReaderType.ImageDataMaskWithPreambule: return ReadImageDataMask(width, height, true);
+                case MaskReaderType.ImageMaskData: return ReadImageDataMask(width, height, maskData: true);
+                case MaskReaderType.ImageDataMaskWithPreambule: return ReadImageDataMask(width, height, maskPreambule: true);
                 default: throw new NotImplementedException($"Reading mask type {Type}");
             }
         }
@@ -110,16 +115,22 @@ namespace WpfGrabber.Readers
             }
         }
 
-        private ByteBitmap8Bit ReadImageDataMask(int width, int height, bool maskPreambule = false)
+        private ByteBitmap8Bit ReadImageDataMask(int width, int height,
+            bool maskPreambule = false,
+            bool maskData = false)
         {
             var result = new ByteBitmap8Bit(width * 8, height);
 
             var dataBytes = ReadBytes(width * height);
-            if(maskPreambule)
+            if (maskPreambule)
             {
                 ReadPreambule(ref width, ref height);
             }
             var maskBytes = ReadBytes(width * height);
+            if (maskData)
+            {
+                (dataBytes, maskBytes) = (maskBytes, dataBytes);
+            }
             for (var y = 0; y < height; y++)
             {
                 var posY = FlipY ? height - y : y;
@@ -154,7 +165,10 @@ namespace WpfGrabber.Readers
             var result = new byte[count];
             for (int i = 0; i < result.Length; i++)
             {
-                result[i] = BitReader.ReadByte();
+                var b = BitReader.ReadByte();
+                if (FlipByte)
+                    b = BitReader.GetFlippedX(b);
+                result[i] = b;
             }
             return result;
         }
@@ -165,7 +179,7 @@ namespace WpfGrabber.Readers
                 byte b = GetBit0Color2(data, mask);
                 var posX = x * 8 + i;
                 if (FlipX)
-                    posX = result.Width - posX;
+                    posX = result.Width - posX - 1;
                 result.SetPixel(posX, y, b);
                 data = (byte)(data >> 1);
                 mask = (byte)(mask >> 1);
@@ -200,7 +214,7 @@ namespace WpfGrabber.Readers
         }
         private static byte GetBit0Color2(byte data, byte mask)
         {
-            var colors = new byte[] { 1, 1, 2, 0 };
+            var colors = new byte[] { 1, 1, 2, 0 }; //[MD]=[00,01,10,11]
             var dm = ((data & 1) << 1) | (mask & 1);
             var b = colors[dm];
             return b;

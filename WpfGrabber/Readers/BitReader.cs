@@ -12,6 +12,9 @@ namespace WpfGrabber
             set => _posbit = value * 8;
         }
 
+        /// <summary>
+        /// flips each byte
+        /// </summary>
         public bool FlipX { get; set; } = true;
         public int DataLength => Data.Length;
 

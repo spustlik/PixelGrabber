@@ -61,9 +61,12 @@ namespace WpfGrabber.ViewParts
             reader.BytePosition = ShellVm.Offset;
             reader.FlipX = ViewModel.Reversed;
             var w = ViewModel.Width;
-           
+
             var total_w = this.GetFirstValid(imageBorder.ActualWidth, imageBorder.Width, Width, 100);
-            var total_h = this.GetFirstValid(imageBorder.ActualHeight, imageBorder.Height, Height,200);
+            total_w -= (int)imageBorder.Padding.Right + (int)imageBorder.Padding.Left;
+            total_w = (int)(total_w / ShellVm.Zoom);
+            var total_h = this.GetFirstValid(imageBorder.ActualHeight, imageBorder.Height, Height, 200);
+            total_h -= (int)imageBorder.Padding.Bottom + (int)imageBorder.Padding.Top;
             total_h = (int)(total_h / ShellVm.Zoom);
             //log.Text += $"H:{total_h},W:{total_w}, w={w}\n";
 
@@ -83,7 +86,7 @@ namespace WpfGrabber.ViewParts
             dlg.FileName = $"{Path.GetFileName(ShellVm.FileName)}-{ShellVm.Offset}-{ShellVm.Offset:X4}-{ViewModel.Width}";
             if (dlg.ShowDialog(App.Current.MainWindow) != true)
                 return;
-            ((BitmapSource)image.Source).SaveToPngFile(dlg.FileName);        
+            ((BitmapSource)image.Source).SaveToPngFile(dlg.FileName);
         }
 
         private void OnButtonSaveData_Click(object sender, RoutedEventArgs e)
@@ -92,7 +95,7 @@ namespace WpfGrabber.ViewParts
             dlg.DefaultExt = "png";
             dlg.OverwritePrompt = true;
             dlg.FileName = $"{Path.GetFileName(ShellVm.FileName)}-{ShellVm.Offset}-{ShellVm.Offset:X4}-{ViewModel.Width}.data.png";
-            if(dlg.ShowDialog() != true) 
+            if (dlg.ShowDialog() != true)
                 return;
             var bir = new BitImageReader();
             var bmp2 = bir.ReadBitmap(new BitReader(ShellVm.Data) { BytePosition = ShellVm.Offset },

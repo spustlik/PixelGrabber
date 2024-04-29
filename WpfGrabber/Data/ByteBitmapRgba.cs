@@ -115,9 +115,9 @@ namespace WpfGrabber
             }
             DrawBitmapFunctioned(width, height, 
                 getPixel,
-                (x, y, pixel) => {
+                (x, y, b) =>{
                     uint orig = GetPixel(posX + x, posY + y);
-                    uint c = colorizer(pixel, orig);
+                    uint c = colorizer(b, orig);
                     SetPixel(posX + x, posY + y, c);
                 });
         }
@@ -157,6 +157,15 @@ namespace WpfGrabber
             {
                 case 0: return 0xFFFFFFFF;
                 case 1: return 0;
+                default: return GetColorGray(b, orig);
+            }
+        }
+        public static uint GetColor10Gray(uint b, uint orig)
+        {
+            switch (b)
+            {
+                case 0: return 0;
+                case 1: return 0xFFFFFFFF;
                 default: return GetColorGray(b, orig);
             }
         }

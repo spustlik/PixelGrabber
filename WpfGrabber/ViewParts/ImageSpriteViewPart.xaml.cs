@@ -87,7 +87,7 @@ namespace WpfGrabber.ViewParts
         protected override void DoPropertyChanged([CallerMemberName] string propertyName = null)
         {
             base.DoPropertyChanged(propertyName);
-            if (propertyName==nameof(SelectedImage))
+            if (propertyName == nameof(SelectedImage))
             {
                 DoPropertyChanged(nameof(SelectedIndex));
             }
