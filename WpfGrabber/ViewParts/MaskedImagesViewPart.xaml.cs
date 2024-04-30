@@ -84,25 +84,15 @@ namespace WpfGrabber.ViewParts
         }
         #endregion
 
-        #region Colorizer property
-        private MaskedImagesColorizer _colorizer;
-        public MaskedImagesColorizer Colorizer
+        #region Colorize property
+        private int _colorize;
+        public int Colorize
         {
-            get => _colorizer;
-            set => Set(ref _colorizer, value);
+            get => _colorize;
+            set => Set(ref _colorize, value);
         }
         #endregion
 
-    }
-
-    public enum MaskedImagesColorizer
-    {
-        Color01,
-        Color10,
-        Color01Blue,
-        Color10Blue,
-        ColorA,
-        ColorB,
     }
 
     public class MaskedImagesViewPartBase : ViewPartDataViewer<MaskedImagesVM>
@@ -154,23 +144,18 @@ namespace WpfGrabber.ViewParts
 
         private ByteBitmapRgba.Colorizer GetColorizer()
         {
-            switch (ViewModel.Colorizer)
+            var colorizers = new List<ByteBitmapRgba.Colorizer>
             {
-                case MaskedImagesColorizer.Color01:
-                    return ByteBitmapRgba.GetColor01Gray;
-                case MaskedImagesColorizer.Color10:
-                    return ByteBitmapRgba.GetColor10Gray;
-                case MaskedImagesColorizer.Color01Blue:
-                    return (b, o) => b == 1 ? 0 : b == 0 ? 0xFFFFFFFF : 0xFF0000FF;
-                case MaskedImagesColorizer.Color10Blue:
-                    return (b, o) => b == 0 ? 0 : b == 1 ? 0xFFFFFFFF : 0xFF0000FF;
-                case MaskedImagesColorizer.ColorA:
-                    return (b, o) => b > 1 ? 0 : b == 0 ? 0xFFFFFFFF : 0xFF00FF00;
-                case MaskedImagesColorizer.ColorB:
-                    return (b, o) => b > 1 ? 0 : b == 1 ? 0xFFFFFFFF : 0xFF00FF00;
-                default:
-                    throw new NotImplementedException();
-            }
+                ByteBitmapRgba.GetColor01Gray,
+                ByteBitmapRgba.GetColor10Gray,
+                (b, o) => b == 1 ? 0 : b == 0 ? 0xFFFFFFFF : 0xFF0000FF,
+                (b, o) => b == 0 ? 0 : b == 1 ? 0xFFFFFFFF : 0xFF0000FF,
+                (b, o) => b > 1 ? 0 : b == 0 ? 0xFFFFFFFF : 0xFF00FF00,
+                (b, o) => b > 1 ? 0 : b == 1 ? 0xFFFFFFFF : 0xFF00FF00
+            };
+            if (ViewModel.Colorize>=colorizers.Count)
+                throw new NotImplementedException();
+            return colorizers[ViewModel.Colorize];
         }
 
         private IEnumerable<ByteBitmap8Bit> ReadImages()

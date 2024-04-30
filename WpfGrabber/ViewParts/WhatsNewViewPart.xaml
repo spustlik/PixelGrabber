@@ -10,20 +10,20 @@
     <Grid>
         <ScrollViewer>
             <TextBlock Margin="10">
-                <Run FontSize="30" FontWeight="Bold">What is new</Run>
+                <Run FontSize="30" FontWeight="Bold" Foreground="DodgerBlue">What is new</Run>
                 <Run xml:space="preserve">
 - clear images in Image sprite
 - auto load layout
+- change color in MaskViewPart to int
 </Run>
                 <LineBreak/>
 
-                <Run FontSize="30" FontWeight="Bold">What to do</Run>
+                <Run FontSize="30" FontWeight="Bold" Foreground="DodgerBlue">What to do</Run>
                 <Run xml:space="preserve">
 - multiselect in imagesprite              
 - save layout with address
 - auto save layout ?
 - end offset for bit8, masked - count?
-- change color in MaskViewPart to int
 - whatsnew viewpart...
                 </Run>
             </TextBlock>
