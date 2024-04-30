@@ -12,11 +12,12 @@
             <TextBlock Margin="10">
                 <Run FontSize="30" FontWeight="Bold">What is new</Run>
                 <Run xml:space="preserve">
-- all</Run>
+- clear images in Image sprite</Run>
                 <LineBreak/>
 
                 <Run FontSize="30" FontWeight="Bold">What to do</Run>
                 <Run xml:space="preserve">
+- multiselect in imagesprite              
 - save layout with address
 - auto load/save? layout
 - end offset for bit8, masked - count?

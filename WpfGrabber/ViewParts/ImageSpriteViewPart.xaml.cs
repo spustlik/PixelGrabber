@@ -158,13 +158,12 @@ namespace WpfGrabber.ViewParts
             ViewModel.Columns = 1;
             ViewModel.ShowLabels = true;
             //foreach (var file in Directory.GetFiles(@"E:\GameWork\8bitgames\alien8", "alien8.*.png"))
-            foreach (var file in Directory.GetFiles(@"E:\GameWork\_AssetsIso\kenney_isometric-roads\png\roads", "*.png"))
-            {
-                var img = new BitmapImage();
-                img.LoadFromFile(file);
-                CreateImageVMFromFile(img, file);
-            }
-
+            //foreach (var file in Directory.GetFiles(@"E:\GameWork\_AssetsIso\kenney_isometric-roads\png\roads", "*.png"))
+            //{
+            //    var img = new BitmapImage();
+            //    img.LoadFromFile(file);
+            //    CreateImageVMFromFile(img, file);
+            //}
         }
         private void BorderSize_Changed(object sender, SizeChangedEventArgs e)
         {
@@ -316,6 +315,13 @@ namespace WpfGrabber.ViewParts
             if (i < 0)
                 return;
             ViewModel.Images.RemoveAt(i);
+        }
+
+        private void OnButtonClear_Click(object sender, RoutedEventArgs e)
+        {
+            if (MessageBox.Show("Do you really remove all images?", "Question", MessageBoxButton.YesNoCancel) != MessageBoxResult.Yes)
+                return;
+            this.ViewModel.Images.Clear();
         }
     }
 }
