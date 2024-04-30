@@ -1,0 +1,29 @@
+﻿<local:WhatsNewViewPartBase x:Class="WpfGrabber.ViewParts.WhatsNewViewPart"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfGrabber.ViewParts"
+             mc:Ignorable="d" d:DesignWidth="300"
+             Background="LightYellow" Height="191"
+             >
+    <Grid>
+        <ScrollViewer>
+            <TextBlock Margin="10">
+                <Run FontSize="30" FontWeight="Bold">What is new</Run>
+                <Run xml:space="preserve">
+- all</Run>
+                <LineBreak/>
+
+                <Run FontSize="30" FontWeight="Bold">What to do</Run>
+                <Run xml:space="preserve">
+- save layout with address
+- auto load/save? layout
+- end offset for bit8, masked - count?
+- change color in MaskViewPart to int
+- whatsnew viewpart...
+                </Run>
+            </TextBlock>
+        </ScrollViewer>
+    </Grid>
+</local:WhatsNewViewPartBase>
