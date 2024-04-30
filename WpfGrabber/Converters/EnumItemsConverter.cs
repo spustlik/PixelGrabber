@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Markup;
@@ -40,16 +41,35 @@ namespace WpfGrabber.Converters
 
         public static string GetDescription(Enum value)
         {
-            var attributes = value.GetType()
+            var attribute = value.GetType()
                 .GetField(value.ToString())
-                .GetCustomAttributes(typeof(DescriptionAttribute), false);
-            if (attributes.Any())
-                return (attributes.First() as DescriptionAttribute).Description;
+                .GetCustomAttribute<DescriptionAttribute>();
+            if (attribute != null)
+                return attribute.Description;
+            var v = value.ToString();
+            return AddSpacesToUpperCase(v);
+        }
 
-            // If no description is found, the least we can do is replace underscores with spaces
-            // You can add your own custom default formatting logic here
-            TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
-            return ti.ToTitleCase(ti.ToLower(value.ToString().Replace("_", " ")));
+        public static string AddSpacesToUpperCase(string v)
+        {
+            bool isBig(char c) => c == Char.ToUpperInvariant(c);
+
+            if (v == null || string.IsNullOrEmpty(v))
+                return v;
+            var last = isBig(v[0]);
+            var r = "";
+            for (int i = 0; i < v.Length; i++)
+            {
+                var c = v[i];
+                if (!last && isBig(c))
+                {
+                    r += " ";
+                }
+                last = isBig(c);
+                r += c;
+            }
+            return r;
+
         }
     }
 

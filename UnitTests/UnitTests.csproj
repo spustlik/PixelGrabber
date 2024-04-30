@@ -57,6 +57,7 @@
     <Compile Include="HexTests.cs" />
     <Compile Include="TestBitmap.cs" />
     <Compile Include="ColorTests.cs" />
+    <Compile Include="ConverterTests.cs" />
     <Compile Include="XmlTests.cs" />
     <Compile Include="Z80Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

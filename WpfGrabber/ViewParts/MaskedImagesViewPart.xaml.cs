@@ -75,6 +75,15 @@ namespace WpfGrabber.ViewParts
         }
         #endregion
 
+        #region MaskType property
+        private int _maskType;
+        public int MaskType
+        {
+            get => _maskType;
+            set => Set(ref _maskType, value);
+        }
+        #endregion
+
         #region Colorizer property
         private MaskedImagesColorizer _colorizer;
         public MaskedImagesColorizer Colorizer
@@ -152,9 +161,9 @@ namespace WpfGrabber.ViewParts
                 case MaskedImagesColorizer.Color10:
                     return ByteBitmapRgba.GetColor10Gray;
                 case MaskedImagesColorizer.Color01Blue:
-                    return (b, o) => b == 0 ? 0 : b == 1 ? 0xFFFFFFFF : 0xFF0000FF;
-                case MaskedImagesColorizer.Color10Blue:
                     return (b, o) => b == 1 ? 0 : b == 0 ? 0xFFFFFFFF : 0xFF0000FF;
+                case MaskedImagesColorizer.Color10Blue:
+                    return (b, o) => b == 0 ? 0 : b == 1 ? 0xFFFFFFFF : 0xFF0000FF;
                 case MaskedImagesColorizer.ColorA:
                     return (b, o) => b > 1 ? 0 : b == 0 ? 0xFFFFFFFF : 0xFF00FF00;
                 case MaskedImagesColorizer.ColorB:
@@ -179,6 +188,7 @@ namespace WpfGrabber.ViewParts
                 Height = ViewModel.Height,
                 Width = ViewModel.Width <= 0 ? 1 : ViewModel.Width,
                 Type = ViewModel.ReaderType,
+                ColorType = ViewModel.MaskType,
                 Preambule = ViewModel.Preambule
             };
             while (rd.BitReader.BytePosition < rd.BitReader.DataLength)
@@ -202,11 +212,10 @@ namespace WpfGrabber.ViewParts
                 var rgba = ByteBitmapRgba.FromBitmap(img);
                 string fileName = Path.Combine(
                     Path.GetDirectoryName(dlg.FileName),
-                    $"{Path.GetFileNameWithoutExtension(dlg.FileName)}-{i:00}.png");
+                    $"{Path.GetFileNameWithoutExtension(ShellVm.FileName)}-{i:00}.png");
                 rgba.ToBitmapSource().SaveToPngFile(fileName);
                 i++;
             }
-            ((BitmapSource)image.Source).SaveToPngFile(dlg.FileName);
         }
 
         private void OnButtonSave_Click(object sender, RoutedEventArgs e)

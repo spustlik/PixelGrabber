@@ -4,13 +4,13 @@ using System.Windows.Media;
 using System.Windows;
 using System.ComponentModel;
 using System.Threading;
+using System.Runtime.InteropServices;
 
 namespace WpfGrabber.Readers
 {
-    // vzdy dva byte DATA,MASK, nejaka vyska a (sirka v bytech)
-    //varianta 2 - vzdy WidthBytes Data, pak WidthBytes Mask
-    //varianta 3 - vzdy cely obr (WidthBuytes*Height) Data, cely obr mask
-
+    // always 2 bytes DATA,MASK, some Width (bytes), Height
+    // var 2 - always WidthBytes Data, than WidthBytes Mask
+    // var 3 - always whole image (WidthBytes*Height) Data, than whole Mask
     public enum MaskReaderType
     {
         [Description("Byte")]
@@ -23,7 +23,6 @@ namespace WpfGrabber.Readers
         ImageMaskData,
         [Description("Image and mask preambules")]
         ImageDataMaskWithPreambule,
-
     }
 
     public enum MaskReaderPreambule
@@ -39,8 +38,8 @@ namespace WpfGrabber.Readers
         HeightWidth8,
         [Description("Height & Width 16 bits")]
         HeightWidth16,
-
     }
+
     public class MaskReader
     {
         public BitReader BitReader { get; }
@@ -57,11 +56,20 @@ namespace WpfGrabber.Readers
         public int Width { get; set; }
         public MaskReaderType Type { get; set; }
         public MaskReaderPreambule Preambule { get; set; }
+        public int ColorType { get; set; }
 
+        private byte[] _colors;
+        private static byte[][] COLORTABLE = new[]{
+            new byte[] { 1, 1, 2, 0 }, //[DM]=[00,01,10,11]
+            new byte[] { 1, 1, 0, 2 },
+            new byte[] { 0, 2, 1, 1 },
+            new byte[] { 2, 0, 1, 1 },
+            };
         public ByteBitmap8Bit Read()
         {
             var width = this.Width;
             var height = this.Height;
+            _colors = COLORTABLE[this.ColorType];
             ReadPreambule(ref width, ref height);
             switch (Type)
             {
@@ -176,7 +184,7 @@ namespace WpfGrabber.Readers
         {
             for (var i = 0; i < 8; i++)
             {
-                byte b = GetBit0Color2(data, mask);
+                byte b = GetDMColor(data, mask);
                 var posX = x * 8 + i;
                 if (FlipX)
                     posX = result.Width - posX - 1;
@@ -184,6 +192,20 @@ namespace WpfGrabber.Readers
                 data = (byte)(data >> 1);
                 mask = (byte)(mask >> 1);
             }
+        }
+
+        private byte GetDMColor(byte data, byte mask)
+        {
+            var dm = ((data & 1) << 1) | (mask & 1);
+            var b = _colors[dm];
+            return b;
+        }
+        private static byte GetBit0Color2(byte data, byte mask)
+        {
+            var colors = new byte[] { 1, 1, 2, 0 }; //[DM]=[00,01,10,11]
+            var dm = ((data & 1) << 1) | (mask & 1);
+            var b = colors[dm];
+            return b;
         }
 
         private ByteBitmap8Bit ReadByteArrayMask(int width, int height)
@@ -204,21 +226,14 @@ namespace WpfGrabber.Readers
 
         }
 
-        private static byte GetBit0Color(byte data, byte mask)
-        {
-            if ((mask & 1) == 0)
-                return 0; //white
-            if ((data & 1) == 0)
-                return 1; //transparent
-            return 2; //black
-        }
-        private static byte GetBit0Color2(byte data, byte mask)
-        {
-            var colors = new byte[] { 1, 1, 2, 0 }; //[MD]=[00,01,10,11]
-            var dm = ((data & 1) << 1) | (mask & 1);
-            var b = colors[dm];
-            return b;
-        }
+        //private static byte GetBit0Color(byte data, byte mask)
+        //{
+        //    if ((mask & 1) == 0)
+        //        return 0; //white
+        //    if ((data & 1) == 0)
+        //        return 1; //transparent
+        //    return 2; //black
+        //}
 
     }
 
