@@ -1,4 +1,6 @@
-﻿using WpfGrabber.ViewParts;
+﻿using System.Collections.Generic;
+using WpfGrabber.Controls;
+using WpfGrabber.ViewParts;
 
 namespace WpfGrabber.Shell
 {
@@ -10,6 +12,14 @@ namespace WpfGrabber.Shell
 		void SetOptions(ViewPart viewPart, ViewPartOptions options);
 	}
 
+    public interface IViewPartServiceEx : IViewPartService
+    {
+        IEnumerable<ViewPart> ViewParts { get; }
+
+        void FixGridLayout();
+
+        (ViewPartControl vpc, int index) GetViewPartControl(ViewPart viewPart);
+    }
     public class ViewPartOptions
     {
         public string Title { get; set; }

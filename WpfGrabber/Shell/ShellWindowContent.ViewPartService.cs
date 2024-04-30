@@ -11,13 +11,13 @@ using WpfGrabber.ViewParts;
 namespace WpfGrabber.Shell
 {
 
-	partial class ShellWindowContent : IViewPartService
-	{
-		#region IViewPartService
-		public IEnumerable<ViewPart> ViewParts => partsGrid.Children.OfType<ViewPartControl>().Select(x => x.Content).OfType<ViewPart>();
+    partial class ShellWindowContent : IViewPartServiceEx
+    {
+        #region IViewPartService
+        public IEnumerable<ViewPart> ViewParts => partsGrid.Children.OfType<ViewPartControl>().Select(x => x.Content).OfType<ViewPart>();
 
-		public void Add(ViewPart viewPart)
-		{
+        public void Add(ViewPart viewPart)
+        {
             if (GetViewPartControl(viewPart).index >= 0)
                 return;
 
@@ -29,8 +29,8 @@ namespace WpfGrabber.Shell
             viewPart.OnInitialize();
         }
 
-		public void Remove(ViewPart viewPart)
-		{
+        public void Remove(ViewPart viewPart)
+        {
             var i = GetViewPartControl(viewPart).index;
             if (i < 0)
                 return;
@@ -49,81 +49,91 @@ namespace WpfGrabber.Shell
             FixGridLayout();
         }
 
-		public void RemoveAll()
-		{
-			foreach (var vp in ViewParts.Reverse())
-			{
-				Remove(vp);
-			}
-		}
-		public void SetOptions(ViewPart viewPart, ViewPartOptions options)
-		{
-			var (vpc, i) = GetViewPartControl(viewPart);
-			if (i < 0)
-				return;
-			vpc.Title = options.Title;
-			if (options.Width > 0)
-				partsGrid.ColumnDefinitions[i].Width = new GridLength(options.Width);
-		}
-		#endregion
+        public void RemoveAll()
+        {
+            foreach (var vp in ViewParts.Reverse())
+            {
+                Remove(vp);
+            }
+        }
+        public void SetOptions(ViewPart viewPart, ViewPartOptions options)
+        {
+            var (vpc, i) = GetViewPartControl(viewPart);
+            if (i < 0)
+                return;
+            vpc.Title = options.Title;
+            if (options.Width == 0)
+                options.Width = DEFAULT_WIDTH;
+            partsGrid.ColumnDefinitions[i].Width = new GridLength(options.Width);
+        }
+        #endregion
 
-		private (ViewPartControl control, int index) GetViewPartControl(ViewPart viewPart)
-		{
-			for (int i = 0; i < partsGrid.Children.Count; i++)
-			{
-				var vpc = partsGrid.Children[i] as ViewPartControl;
-				if (vpc?.Content == viewPart)
-					return (control: vpc, index: i);
-			}
-			return (control: null, index: -1);
-		}
+        #region IViewPartServiceEx
+        IEnumerable<ViewPart> IViewPartServiceEx.ViewParts => this.ViewParts;
 
-		private void FixGridLayout()
-		{
-			//fix column definitions to be same as children
-			var columns = ViewParts.Count();
-			if (columns > 0)
-				columns = columns * 2 - 1; // []  [VP]  [VP,GS,VP]  [VP,GS,VP,GS,VP]...
+        void IViewPartServiceEx.FixGridLayout() => this.FixGridLayout();
 
-			while (partsGrid.ColumnDefinitions.Count > columns)
-				partsGrid.ColumnDefinitions.Remove(partsGrid.ColumnDefinitions.Last());
-			while (partsGrid.ColumnDefinitions.Count < columns)
-				partsGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(DEFAULT_WIDTH) });
-			//fix Width of coldef[0]
-			//fix Grid.Column of control to index
-			for (int i = 0; i < partsGrid.ColumnDefinitions.Count; i++)
-			{
-				var col = partsGrid.ColumnDefinitions[i];
-				var con = partsGrid.Children[i];
-				if (i % 2 == 1)
-				{
-					if (!(con is GridSplitter))
-					{
-						con = new GridSplitter();
-						partsGrid.Children.Insert(i, con);
-					}
-					col.Width = GridLength.Auto;
-					Grid.SetColumn(con, i);
-					continue;
-				}
-				if (i == partsGrid.Children.Count - 1)
-				{
-					//last viewpart - star
-					col.Width = new GridLength(1, GridUnitType.Star);
-				}
-				else
-				{
-					//convert star viewpart to implicit width
-					if (col.Width.IsStar)
-						if (con is ViewPartControl vpc)
-							//if (!double.IsNaN(vpc.ActualWidth))
-							col.Width = new GridLength(DEFAULT_WIDTH);
-				}
-				Grid.SetColumn(con, i);
-			}
-			if (partsGrid.Children.Count != columns)
-				throw new Exception("Columns error");
-		}
+        (ViewPartControl vpc, int index) IViewPartServiceEx.GetViewPartControl(ViewPart viewPart) => this.GetViewPartControl(viewPart);
 
-	}
+        #endregion
+
+        private (ViewPartControl control, int index) GetViewPartControl(ViewPart viewPart)
+        {
+            for (int i = 0; i < partsGrid.Children.Count; i++)
+            {
+                var vpc = partsGrid.Children[i] as ViewPartControl;
+                if (vpc?.Content == viewPart)
+                    return (control: vpc, index: i);
+            }
+            return (control: null, index: -1);
+        }
+
+        private void FixGridLayout()
+        {
+            //fix column definitions to be same as children
+            var columns = ViewParts.Count();
+            if (columns > 0)
+                columns = columns * 2 - 1; // []  [VP]  [VP,GS,VP]  [VP,GS,VP,GS,VP]...
+
+            while (partsGrid.ColumnDefinitions.Count > columns)
+                partsGrid.ColumnDefinitions.Remove(partsGrid.ColumnDefinitions.Last());
+            while (partsGrid.ColumnDefinitions.Count < columns)
+                partsGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(DEFAULT_WIDTH) });
+            //fix Width of coldef[0]
+            //fix Grid.Column of control to index
+            for (int i = 0; i < partsGrid.ColumnDefinitions.Count; i++)
+            {
+                var col = partsGrid.ColumnDefinitions[i];
+                var con = partsGrid.Children[i];
+                if (i % 2 == 1)
+                {
+                    if (!(con is GridSplitter))
+                    {
+                        con = new GridSplitter();
+                        partsGrid.Children.Insert(i, con);
+                    }
+                    col.Width = GridLength.Auto;
+                    Grid.SetColumn(con, i);
+                    continue;
+                }
+                if (i == partsGrid.Children.Count - 1)
+                {
+                    //last viewpart - star
+                    col.Width = new GridLength(1, GridUnitType.Star);
+                }
+                else
+                {
+                    //convert star viewpart to implicit width
+                    if (col.Width.IsStar)
+                        if (con is ViewPartControl vpc)
+                            //if (!double.IsNaN(vpc.ActualWidth))
+                            col.Width = new GridLength(DEFAULT_WIDTH);
+                }
+                Grid.SetColumn(con, i);
+            }
+            if (partsGrid.Children.Count != columns)
+                throw new Exception("Columns error");
+        }
+
+    }
 }

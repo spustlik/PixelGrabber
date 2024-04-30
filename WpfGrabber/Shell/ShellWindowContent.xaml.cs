@@ -41,9 +41,11 @@ namespace WpfGrabber.Shell
         {
             base.OnInitialized(e);
             App.Current?.ServiceContainer?.AddService<IViewPartService>(this);
-            App.Current?.ServiceContainer?.AddService<ILayoutManagerService>(this);
+            App.Current?.ServiceContainer?.AddService<IViewPartServiceEx>(this);
             viewPartFactory = App.Current?.ServiceProvider.GetService<ViewPartFactory>();
             shellVm = App.Current?.ServiceProvider.GetService<ShellVm>();
-        }        
+            var lms = new LayoutManagerService(shellVm, this, viewPartFactory);
+            App.Current?.ServiceContainer?.AddService<ILayoutManagerService>(lms);
+        }
     }
 }

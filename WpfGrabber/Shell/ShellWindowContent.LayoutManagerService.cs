@@ -17,7 +17,7 @@ namespace WpfGrabber.Shell
         void SaveLayoutFile();
     }
 
-    partial class ShellWindowContent : ILayoutManagerService
+    public class LayoutManagerService : ILayoutManagerService
     {
         private const string ELE_LAYOUTS = "Layouts";
         private const string ELE_FILE = "File";
@@ -28,7 +28,19 @@ namespace WpfGrabber.Shell
         private const string ATTR_TYPE = "Type";
         private const string ATTR_WIDTH = "Width";
         private const string ELE_LAYOUT = "Layout";
+        private ShellVm shellVm;
+        private IViewPartServiceEx viewPartService;
+        private ViewPartFactory viewPartFactory;
 
+        public LayoutManagerService(
+            ShellVm shellVm, 
+            IViewPartServiceEx viewPartService,
+            ViewPartFactory viewPartFactory)
+        {
+            this.shellVm = shellVm;
+            this.viewPartService = viewPartService;
+            this.viewPartFactory = viewPartFactory;
+        }
         private string GetProjectFileName()
         {
             return Path.GetFileName(shellVm.FileName).ToUpperInvariant();
@@ -66,14 +78,14 @@ namespace WpfGrabber.Shell
                 .FirstOrDefault(x => x.Attribute(ATTR_FILENAME)?.Value == fileName);
             if (ele == null)
                 return;
-            RemoveAll();
+            viewPartService.RemoveAll();
             shellVm.Zoom = (double?)ele.Attribute(ATTR_ZOOM) ?? shellVm.Zoom;
             shellVm.Offset = (int?)ele.Attribute(ATTR_OFFSET) ?? 0;
             foreach (var e in ele.Elements(ELE_VIEWPART))
             {
                 LoadViewPart(e);
             }
-            FixGridLayout();
+            viewPartService.FixGridLayout();
         }
 
         private void LoadViewPart(XElement ele)
@@ -83,9 +95,9 @@ namespace WpfGrabber.Shell
             if (def == null)
                 return;
             var viewPart = def.Create();
-            Add(viewPart);
-            var width = (int?)ele.Attribute(ATTR_WIDTH) ?? DEFAULT_WIDTH;
-            SetOptions(viewPart, new ViewPartOptions() { Title = def.Title, Width = width });
+            viewPartService.Add(viewPart);
+            var width = (int)ele.Attribute(ATTR_WIDTH);
+            viewPartService.SetOptions(viewPart, new ViewPartOptions() { Title = def.Title, Width = width });
             var le = ele.Element(ELE_LAYOUT);
             if (le != null)
                 viewPart.OnLoadLayout(le);
@@ -103,7 +115,7 @@ namespace WpfGrabber.Shell
                 new XAttribute(ATTR_OFFSET, shellVm.Offset)
                 );
             parent.Add(ele);
-            foreach (var viewPart in ViewParts)
+            foreach (var viewPart in viewPartService.ViewParts)
             {
                 SaveViewPart(ele, viewPart);
             }
@@ -116,7 +128,7 @@ namespace WpfGrabber.Shell
                 .FirstOrDefault(e => e.Attribute(ATTR_TYPE)?.Value == def.TypeId);
             if (ele != null)
                 ele.Remove();
-            var (vpc, index) = GetViewPartControl(viewPart);
+            var (vpc, index) = viewPartService.GetViewPartControl(viewPart);
             ele = new XElement(ELE_VIEWPART,
                 new XAttribute(ATTR_TYPE, def.TypeId),
                 new XAttribute(ATTR_WIDTH, (int)vpc.ActualWidth)
