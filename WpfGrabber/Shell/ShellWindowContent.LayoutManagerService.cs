@@ -6,18 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows.Markup;
 using System.Xml.Linq;
 using WpfGrabber.ViewParts;
 
 namespace WpfGrabber.Shell
 {
-    public interface ILayoutManagerService
-    {
-        void LoadLayoutFile();
-        void SaveLayoutFile();
-    }
 
-    public class LayoutManagerService : ILayoutManagerService
+    public class LayoutManagerService
     {
         private const string ELE_LAYOUTS = "Layouts";
         private const string ELE_FILE = "File";
@@ -27,13 +23,15 @@ namespace WpfGrabber.Shell
         private const string ELE_VIEWPART = "View";
         private const string ATTR_TYPE = "Type";
         private const string ATTR_WIDTH = "Width";
+        private const string ELE_NAMEDLAYOUT = "Save";
+        private const string ATTR_NAME = "Name";
         private const string ELE_LAYOUT = "Layout";
         private ShellVm shellVm;
         private IViewPartServiceEx viewPartService;
         private ViewPartFactory viewPartFactory;
 
         public LayoutManagerService(
-            ShellVm shellVm, 
+            ShellVm shellVm,
             IViewPartServiceEx viewPartService,
             ViewPartFactory viewPartFactory)
         {
@@ -51,7 +49,7 @@ namespace WpfGrabber.Shell
             return Path.Combine(Path.GetDirectoryName(shellVm.FileName), ".pixelgrabber");
         }
 
-        public void LoadLayoutFile()
+        public void LoadLayoutFile(string name)
         {
             var fileName = GetConfigFileName();
             if (!File.Exists(fileName))
@@ -59,19 +57,20 @@ namespace WpfGrabber.Shell
             var doc = XDocument.Load(fileName);
             if (doc.Root.Name != ELE_LAYOUTS)
                 throw new FormatException("Invalid xml file");
-            LoadLayout(doc.Root);
+            LoadLayout(doc.Root, name);
         }
 
-        public void SaveLayoutFile()
+        public void SaveLayoutFile(string name)
         {
-            var fileName = GetConfigFileName();
-            var doc = File.Exists(fileName) ? XDocument.Load(fileName) : new XDocument(new XElement(ELE_LAYOUTS));
-
-            SaveLayout(doc.Root);
-            doc.Save(fileName);
+            SaveLayoutFileInternal(name, remove: false);
         }
 
-        private void LoadLayout(XElement parent)
+        public void RemoveLayoutFile(string name)
+        {
+            SaveLayoutFileInternal(name, remove: true);
+        }
+
+        public void LoadLayout(XElement parent, string name)
         {
             var fileName = GetProjectFileName();
             var ele = parent.Elements(ELE_FILE)
@@ -79,9 +78,22 @@ namespace WpfGrabber.Shell
             if (ele == null)
                 return;
             viewPartService.RemoveAll();
-            shellVm.Zoom = (double?)ele.Attribute(ATTR_ZOOM) ?? shellVm.Zoom;
-            shellVm.Offset = (int?)ele.Attribute(ATTR_OFFSET) ?? 0;
-            foreach (var e in ele.Elements(ELE_VIEWPART))
+
+            var source = ele;
+            if (!string.IsNullOrEmpty(name))
+            {
+                source = ele.Elements(ELE_NAMEDLAYOUT)
+                    .FirstOrDefault(e => e.Attribute(ATTR_NAME)?.Value == name);
+                if (source == null)
+                    return;
+            }
+            else
+            {
+                shellVm.Layouts.AddRange(source.Elements(ELE_NAMEDLAYOUT).Select(e => e.Attribute(ATTR_NAME)?.Value), clear: true);
+            }
+            shellVm.Zoom = (double?)source.Attribute(ATTR_ZOOM) ?? shellVm.Zoom;
+            shellVm.Offset = (int?)source.Attribute(ATTR_OFFSET) ?? 0;
+            foreach (var e in source.Elements(ELE_VIEWPART))
             {
                 LoadViewPart(e);
             }
@@ -103,21 +115,54 @@ namespace WpfGrabber.Shell
                 viewPart.OnLoadLayout(le);
         }
 
-        private void SaveLayout(XElement parent)
+        private void SaveLayoutFileInternal(string name, bool remove)
+        {
+            var fileName = GetConfigFileName();
+            var doc = File.Exists(fileName) ? XDocument.Load(fileName) : new XDocument(new XElement(ELE_LAYOUTS));
+
+            SaveLayoutInternal(doc.Root, name, remove);
+            doc.Save(fileName);
+        }
+
+        public void SaveLayout(XElement parent, string name)
+        {
+            SaveLayoutInternal(parent, name, remove: false);
+        }
+
+        private void SaveLayoutInternal(XElement parent, string name, bool remove)
         {
             var fileName = GetProjectFileName();
             var ele = parent.Elements(ELE_FILE)
                 .FirstOrDefault(x => x.Attribute(ATTR_FILENAME)?.Value == fileName);
-            ele?.Remove();
-            ele = new XElement(ELE_FILE,
-                new XAttribute(ATTR_FILENAME, fileName),
-                new XAttribute(ATTR_ZOOM, shellVm.Zoom),
-                new XAttribute(ATTR_OFFSET, shellVm.Offset)
-                );
-            parent.Add(ele);
+            if (ele == null)
+            {
+                ele = new XElement(ELE_FILE, new XAttribute(ATTR_FILENAME, fileName));
+                parent.Add(ele);
+            }
+            var target = ele;
+            if (!String.IsNullOrEmpty(name))
+            {
+                target = ele.Elements(ELE_NAMEDLAYOUT)
+                    .FirstOrDefault(x => x.Attribute(ATTR_NAME)?.Value == name);
+                if (target == null)
+                {
+                    target = new XElement(ELE_NAMEDLAYOUT, new XAttribute(ATTR_NAME, name));
+                    ele.Add(target);
+                }
+                if (!shellVm.Layouts.Contains(name))
+                    shellVm.Layouts.Add(name);
+            }
+            if (remove)
+            {
+                shellVm.Layouts.Remove(name);
+                target.Remove();
+                return;
+            }
+            target.Add(new XAttribute(ATTR_ZOOM, shellVm.Zoom),
+                    new XAttribute(ATTR_OFFSET, shellVm.Offset));
             foreach (var viewPart in viewPartService.ViewParts)
             {
-                SaveViewPart(ele, viewPart);
+                SaveViewPart(target, viewPart);
             }
         }
 
@@ -134,9 +179,8 @@ namespace WpfGrabber.Shell
                 new XAttribute(ATTR_WIDTH, (int)vpc.ActualWidth)
                 );
             parent.Add(ele);
-            var le = new XElement(ELE_LAYOUT);
-            viewPart.OnSaveLayout(le);
-            ele.Add(le);
+            viewPart.OnSaveLayout(ele);
+            ele.Add(ele);
         }
 
     }

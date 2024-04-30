@@ -105,5 +105,21 @@ namespace WpfGrabber.Shell
         {
             App.GetService<ProjectManager>().SaveLayout();
         }
+
+        private void SaveOffsetLayout_Click(object sender, RoutedEventArgs e)
+        {
+            App.GetService<ProjectManager>().SaveOffsetLayout();
+        }
+
+        private void LoadNamedLayout_Click(object sender, RoutedEventArgs e)
+        {
+            var name = ((MenuItem)e.OriginalSource).CommandParameter;
+            App.GetService<ProjectManager>().LoadOffsetLayout((string)name);
+        }
+
+        private void RemoveOffsetLayout_Click(object sender, RoutedEventArgs e)
+        {
+            App.GetService<ProjectManager>().RemoveOffsetLayout();
+        }
     }
 }

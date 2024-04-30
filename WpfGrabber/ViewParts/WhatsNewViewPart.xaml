@@ -15,13 +15,13 @@
 - clear images in Image sprite
 - auto load layout
 - change color in MaskViewPart to int
+- named layouts (by Offset)
 </Run>
                 <LineBreak/>
 
                 <Run FontSize="30" FontWeight="Bold" Foreground="DodgerBlue">What to do</Run>
                 <Run xml:space="preserve">
 - multiselect in imagesprite              
-- save layout with address
 - auto save layout ?
 - end offset for bit8, masked - count?
 - whatsnew viewpart...

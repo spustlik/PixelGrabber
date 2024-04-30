@@ -120,6 +120,7 @@ namespace WpfGrabber.Shell
             RecentFiles.RemoveAt(i);
         }
         public ObservableCollection<string> RecentFiles { get; private set; } = new ObservableCollection<string>();
-
+        [XmlIgnore]
+        public ObservableCollection<string> Layouts { get; private set; } = new ObservableCollection<string>();
     }
 }

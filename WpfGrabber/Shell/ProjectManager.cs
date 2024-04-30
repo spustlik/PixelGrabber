@@ -29,13 +29,33 @@ namespace WpfGrabber.Shell
 
         public void LoadLayout()
         {
-            var layoutSvc = serviceProvider.GetService<ILayoutManagerService>();
-            layoutSvc.LoadLayoutFile();
+            var layoutSvc = serviceProvider.GetService<LayoutManagerService>();
+            layoutSvc.LoadLayoutFile(null);
         }
         public void SaveLayout()
         {
-            var layoutSvc = serviceProvider.GetService<ILayoutManagerService>();
-            layoutSvc.SaveLayoutFile();
+            var layoutSvc = serviceProvider.GetService<LayoutManagerService>();
+            layoutSvc.SaveLayoutFile(null);
+        }
+
+        public void SaveOffsetLayout()
+        {
+            var layoutSvc = serviceProvider.GetService<LayoutManagerService>();
+            var shellVm = serviceProvider.GetService<ShellVm>();
+            layoutSvc.SaveLayoutFile(shellVm.Offset.ToString("X4"));
+        }
+
+        public void LoadOffsetLayout(string name)
+        {
+            var layoutSvc = serviceProvider.GetService<LayoutManagerService>();
+            layoutSvc.LoadLayoutFile(name);
+        }
+
+        internal void RemoveOffsetLayout()
+        {
+            var layoutSvc = serviceProvider.GetService<LayoutManagerService>();
+            var shellVm = serviceProvider.GetService<ShellVm>();
+            layoutSvc.RemoveLayoutFile(shellVm.Offset.ToString("X4"));
         }
     }
 }

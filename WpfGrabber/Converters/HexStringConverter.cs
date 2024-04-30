@@ -16,14 +16,14 @@ namespace WpfGrabber
         /// number of hex numbers, 0 means do not convert to hex string
         /// </summary>
         public int HexNums { get; set; } = 4;
-
+        public string Prefix { get; set; } = "0x";
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value == null || value == DependencyProperty.UnsetValue)
                 return value;
             if ((value is int i) && HexNums>0)
             {
-                return "0x" + i.ToString("X" + HexNums);
+                return Prefix + i.ToString("X" + HexNums);
             }
             return value;
         }
