@@ -9,10 +9,12 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using WpfGrabber.Services;
+using static WpfGrabber.Shell.ShellWindowMenu;
 
 namespace WpfGrabber.Shell
 {
@@ -22,11 +24,15 @@ namespace WpfGrabber.Shell
     public partial class ShellWindow : Window
     {
         public ShellVm ViewModel => DataContext as ShellVm;
+
+        public ProjectManager ProjectManager { get; }
+
         public ShellWindow()
         {
             DataContext = new ShellVm();
             App.Current.ServiceContainer.AddService(ViewModel);
             App.Current.ServiceContainer.AddService(new ViewParts.ViewPartFactory());
+            App.Current.ServiceContainer.AddService(ProjectManager = new ProjectManager(App.Current.ServiceProvider));
             InitializeComponent();
             ExceptionWindow.StartHandlingExceptions();
         }
@@ -34,7 +40,12 @@ namespace WpfGrabber.Shell
         protected override void OnInitialized(EventArgs e)
         {
             base.OnInitialized(e);
-            AppConfig.Load(this.ViewModel);
+            var cfg = AppConfig.Load(this.ViewModel);
+            if (cfg != null && !string.IsNullOrEmpty(cfg.LastFile) && cfg.OpenLastFile)
+            {
+                ProjectManager.LoadFile(cfg.LastFile);
+            }
+
             _configSaver = Throthler.Create(TimeSpan.FromMilliseconds(50), () =>
             {
                 AppConfig.Save(ViewModel);

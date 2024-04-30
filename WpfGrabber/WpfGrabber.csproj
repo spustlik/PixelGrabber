@@ -79,6 +79,7 @@
     <Compile Include="Services\Throthler.cs" />
     <Compile Include="Shell\AppData.cs" />
     <Compile Include="Shell\IViewPartService.cs" />
+    <Compile Include="Shell\ProjectManager.cs" />
     <Compile Include="Shell\ShellWindowContent.LayoutManagerService.cs" />
     <Compile Include="Themes\ResourceEvents.cs" />
     <Compile Include="ViewParts\FontBinaryViewPart.xaml.cs">

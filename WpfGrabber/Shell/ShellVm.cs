@@ -95,7 +95,6 @@ namespace WpfGrabber.Shell
             Offset = 0;
             DataLength = Data.Length;
             DoPropertyChanged(nameof(Data));
-            //TODO: load layout if AutoLoad
         }
 
         public void SetData(byte[] data)

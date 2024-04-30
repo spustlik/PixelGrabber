@@ -34,17 +34,15 @@ namespace WpfGrabber.Services
             //XmlHelper.SaveToFile(Path.ChangeExtension(AppConfigFileName,".config"), data);
         }
 
-        public static void Load(ShellVm vm)
+        public static AppConfig Load(ShellVm vm)
         {
             var data = XmlHelper.SerializeFromFile<AppConfig>(AppConfigFileName);
             if (data == null)
-                return;
+                return null;
             vm.Zoom = data.Zoom;
             vm.AutoLoadLayout = data.AutoLoadLayout;
             vm.RecentFiles.AddRange(data.RecentFiles, clear: true);
-            if (!string.IsNullOrEmpty(data.LastFile) && data.OpenLastFile)
-                vm.LoadData(data.LastFile);
-            //var data2 = XmlHelper.LoadFromFile<AppConfig>(Path.ChangeExtension(AppConfigFileName, ".config"));
+            return data;
         }
     }
 }

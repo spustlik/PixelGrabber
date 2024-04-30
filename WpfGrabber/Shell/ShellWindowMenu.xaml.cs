@@ -66,10 +66,14 @@ namespace WpfGrabber.Shell
             Application.Current.Shutdown();
         }
 
+        private void LoadFile(string fn)
+        {
+            App.GetService<ProjectManager>().LoadFile(fn);
+        }
+
         private void OnOpenRecentFileExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            var fn = (string)e.Parameter;
-            ViewModel.ShellVm.LoadData(fn);
+            LoadFile((string)e.Parameter);
         }
 
         private void OnOpenFileExecuted(object sender, ExecutedRoutedEventArgs e)
@@ -77,7 +81,7 @@ namespace WpfGrabber.Shell
             var dlg = new OpenFileDialog();
             if (dlg.ShowDialog() != true)
                 return;
-            ViewModel.ShellVm.LoadData(dlg.FileName);
+            LoadFile(dlg.FileName);
         }
 
         private void OnTestData_Click(object sender, RoutedEventArgs e)
@@ -94,14 +98,12 @@ namespace WpfGrabber.Shell
 
         private void LoadLayout_Click(object sender, RoutedEventArgs e)
         {
-            var lsvc = App.Current?.ServiceProvider.GetService<ILayoutManagerService>();
-            lsvc.LoadLayoutFile();
+            App.GetService<ProjectManager>().LoadLayout();
         }
 
         private void SaveLayout_Click(object sender, RoutedEventArgs e)
         {
-            var lsvc = App.Current?.ServiceProvider.GetService<ILayoutManagerService>();
-            lsvc.SaveLayoutFile();
+            App.GetService<ProjectManager>().SaveLayout();
         }
     }
 }
