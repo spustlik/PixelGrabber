@@ -23,7 +23,7 @@ namespace WpfGrabber.Shell
     public class ViewPartOptions
     {
         public string Title { get; set; }
-        public int Width { get; set; }
+        public int? Width { get; set; }
     }
 
 

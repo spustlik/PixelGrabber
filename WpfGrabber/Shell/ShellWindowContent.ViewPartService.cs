@@ -62,9 +62,15 @@ namespace WpfGrabber.Shell
             if (i < 0)
                 return;
             vpc.Title = options.Title;
-            if (options.Width == 0)
-                options.Width = DEFAULT_WIDTH;
-            partsGrid.ColumnDefinitions[i].Width = new GridLength(options.Width);
+            if (options.Width.HasValue)
+            {
+                if (options.Width < 50)
+                {
+                    options.Width = DEFAULT_WIDTH;
+                }
+                partsGrid.ColumnDefinitions[i].Width = new GridLength(options.Width.GetValueOrDefault());
+            }
+
         }
         #endregion
 
