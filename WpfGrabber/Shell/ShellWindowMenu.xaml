@@ -41,7 +41,16 @@
                 <MenuItem Header="Load" Click="LoadLayout_Click"/>
                 <MenuItem Header="Save" Click="SaveLayout_Click"/>
                 <Separator/>
-                <MenuItem Header="Load" ItemsSource="{Binding ShellVm.Layouts}">
+                <MenuItem Header="Load" ItemsSource="{Binding ShellVm.Layouts}" >
+                    <MenuItem.Style>
+                        <Style TargetType="MenuItem">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ShellVm.Layouts.Count}" Value="0">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </MenuItem.Style>
                     <MenuItem.ItemContainerStyle>
                         <Style TargetType="MenuItem">
                             <EventSetter Event="Click" Handler="LoadNamedLayout_Click"/>

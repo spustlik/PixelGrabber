@@ -179,8 +179,13 @@ namespace WpfGrabber.Shell
                 new XAttribute(ATTR_WIDTH, (int)vpc.ActualWidth)
                 );
             parent.Add(ele);
-            viewPart.OnSaveLayout(ele);
-            ele.Add(ele);
+            var le = ele.Element(ELE_LAYOUT);
+            if (le == null)
+            {
+                le = new XElement(ELE_LAYOUT);
+                ele.Add(le);
+            }
+            viewPart.OnSaveLayout(le);
         }
 
     }

@@ -23,6 +23,8 @@ namespace WpfGrabber.Readers
         ImageMaskData,
         [Description("Image and mask preambules")]
         ImageDataMaskWithPreambule,
+        [Description("4 bits")]
+        Bits4DataMask,
     }
 
     public enum MaskReaderPreambule
@@ -65,7 +67,7 @@ namespace WpfGrabber.Readers
             new byte[] { 0, 2, 1, 1 },
             new byte[] { 2, 0, 1, 1 },
 
-            new byte[] { 0, 1, 1, 2 }, 
+            new byte[] { 0, 1, 1, 2 },
             new byte[] { 2, 1, 1, 0 },
             new byte[] { 1, 0, 2, 1 },
             new byte[] { 1, 2, 0, 1 },
@@ -78,7 +80,8 @@ namespace WpfGrabber.Readers
             ReadPreambule(ref width, ref height);
             switch (Type)
             {
-                case MaskReaderType.ByteDataMask: return ReadByteArrayMask(width, height);
+                case MaskReaderType.Bits4DataMask: return ReadBits4DataMask(width, height);
+                case MaskReaderType.ByteDataMask: return ReadByteDataMask(width, height);
                 case MaskReaderType.LineDataMask: return ReadLineDataMask(width, height);
                 case MaskReaderType.ImageDataMask: return ReadImageDataMask(width, height);
                 case MaskReaderType.ImageMaskData: return ReadImageDataMask(width, height, maskData: true);
@@ -146,10 +149,10 @@ namespace WpfGrabber.Readers
             }
             for (var y = 0; y < height; y++)
             {
-                var posY = FlipY ? height - y : y;
+                var posY = FlipY ? height - y - 1 : y;
                 for (int x = 0; x < width; x++)
                 {
-                    WriteByte(result, x, posY, dataBytes[x + y * width], maskBytes[x + y * width]);
+                    WriteByte(result, x * 8, posY, dataBytes[x + y * width], maskBytes[x + y * width]);
                 }
             }
             return result;
@@ -160,14 +163,14 @@ namespace WpfGrabber.Readers
             var result = new ByteBitmap8Bit(width * 8, height);
             for (var y = 0; y < height; y++)
             {
-                var posY = FlipY ? height - y : y;
+                var posY = FlipY ? height - y - 1 : y;
 
                 var dataBytes = ReadBytes(width);
                 var maskBytes = ReadBytes(width);
 
                 for (int x = 0; x < width; x++)
                 {
-                    WriteByte(result, x, posY, dataBytes[x], maskBytes[x]);
+                    WriteByte(result, x * 8, posY, dataBytes[x], maskBytes[x]);
                 }
             }
             return result;
@@ -185,12 +188,12 @@ namespace WpfGrabber.Readers
             }
             return result;
         }
-        private void WriteByte(ByteBitmap8Bit result, int x, int y, byte data, byte mask)
+        private void WriteByte(ByteBitmap8Bit result, int x, int y, byte data, byte mask, int size = 8)
         {
-            for (var i = 0; i < 8; i++)
+            for (var i = 0; i < size; i++)
             {
                 byte b = GetDMColor(data, mask);
-                var posX = x * 8 + i;
+                var posX = x + i;
                 if (FlipX)
                     posX = result.Width - posX - 1;
                 result.SetPixel(posX, y, b);
@@ -213,12 +216,30 @@ namespace WpfGrabber.Readers
             return b;
         }
 
-        private ByteBitmap8Bit ReadByteArrayMask(int width, int height)
+        private ByteBitmap8Bit ReadBits4DataMask(int width, int height)
+        {
+            var result = new ByteBitmap8Bit(4 * width, height);
+            for (var y = 0; y < height; y++)
+            {
+                var posY = FlipY ? height - y - 1 : y;
+                var data = ReadBytes(width);
+                for (int x = 0; x < width; x++)
+                {
+                    var dm = data[x];
+                    var d = (byte)(dm & 0xF);
+                    var m = (byte)((dm >> 4) & 0x0F);
+                    WriteByte(result, x * 4, posY, d, m, 4);
+                }
+            }
+            return result;
+        }
+
+        private ByteBitmap8Bit ReadByteDataMask(int width, int height)
         {
             var result = new ByteBitmap8Bit(width * 8, height);
             for (var y = 0; y < height; y++)
             {
-                var posY = FlipY ? height - y : y;
+                var posY = FlipY ? height - y - 1 : y;
 
                 for (int x = 0; x < width; x++)
                 {
@@ -226,7 +247,7 @@ namespace WpfGrabber.Readers
                     //var mask = BitReader.ReadByte();
                     var data = ReadBytes(1)[0];
                     var mask = ReadBytes(1)[0];
-                    WriteByte(result, x, posY, data, mask);
+                    WriteByte(result, x * 8, posY, data, mask);
                 }
             }
             return result;

@@ -24,6 +24,7 @@
 
                 <Run FontSize="30" FontWeight="Bold" Foreground="DodgerBlue">What to do</Run>
                 <Run xml:space="preserve">
+- fix FlipY in maskreaedr                    
 - multiselect in imagesprite              
 - auto save layout ?
 - end offset for bit8, masked - count?
