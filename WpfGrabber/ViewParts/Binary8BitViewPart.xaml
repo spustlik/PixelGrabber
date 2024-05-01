@@ -28,6 +28,8 @@
                     <ContextMenu>
                         <MenuItem Header="Save image" Click="OnButtonSave_Click"/>
                         <MenuItem Header="Save as data image" Click="OnButtonSaveData_Click"/>
+                        <Separator/>
+                        <MenuItem Header="Copy data image to clipboard" Click="OnButtonCopyClipboard_Click"/>
                     </ContextMenu>
                 </Button.ContextMenu>
             </Button>

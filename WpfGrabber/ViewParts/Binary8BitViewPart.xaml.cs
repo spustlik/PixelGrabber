@@ -62,6 +62,8 @@ namespace WpfGrabber.ViewParts
             reader.FlipX = ViewModel.Reversed;
             var w = ViewModel.Width;
 
+            var (max_w, max_h) = GetDataImageSize(imageBorder);
+            /*
             var total_w = this.GetFirstValid(imageBorder.ActualWidth, imageBorder.Width, Width, 100);
             total_w -= (int)imageBorder.Padding.Right + (int)imageBorder.Padding.Left;
             total_w = (int)(total_w / ShellVm.Zoom);
@@ -69,10 +71,11 @@ namespace WpfGrabber.ViewParts
             total_h -= (int)imageBorder.Padding.Bottom + (int)imageBorder.Padding.Top;
             total_h = (int)(total_h / ShellVm.Zoom);
             //log.Text += $"H:{total_h},W:{total_w}, w={w}\n";
+            */
 
             var space = w < 16 ? 4 : 10;
             var bir = new BitImageReader();
-            BitmapSource bmp = bir.ReadBitmap(reader, total_w, total_h, w, space);
+            BitmapSource bmp = bir.ReadBitmap(reader, max_w, max_h, w, space);
             image.Source = bmp;
             image.RenderTransform = new ScaleTransform(ShellVm.Zoom, ShellVm.Zoom);
 
@@ -97,13 +100,24 @@ namespace WpfGrabber.ViewParts
             dlg.FileName = $"{Path.GetFileName(ShellVm.FileName)}-{ShellVm.Offset}-{ShellVm.Offset:X4}-{ViewModel.Width}.data.png";
             if (dlg.ShowDialog() != true)
                 return;
+            BitmapSource bmp = ReadDataImage();
+            bmp.SaveToPngFile(dlg.FileName);
+        }
+
+        private BitmapSource ReadDataImage()
+        {
             var bir = new BitImageReader();
-            var bmp2 = bir.ReadBitmap(new BitReader(ShellVm.Data) { BytePosition = ShellVm.Offset },
+            var bmp = bir.ReadBitmap(new BitReader(ShellVm.Data) { BytePosition = ShellVm.Offset },
                 ViewModel.Width,
                 (ShellVm.DataLength - ShellVm.Offset) / (ViewModel.Width / 8),
                 ViewModel.Width, 10);
-            bmp2.SaveToPngFile(dlg.FileName);
+            return bmp;
         }
 
+        private void OnButtonCopyClipboard_Click(object sender, RoutedEventArgs e)
+        {
+            var bmp = ReadDataImage();
+            Clipboard.SetImage(bmp);
+        }
     }
 }
