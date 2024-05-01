@@ -62,6 +62,15 @@ namespace WpfGrabber.ViewParts
         }
         #endregion
 
+        #region IsTestTextMultiLine property
+        private bool _isTestTextMultiLine;
+        public bool IsTestTextMultiLine
+        {
+            get => _isTestTextMultiLine;
+            set => Set(ref _isTestTextMultiLine, value);
+        }
+        #endregion
+
         #region FontCharacters property
         private string _fontCharacters;
         public string FontCharacters
@@ -116,9 +125,21 @@ namespace WpfGrabber.ViewParts
             var (max_w, max_h) = GetDataImageSize(imageBorder);
             var rgba = new ByteBitmapRgba(max_w, max_h);
             font.DrawString(rgba, 10, 10, ViewModel.TestText);
+            var posX = 0;
+            var posY = 40;
+            var maxX = (int)(max_w) - 40;
             for (int i = 0; i < font.Letters.Length; i++)
             {
-                rgba.DrawBitmap(font.Letters[i], i * 8, 40, ByteBitmapRgba.GetColorBlack);
+                rgba.DrawBitmap(font.Letters[i], posX, posY, ByteBitmapRgba.GetColorBlack);
+                if (posX >= maxX)
+                {
+                    posX = 0;
+                    posY += 16;
+                }
+                else
+                {
+                    posX += 8;
+                }
             }
             var bmp = rgba.ToBitmapSource();
             image.Source = bmp;

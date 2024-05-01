@@ -4,8 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WpfGrabber.ViewParts"
-             mc:Ignorable="d" d:DesignWidth="300"
-             Background="LightYellow" Height="191"
+             mc:Ignorable="d" d:DesignWidth="490.477"
+             Background="LightYellow" Height="318"
              >
     <Grid>
         <ScrollViewer>
@@ -16,6 +16,7 @@
 - auto load layout
 - change color in MaskViewPart to int
 - named layouts (by Offset)
+- multiline font viewer
 </Run>
                 <LineBreak/>
 

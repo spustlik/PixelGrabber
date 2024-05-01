@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:WpfGrabber.ViewParts" xmlns:c="clr-namespace:WpfGrabber.Controls"
              x:Name="root"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="400">
+             d:DesignHeight="154.483" d:DesignWidth="400">
     <d:DesignerProperties.DesignStyle>
         <Style TargetType="UserControl">
             <Setter Property="Background" Value="White" />

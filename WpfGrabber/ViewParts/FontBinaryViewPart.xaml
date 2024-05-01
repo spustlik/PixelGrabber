@@ -11,9 +11,13 @@
         </Style>
     </d:DesignerProperties.DesignStyle>
     <Grid>
+        <Grid.Resources>
+            <BooleanToVisibilityConverter x:Key="visiConv"/>
+        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="5"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <ItemsControl Style="{StaticResource toolbar}">
@@ -51,8 +55,12 @@
                 </Button.ContextMenu>
             </Button>
         </ItemsControl>
-        <StackPanel Grid.Row="1" Orientation="Vertical">
-            <StackPanel.Resources>
+        <Grid Grid.Row="1" x:Name="texts">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.Resources>
                 <Style TargetType="Border">
                     <Setter Property="Background" Value="LightBlue" />
                     <Setter Property="Padding" Value="10,5" />
@@ -61,11 +69,9 @@
                 <Style TargetType="Label">
                     <Setter Property="Margin" Value="0" />
                     <Setter Property="Height" Value="23" />
+                    <Setter Property="VerticalAlignment" Value="Top" />
                 </Style>
-                <Style TargetType="Button">
-                    <Setter Property="Height" Value="23" />
-                </Style>
-            </StackPanel.Resources>
+            </Grid.Resources>
             <Border>
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -74,7 +80,8 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Label>Font characters: </Label>
-                    <TextBox Grid.Column="1" Text="{Binding FontCharacters, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox Grid.Column="1" Text="{Binding FontCharacters, UpdateSourceTrigger=PropertyChanged}"
+                             FontFamily="Courier New" VerticalContentAlignment="Center"/>
                     <Button Grid.Column="2" Style="{StaticResource dropDown}" Content="">
                         <Button.ContextMenu>
                             <ContextMenu>
@@ -85,7 +92,7 @@
                     </Button>
                 </Grid>
             </Border>
-            <Border>
+            <Border Grid.Row="1">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -93,20 +100,28 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Label>Test text:</Label>
-                    <TextBox Grid.Column="1" Text="{Binding TestText, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Button Grid.Column="2" Style="{StaticResource dropDown}" Content="">
+                    <TextBox Grid.Column="1" Text="{Binding TestText, UpdateSourceTrigger=PropertyChanged}"
+                             FontFamily="Courier New" VerticalContentAlignment="Center"
+                             TextWrapping="Wrap"
+                             AcceptsReturn="True"
+                             VerticalScrollBarVisibility="{Binding IsTestTextMultiLine, Converter={StaticResource visiConv}}"
+                             />
+                    <Button Grid.Column="2" Style="{StaticResource dropDown}" Content="" VerticalAlignment="Top">
                         <Button.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="ASCII" Click="SetAsciiTestText_Click"/>
                                 <MenuItem Header="Lorem ipsum" Click="SetLoremTestText_Click"/>
+                                <Separator/>
+                                <MenuItem Header="Allow multiline" IsChecked="{Binding IsTestTextMultiLine}" IsCheckable="True"/>
                             </ContextMenu>
                         </Button.ContextMenu>
                     </Button>
                 </Grid>
             </Border>
-
-        </StackPanel>
-        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+            
+        </Grid>
+        <!--<GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="red"/>-->
+        <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto">
             <Border x:Name="imageBorder" 
                     SizeChanged="BorderSize_Changed"
                     Style="{StaticResource checkerBorder}">
