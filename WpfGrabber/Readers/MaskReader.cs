@@ -64,6 +64,11 @@ namespace WpfGrabber.Readers
             new byte[] { 1, 1, 0, 2 },
             new byte[] { 0, 2, 1, 1 },
             new byte[] { 2, 0, 1, 1 },
+
+            new byte[] { 0, 1, 1, 2 }, 
+            new byte[] { 2, 1, 1, 0 },
+            new byte[] { 1, 0, 2, 1 },
+            new byte[] { 1, 2, 0, 1 },
             };
         public ByteBitmap8Bit Read()
         {
@@ -217,8 +222,10 @@ namespace WpfGrabber.Readers
 
                 for (int x = 0; x < width; x++)
                 {
-                    var data = BitReader.ReadByte();
-                    var mask = BitReader.ReadByte();
+                    //var data = BitReader.ReadByte();
+                    //var mask = BitReader.ReadByte();
+                    var data = ReadBytes(1)[0];
+                    var mask = ReadBytes(1)[0];
                     WriteByte(result, x, posY, data, mask);
                 }
             }

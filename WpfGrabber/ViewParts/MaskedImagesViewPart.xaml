@@ -62,7 +62,7 @@
             <Separator/>
             <StackPanel>
                 <Label Content="Mask type"/>
-                <c:NumberEditor Value="{Binding MaskType}" Minimum="0" Maximum="3" Width="70"/>
+                <c:NumberEditor Value="{Binding MaskType}" Minimum="0" Maximum="7" Width="70"/>
                 <Separator/>
             </StackPanel>
             <Separator/>
