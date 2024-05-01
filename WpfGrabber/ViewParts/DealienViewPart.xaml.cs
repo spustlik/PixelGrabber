@@ -39,6 +39,16 @@ namespace WpfGrabber.ViewParts
         }
         #endregion
 
+        #region MaxCount property
+        private int _maxCount;
+        public int MaxCount
+        {
+            get => _maxCount;
+            set => Set(ref _maxCount, value);
+        }
+        #endregion
+
+
         #region FlipVertical property
         private bool _flipVertical;
         public bool FlipVertical
@@ -95,6 +105,7 @@ namespace WpfGrabber.ViewParts
             const int XSPACER = 10;
             const int YSPACER = 0;
             int maxw = 0;
+            int counter = 0;
             foreach (var img in images.Select(a => a.Bitmap))
             {
                 if (posY + img.Height > max_h)
@@ -104,6 +115,9 @@ namespace WpfGrabber.ViewParts
                     maxw = 0;
                 }
                 rgba.DrawBitmap(img, posX,posY);
+                counter++;
+                if (ViewModel.MaxCount > 0 && counter > ViewModel.MaxCount)
+                    break;
                 posY += img.Height + YSPACER;
                 maxw = Math.Max(maxw, img.Width);
                 if (posX > max_w)

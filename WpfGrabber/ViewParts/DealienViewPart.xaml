@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:WpfGrabber.ViewParts" xmlns:c="clr-namespace:WpfGrabber.Controls"
              x:Name="root"
              mc:Ignorable="d" 
-             d:DesignHeight="154.483" d:DesignWidth="400">
+             d:DesignHeight="146.483" d:DesignWidth="564.667">
     <d:DesignerProperties.DesignStyle>
         <Style TargetType="UserControl">
             <Setter Property="Background" Value="White" />
@@ -22,6 +22,11 @@
             <c:NumberEditor Value="{Binding EndPos}" 
                             Maximum="{Binding EndPosMax}"
                             Width="160" SliderWidth="80"/>
+            <Separator/>
+            <Label Content="Max count"/>
+            <c:NumberEditor Value="{Binding MaxCount}" 
+                            Maximum="256"
+                            Width="80" SliderWidth="0"/>
             <Separator/>
             <CheckBox Content="Flip V" IsChecked="{Binding FlipVertical}"/>
             <Separator/>

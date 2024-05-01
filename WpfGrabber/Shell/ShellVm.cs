@@ -110,6 +110,8 @@ namespace WpfGrabber.Shell
             var i = RecentFiles.FindIndex(x => String.Compare(x, fileName, StringComparison.OrdinalIgnoreCase) == 0);
             if (i >= 0)
                 return;
+            while (RecentFiles.Count > 20)
+                RecentFiles.RemoveAt(0);
             RecentFiles.Add(fileName);
         }
         private void RemoveRecentFile(string fileName)
