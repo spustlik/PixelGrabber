@@ -158,8 +158,8 @@ namespace WpfGrabber.Shell
                 target.Remove();
                 return;
             }
-            target.Add(new XAttribute(ATTR_ZOOM, shellVm.Zoom),
-                    new XAttribute(ATTR_OFFSET, shellVm.Offset));
+            target.SetAttributeValue(ATTR_ZOOM, shellVm.Zoom);
+            target.SetAttributeValue(ATTR_OFFSET, shellVm.Offset);
             foreach (var viewPart in viewPartService.ViewParts)
             {
                 SaveViewPart(target, viewPart);
