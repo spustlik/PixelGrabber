@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
@@ -91,13 +92,7 @@ namespace WpfGrabber.ViewParts
                 ViewModel.EndPos = ShellVm.Offset;
             if (ViewModel.EndPosMax > ShellVm.DataLength)
                 ViewModel.EndPosMax -= ShellVm.DataLength;
-            var images = AlienReader
-                .ReadList(
-                    ShellVm.Data, 
-                    ShellVm.Offset,
-                    ViewModel.GetEndPosSafe(), 
-                    flipY: ViewModel.FlipVertical
-                );
+            var images = ReadImages();
             var (max_w, max_h) = GetDataImageSize(imageBorder);
             var rgba = new ByteBitmapRgba(max_w, max_h);
             var posX = 0;
@@ -105,7 +100,6 @@ namespace WpfGrabber.ViewParts
             const int XSPACER = 10;
             const int YSPACER = 0;
             int maxw = 0;
-            int counter = 0;
             foreach (var img in images.Select(a => a.Bitmap))
             {
                 if (posY + img.Height > max_h)
@@ -114,10 +108,7 @@ namespace WpfGrabber.ViewParts
                     posY = 0;
                     maxw = 0;
                 }
-                rgba.DrawBitmap(img, posX,posY);
-                counter++;
-                if (ViewModel.MaxCount > 0 && counter > ViewModel.MaxCount)
-                    break;
+                rgba.DrawBitmap(img, posX, posY);
                 posY += img.Height + YSPACER;
                 maxw = Math.Max(maxw, img.Width);
                 if (posX > max_w)
@@ -128,6 +119,20 @@ namespace WpfGrabber.ViewParts
             image.RenderTransform = new ScaleTransform(ShellVm.Zoom, ShellVm.Zoom);
         }
 
+        private IEnumerable<AlienReader.AlienImage> ReadImages()
+        {
+            var result = AlienReader
+                .ReadList(
+                    ShellVm.Data,
+                    ShellVm.Offset,
+                    ViewModel.GetEndPosSafe(),
+                    flipY: ViewModel.FlipVertical
+                );
+            if(ViewModel.MaxCount>0)
+                result = result.Take(ViewModel.MaxCount);
+            return result;
+        }
+
         private void OnButtonSaveImages_Click(object sender, RoutedEventArgs e)
         {
             var dlg = new SaveFileDialog();
@@ -135,7 +140,7 @@ namespace WpfGrabber.ViewParts
             dlg.FileName = Path.ChangeExtension(ShellVm.FileName, ".png");
             if (dlg.ShowDialog() != true)
                 return;
-            var images = AlienReader.ReadList(ShellVm.Data, ShellVm.Offset, ViewModel.GetEndPosSafe(), flipY: ViewModel.FlipVertical);
+            var images = ReadImages();
             var id = 0;
             foreach (var item in images)
             {
