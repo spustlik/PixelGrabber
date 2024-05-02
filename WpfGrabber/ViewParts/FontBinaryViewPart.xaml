@@ -41,6 +41,11 @@
                 <c:NumberEditor Value="{Binding Height}" Maximum="40" Width="70" SliderWidth="0"/>
             </StackPanel>
             <Separator/>
+            <StackPanel>
+                <Label>Border</Label>
+                <c:NumberEditor Value="{Binding Border}" Maximum="8" Width="70" SliderWidth="0"/>
+            </StackPanel>
+            <Separator/>
             <CheckBox IsChecked="{Binding FlipX}">FlipX</CheckBox>
             <Separator/>
             <CheckBox IsChecked="{Binding FlipY}">FlipY</CheckBox>

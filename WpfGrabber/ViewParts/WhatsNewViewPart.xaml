@@ -19,12 +19,13 @@
 - multiline font viewer
 - dealien max count                    
 - copy to clipboard - 8 bit 
+- fix FlipY in maskreader                    
+- font border
 </Run>
                 <LineBreak/>
 
                 <Run FontSize="30" FontWeight="Bold" Foreground="DodgerBlue">What to do</Run>
                 <Run xml:space="preserve">
-- fix FlipY in maskreaedr                    
 - multiselect in imagesprite              
 - auto save layout ?
 - end offset for bit8, masked - count?

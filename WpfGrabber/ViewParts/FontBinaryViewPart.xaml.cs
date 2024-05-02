@@ -79,6 +79,16 @@ namespace WpfGrabber.ViewParts
             set => Set(ref _fontCharacters, value);
         }
         #endregion
+
+        #region Border property
+        private int _border;
+        public int Border
+        {
+            get => _border;
+            set => Set(ref _border, value);
+        }
+        #endregion
+
     }
 
     public class FontBinaryViewPartBase : ViewPartDataViewer<FontBinaryVM>
@@ -116,9 +126,27 @@ namespace WpfGrabber.ViewParts
                 FlipY = ViewModel.FlipY,
             };
             var letters = fr.ReadImages(br, ViewModel.FontCharacters.Length).ToArray();
+            if (ViewModel.Border > 0)
+            {
+                letters = letters.Select(ltr => AddBorder(ltr, ViewModel.Border, ViewModel.Border)).ToArray();
+            }
             var font = new FontData(letters, ViewModel.SpaceX, ViewModel.FontCharacters);
             return font;
         }
+
+        private static BitBitmap AddBorder(BitBitmap src, int bx, int by)
+        {
+            var r = new BitBitmap(src.WidthPixels + 2 * bx, src.Height + 2 * by);
+            for (int y = 0; y < src.Height; y++)
+            {
+                for (int x = 0; x < src.WidthPixels; x++)
+                {
+                    r.SetPixel(bx + x, by + y, src.GetPixel(x, y));
+                }
+            }
+            return r;
+        }
+
         protected override void OnShowData()
         {
             var font = CreateFont();
@@ -127,18 +155,19 @@ namespace WpfGrabber.ViewParts
             font.DrawString(rgba, 10, 10, ViewModel.TestText);
             var posX = 0;
             var posY = 40;
-            var maxX = (int)(max_w) - 40;
+            var maxX = max_w - 40;
             for (int i = 0; i < font.Letters.Length; i++)
             {
-                rgba.DrawBitmap(font.Letters[i], posX, posY, ByteBitmapRgba.GetColorBlack);
+                BitBitmap letter = font.Letters[i];
+                rgba.DrawBitmap(letter, posX, posY, ByteBitmapRgba.GetColorBlack);
                 if (posX >= maxX)
                 {
                     posX = 0;
-                    posY += 16;
+                    posY += font.Letters.First().Height + 4;
                 }
                 else
                 {
-                    posX += 8;
+                    posX += font.Letters.First().WidthPixels;
                 }
             }
             var bmp = rgba.ToBitmapSource();
@@ -177,7 +206,6 @@ namespace WpfGrabber.ViewParts
                 font.WriteToStream(st);
             }
         }
-
 
         private void OnButtonSaveSampleTextImage_Click(object sender, RoutedEventArgs e)
         {
