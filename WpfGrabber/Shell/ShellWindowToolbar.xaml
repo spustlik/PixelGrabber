@@ -38,6 +38,9 @@
                         Value="{Binding Offset}" Minimum="0" Maximum="{Binding DataLength}" />
                 <FrameworkElement Width="10"/>
                 <TextBlock Text="{Binding FileName}" TextTrimming="CharacterEllipsis"/>
+                <Label Content="*" 
+                       Foreground="Red" FontWeight="Bold" FontSize="16" 
+                       Visibility="{Binding IsChanged, Converter={StaticResource boolToVisi}}"/>
                 <FrameworkElement Width="10"/>
                 <Label Content="Size:"/>
                 <TextBlock Text="{Binding DataLength}"/>

@@ -95,6 +95,7 @@ namespace WpfGrabber.Shell
             Offset = 0;
             DataLength = Data.Length;
             DoPropertyChanged(nameof(Data));
+            IsChanged = false;
         }
 
         public void SetData(byte[] data)

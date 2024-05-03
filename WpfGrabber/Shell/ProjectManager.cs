@@ -25,6 +25,7 @@ namespace WpfGrabber.Shell
             {
                 LoadLayout();
             }
+            shellVm.IsChanged = false;
         }
 
         public void LoadLayout()

@@ -6,7 +6,9 @@
         xmlns:local="clr-namespace:WpfGrabber.Shell"
         mc:Ignorable="d"
         Icon="/icon.png"
-        Title="Pixel Grabber" Height="450" Width="800">
+        Title="Pixel Grabber" Height="450" Width="800"
+        Closing="OnWindow_Closing"
+        >
     <Grid FocusManager.IsFocusScope="True">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

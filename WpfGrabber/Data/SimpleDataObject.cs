@@ -13,7 +13,8 @@ namespace WpfGrabber
     {
         protected virtual void DoPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            IsChanged = true;
+            if(propertyName!=nameof(IsChanged))
+                IsChanged = true;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
@@ -28,8 +29,17 @@ namespace WpfGrabber
             return true;
         }
 
+        #region IsChanged property
+        private bool _isChanged;
         [XmlIgnore]
-        public bool IsChanged { get; protected set; }
+        public bool IsChanged
+        {
+            get => _isChanged;
+            set => Set(ref _isChanged, value);
+        }
+
+        #endregion
+
 
         public event PropertyChangedEventHandler PropertyChanged;
     }

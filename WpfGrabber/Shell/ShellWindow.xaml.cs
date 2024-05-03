@@ -49,6 +49,7 @@ namespace WpfGrabber.Shell
             _configSaver = Throthler.Create(TimeSpan.FromMilliseconds(50), () =>
             {
                 AppConfig.Save(ViewModel);
+                //TODO: auto save layout?!?
             });
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
         }
@@ -57,6 +58,22 @@ namespace WpfGrabber.Shell
         private void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             _configSaver.Start();
+        }
+
+        private void OnWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (!ViewModel.IsChanged)
+                return;
+            var r = MessageBox.Show(this, "Do you want to save layout?", "Close application", MessageBoxButton.YesNoCancel);
+            if (r == MessageBoxResult.Cancel)
+            {
+                e.Cancel = true;
+                return;
+            }
+            if (r == MessageBoxResult.Yes)
+            {
+                ProjectManager.SaveLayout();
+            }
         }
     }
 }
