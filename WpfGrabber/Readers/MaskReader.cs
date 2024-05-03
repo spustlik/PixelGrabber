@@ -40,6 +40,12 @@ namespace WpfGrabber.Readers
         HeightWidth8,
         [Description("Height & Width 16 bits")]
         HeightWidth16,
+        [Description("Skip 8 bits")]
+        Skip8Bits,
+        [Description("Skip 16 bits")]
+        Skip16Bits,
+        [Description("Skip 32 bits")]
+        Skip32Bits,
     }
 
     public class MaskReader
@@ -95,6 +101,16 @@ namespace WpfGrabber.Readers
             switch (Preambule)
             {
                 case MaskReaderPreambule.None:
+                    break;
+                case MaskReaderPreambule.Skip8Bits:
+                    BitReader.ReadByte();
+                    break;
+                case MaskReaderPreambule.Skip16Bits:
+                    BitReader.ReadWord16();
+                    break;
+                case MaskReaderPreambule.Skip32Bits:
+                    BitReader.ReadWord16();
+                    BitReader.ReadWord16();
                     break;
                 case MaskReaderPreambule.WidthHeight:
                     {

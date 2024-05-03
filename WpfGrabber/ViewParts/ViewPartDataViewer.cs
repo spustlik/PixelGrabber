@@ -34,6 +34,7 @@ namespace WpfGrabber.ViewParts
 
         protected virtual void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            //TODO: ShellVm.IsChanged = true;
             ShowData();
         }
 

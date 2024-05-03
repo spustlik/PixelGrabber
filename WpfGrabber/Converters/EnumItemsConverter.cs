@@ -52,7 +52,7 @@ namespace WpfGrabber.Converters
 
         public static string AddSpacesToUpperCase(string v)
         {
-            bool isBig(char c) => c == Char.ToUpperInvariant(c);
+            bool isBig(char c) => Char.IsUpper(c);
 
             if (v == null || string.IsNullOrEmpty(v))
                 return v;

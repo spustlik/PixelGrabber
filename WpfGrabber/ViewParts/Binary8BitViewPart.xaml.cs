@@ -57,28 +57,35 @@ namespace WpfGrabber.ViewParts
         {
             if (ShellVm.DataLength == 0)
                 return;
-            var reader = new BitReader(ShellVm.Data);
-            reader.BytePosition = ShellVm.Offset;
-            reader.FlipX = ViewModel.Reversed;
-            var w = ViewModel.Width;
+            BitReader reader = GetBitReader();
 
+            var w = ViewModel.Width;
             var (max_w, max_h) = GetDataImageSize(imageBorder);
-            /*
-            var total_w = this.GetFirstValid(imageBorder.ActualWidth, imageBorder.Width, Width, 100);
-            total_w -= (int)imageBorder.Padding.Right + (int)imageBorder.Padding.Left;
-            total_w = (int)(total_w / ShellVm.Zoom);
-            var total_h = this.GetFirstValid(imageBorder.ActualHeight, imageBorder.Height, Height, 200);
-            total_h -= (int)imageBorder.Padding.Bottom + (int)imageBorder.Padding.Top;
-            total_h = (int)(total_h / ShellVm.Zoom);
-            //log.Text += $"H:{total_h},W:{total_w}, w={w}\n";
-            */
 
             var space = w < 16 ? 4 : 10;
             var bir = new BitImageReader();
             BitmapSource bmp = bir.ReadBitmap(reader, max_w, max_h, w, space);
             image.Source = bmp;
             image.RenderTransform = new ScaleTransform(ShellVm.Zoom, ShellVm.Zoom);
+        }
 
+        private BitReader GetBitReader()
+        {
+            var reader = new BitReader(ShellVm.Data);
+            reader.BytePosition = ShellVm.Offset;
+            reader.FlipX = ViewModel.Reversed;
+            return reader;
+        }
+
+        private BitmapSource ReadDataImage()
+        {
+            var reader = GetBitReader();            
+            var bir = new BitImageReader();
+            var bmp = bir.ReadBitmap(reader,
+                ViewModel.Width,
+                (ShellVm.DataLength - ShellVm.Offset) / (ViewModel.Width / 8),
+                ViewModel.Width, 10);
+            return bmp;
         }
 
         private void OnButtonSave_Click(object sender, RoutedEventArgs e)
@@ -104,15 +111,6 @@ namespace WpfGrabber.ViewParts
             bmp.SaveToPngFile(dlg.FileName);
         }
 
-        private BitmapSource ReadDataImage()
-        {
-            var bir = new BitImageReader();
-            var bmp = bir.ReadBitmap(new BitReader(ShellVm.Data) { BytePosition = ShellVm.Offset },
-                ViewModel.Width,
-                (ShellVm.DataLength - ShellVm.Offset) / (ViewModel.Width / 8),
-                ViewModel.Width, 10);
-            return bmp;
-        }
 
         private void OnButtonCopyClipboard_Click(object sender, RoutedEventArgs e)
         {
