@@ -56,6 +56,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\InputQueryWindow.xaml.cs">
+      <DependentUpon>InputQueryWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Converters\EnumItemsConverter.cs" />
     <Compile Include="Converters\PercentTextConverter.cs" />
     <Compile Include="Converters\CharConverter.cs" />
@@ -139,6 +142,10 @@
     <Compile Include="ViewParts\ViewPart.cs" />
     <Compile Include="_ObjectExtensions.cs" />
     <Compile Include="_WpfExtensions.cs" />
+    <Page Include="Controls\InputQueryWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ExceptionWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

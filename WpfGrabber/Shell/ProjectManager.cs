@@ -38,24 +38,22 @@ namespace WpfGrabber.Shell
             layoutSvc.SaveLayoutFile(null);
         }
 
-        public void SaveOffsetLayout()
+        public void SaveNamedLayout(string name)
         {
             var layoutSvc = serviceProvider.GetService<LayoutManagerService>();
-            var shellVm = serviceProvider.GetService<ShellVm>();
-            layoutSvc.SaveLayoutFile(shellVm.Offset.ToString("X4"));
+            layoutSvc.SaveLayoutFile(name);
         }
 
-        public void LoadOffsetLayout(string name)
+        public void LoadNamedLayout(string name)
         {
             var layoutSvc = serviceProvider.GetService<LayoutManagerService>();
             layoutSvc.LoadLayoutFile(name);
         }
 
-        internal void RemoveOffsetLayout()
+        public void RemoveNamedLayout(string name)
         {
             var layoutSvc = serviceProvider.GetService<LayoutManagerService>();
-            var shellVm = serviceProvider.GetService<ShellVm>();
-            layoutSvc.RemoveLayoutFile(shellVm.Offset.ToString("X4"));
+            layoutSvc.RemoveLayoutFile(name);
         }
     }
 }

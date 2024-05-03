@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Xml.Linq;
+using WpfGrabber.Controls;
 using WpfGrabber.ViewParts;
 
 namespace WpfGrabber.Shell
@@ -106,20 +107,25 @@ namespace WpfGrabber.Shell
             App.GetService<ProjectManager>().SaveLayout();
         }
 
-        private void SaveOffsetLayout_Click(object sender, RoutedEventArgs e)
-        {
-            App.GetService<ProjectManager>().SaveOffsetLayout();
-        }
 
         private void LoadNamedLayout_Click(object sender, RoutedEventArgs e)
         {
-            var name = ((MenuItem)e.OriginalSource).CommandParameter;
-            App.GetService<ProjectManager>().LoadOffsetLayout((string)name);
+            var name = (string)((MenuItem)e.OriginalSource).CommandParameter;
+            App.GetService<ProjectManager>().LoadNamedLayout(name);
         }
 
-        private void RemoveOffsetLayout_Click(object sender, RoutedEventArgs e)
+        private void RemoveNamedLayout_Click(object sender, RoutedEventArgs e)
         {
-            App.GetService<ProjectManager>().RemoveOffsetLayout();
+            var name = (string)((MenuItem)e.OriginalSource).CommandParameter;
+            App.GetService<ProjectManager>().RemoveNamedLayout(name);
+
+        }
+
+        private void SaveNamedLayout_Click(object sender, RoutedEventArgs e)
+        {
+            if (InputQueryWindow.ShowModal("Enter layout name", out var name, ViewModel.ShellVm.Offset.ToString("X4")) != true)
+                return;
+            App.GetService<ProjectManager>().SaveNamedLayout(name);
         }
     }
 }

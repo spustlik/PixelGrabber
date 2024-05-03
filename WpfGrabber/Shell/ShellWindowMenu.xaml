@@ -37,43 +37,32 @@
                 </MenuItem.ItemContainerStyle>
             </MenuItem>
             <MenuItem Header="Layout">
+                <MenuItem.Resources>
+                    <Style TargetType="MenuItem" x:Key="layoutsMenu">
+                        <Setter Property="ItemsSource" Value="{Binding ShellVm.Layouts}"/>
+                        <Setter Property="ItemContainerStyle" >
+                            <Setter.Value>
+                                <Style TargetType="MenuItem">
+                                    <!--<EventSetter Event="Click" Handler="LoadNamedLayout_Click"/>-->
+                                    <Setter Property="CommandParameter" Value="{Binding .}" />
+                                </Style>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ShellVm.Layouts.Count}" Value="0">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </MenuItem.Resources>
                 <MenuItem Header="Auto load" IsCheckable="True" IsChecked="{Binding ShellVm.AutoLoadLayout}"/>
                 <MenuItem Header="Load" Click="LoadLayout_Click"/>
                 <MenuItem Header="Save" Click="SaveLayout_Click"/>
                 <Separator/>
-                <MenuItem Header="Load" ItemsSource="{Binding ShellVm.Layouts}" >
-                    <MenuItem.Style>
-                        <Style TargetType="MenuItem">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding ShellVm.Layouts.Count}" Value="0">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </MenuItem.Style>
-                    <MenuItem.ItemContainerStyle>
-                        <Style TargetType="MenuItem">
-                            <EventSetter Event="Click" Handler="LoadNamedLayout_Click"/>
-                            <Setter Property="CommandParameter" Value="{Binding .}" />
-                        </Style>
-                    </MenuItem.ItemContainerStyle>
-                </MenuItem>
-                <MenuItem Click="SaveOffsetLayout_Click">
-                    <MenuItem.Header>
-                        <TextBlock>
-                            <Run>Save </Run>
-                            <Run Text="{Binding ShellVm.Offset, Converter={StaticResource hexConv}}"/>
-                        </TextBlock>
-                    </MenuItem.Header>
-                </MenuItem>
-                <MenuItem Click="RemoveOffsetLayout_Click">
-                    <MenuItem.Header>
-                        <TextBlock>
-                            <Run>Remove </Run>
-                            <Run Text="{Binding ShellVm.Offset, Converter={StaticResource hexConv}}"/>
-                        </TextBlock>
-                    </MenuItem.Header>
-                </MenuItem>
+                <MenuItem Header="Load" Style="{StaticResource layoutsMenu}" Click="LoadNamedLayout_Click"/>
+                <MenuItem Header="Save ..." Click="SaveNamedLayout_Click"/>
+                <MenuItem Header="Remove" Style="{StaticResource layoutsMenu}" Click="RemoveNamedLayout_Click"/>
+                
             </MenuItem>
 
             <MenuItem Header="Tools">
