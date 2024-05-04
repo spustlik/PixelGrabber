@@ -25,10 +25,9 @@
 
                 <Run FontSize="30" FontWeight="Bold" Foreground="DodgerBlue">What to do</Run>
                 <Run xml:space="preserve">
-- ask to save layout when loading file and closing app
 - multiselect in imagesprite              
 - end offset for bit8, masked - count?
-- whatsnew viewpart...
+- show whatsnew viewpart...
                 </Run>
             </TextBlock>
         </ScrollViewer>

@@ -17,7 +17,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <local:ShellWindowMenu />
-        <local:ShellWindowToolbar Grid.Row="1" Margin="3"/>
+        <local:ShellWindowToolbar Grid.Row="1" Margin="3,2,3,0"/>
         <local:ShellWindowContent Grid.Row="2"/>
         <local:ShellWindowFooter Grid.Row="3"/>
 

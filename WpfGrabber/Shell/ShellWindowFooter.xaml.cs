@@ -38,7 +38,7 @@ namespace WpfGrabber.Shell
         protected override void OnInitialized(EventArgs e)
         {
             base.OnInitialized(e);
-            ShellVm = App.Current.ServiceProvider.GetService<ShellVm>();
+            ShellVm = App.Current?.ServiceProvider?.GetService<ShellVm>();
         }
         private void ZoomMinus_Click(object sender, RoutedEventArgs e)
         {

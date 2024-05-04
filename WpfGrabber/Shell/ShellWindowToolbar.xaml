@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              HorizontalAlignment="Stretch"
              FocusManager.IsFocusScope="true"
-             Height="30" d:DesignWidth="414.944">
+             d:DesignHeight="30" d:DesignWidth="414.944">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="boolToVisi"/>
         <Style TargetType="Grid" x:Key="disableGrid">
@@ -20,31 +20,42 @@
         </Style>
     </UserControl.Resources>
     <Grid Style="{StaticResource disableGrid}">
-        <Border Background="#f0f0f0" Padding="0" 
-                CornerRadius="5" BorderBrush="#b0b0b0" BorderThickness="1">
+        <Border Background="#d0d0f0" Padding="0" 
+                CornerRadius="5" BorderBrush="#b0b0b0" BorderThickness="0">
             <StackPanel Orientation="Horizontal">
                 <StackPanel.Resources>
+                    <Style TargetType="Label">
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                    </Style>
                     <Style TargetType="TextBlock">
                         <Setter Property="Padding" Value="5,0" />
                         <Setter Property="VerticalAlignment" Value="Center" />
                     </Style>
+                    <Style TargetType="Separator">
+                        <Setter Property="Width" Value="10" />
+                        <Setter Property="Background" Value="Transparent"/>
+                    </Style>
                 </StackPanel.Resources>
                 <Label Content="Offset:"/>
-                <TextBlock Width="50">
-                    <Run Text="0x"/><Run Text="{Binding Offset, StringFormat=X4}" />
-                </TextBlock>
+                <Label>
+                    <Label.Content>
+                        <TextBlock Width="50">
+                            <Run Text="0x"/><Run Text="{Binding Offset, StringFormat=X4}" />
+                        </TextBlock>
+                    </Label.Content>
+                </Label>
                 <c:NumberEditor 
                         SliderWidth="160" Width="250"
                         Value="{Binding Offset}" Minimum="0" Maximum="{Binding DataLength}" />
-                <FrameworkElement Width="10"/>
-                <TextBlock Text="{Binding FileName}" TextTrimming="CharacterEllipsis"/>
+                <Separator/>
+                <Label Content="{Binding FileName}"/>
                 <Label Content="*" 
                        Foreground="Red" FontWeight="Bold" FontSize="16" 
                        Visibility="{Binding IsProjectDirty, Converter={StaticResource boolToVisi}}"/>
-                <FrameworkElement Width="10"/>
+                <Separator/>
                 <Label Content="Size:"/>
-                <TextBlock Text="{Binding DataLength}"/>
-                <FrameworkElement Width="10"/>
+                <Label Content="{Binding DataLength}"/>
+                <Separator/>
             </StackPanel>
         </Border>
     </Grid>

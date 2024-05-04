@@ -19,6 +19,8 @@ namespace WpfGrabber
         {
             if (clear)
                 collection.Clear();
+            if (data == null)
+                return;
             foreach (var item in data)
             {
                 collection.Add(item);
