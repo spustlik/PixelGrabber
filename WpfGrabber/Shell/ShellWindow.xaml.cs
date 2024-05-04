@@ -61,7 +61,7 @@ namespace WpfGrabber.Shell
 
         private void OnWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (!ViewModel.IsChanged)
+            if (!ViewModel.IsProjectDirty)
                 return;
             var r = MessageBox.Show(this, "Do you want to save layout?", "Close application", MessageBoxButton.YesNoCancel);
             if (r == MessageBoxResult.Cancel)

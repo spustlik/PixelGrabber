@@ -63,21 +63,6 @@ namespace WpfGrabber.Shell
         }
         #endregion
 
-        #region Zoom100 property
-        [XmlIgnore]
-        public double Zoom100
-        {
-            get => Zoom * 100;
-            set => Zoom = value / 100;
-        }
-        #endregion
-        protected override void DoPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            base.DoPropertyChanged(propertyName);
-            if (propertyName == nameof(Zoom))
-                base.DoPropertyChanged(nameof(Zoom100));
-        }
-
         #region AutoLoadLayout property
         private bool _autoLoadLayout;
         public bool AutoLoadLayout

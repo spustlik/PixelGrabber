@@ -3,13 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:WpfGrabber.Shell" xmlns:controls="clr-namespace:WpfGrabber.Controls" xmlns:s="clr-namespace:System;assembly=mscorlib"
+             xmlns:local="clr-namespace:WpfGrabber.Shell" xmlns:controls="clr-namespace:WpfGrabber.Controls" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:wpfgrabber="clr-namespace:WpfGrabber"
              mc:Ignorable="d" x:Name="root" 
              d:DesignHeight="50" d:DesignWidth="800"
              FocusManager.IsFocusScope="True">
     <StatusBar>
         <StatusBar.Resources>
-            <ZoomPercentageConverter x:Key="zoomConv"/>
+            <wpfgrabber:PercentTextConverter x:Key="zoomConv"/>
             <Style TargetType="Button">
                 <Setter Property="Width" Value="22" />
             </Style>
@@ -27,7 +27,7 @@
                     <Path Data="M0,0 L10,0" StrokeThickness="2"/>
                 </Button>
                 <ComboBox IsEditable="True" 
-                          Text="{Binding Zoom100, Converter={StaticResource zoomConv}}"
+                          Text="{Binding Zoom, Converter={StaticResource zoomConv}}"
                           MinWidth="60"
                           ItemsSource="{Binding ZoomList, ElementName=root}"
                           >

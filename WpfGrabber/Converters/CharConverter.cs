@@ -9,7 +9,7 @@ using System.Windows.Data;
 
 namespace WpfGrabber
 {
-    [ValueConversion(typeof(char), typeof(int))]
+    [ValueConversion(typeof(int), typeof(char))]
 
     public class CharConverter : IValueConverter
     {

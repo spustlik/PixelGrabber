@@ -10,7 +10,7 @@ using System.Windows.Data;
 
 namespace WpfGrabber
 {
-    [ValueConversion(typeof(string), typeof(string))]
+    [ValueConversion(typeof(double), typeof(string))]
 
     public class PercentTextConverter : IValueConverter
     {
@@ -18,10 +18,9 @@ namespace WpfGrabber
         {
             if (value == null || value == DependencyProperty.UnsetValue)
                 return value;
-            if ((value is string s))
+            if(value is double d)
             {
-                s = s.Trim(' ', '%');
-                return s;
+                return (d * 100).ToString("0")+" %";
             }
             return value;
         }
@@ -30,9 +29,12 @@ namespace WpfGrabber
         {
             if (value == null || value == DependencyProperty.UnsetValue)
                 return value;
-            if(value is double d)
+            if(value is string s)
             {
-                return d.ToString("0%");
+                s = s.Trim('%').Trim(' ');
+                if (!double.TryParse(s, out var d))
+                    return value;
+                return d / 100;
             }
             return value;
         }
