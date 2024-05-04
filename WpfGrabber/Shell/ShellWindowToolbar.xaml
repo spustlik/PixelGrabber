@@ -50,7 +50,7 @@
                 <Separator/>
                 <Label Content="{Binding FileName}"/>
                 <Label Content="*" 
-                       Foreground="Red" FontWeight="Bold" FontSize="16" 
+                       Foreground="Red" FontWeight="Bold" FontSize="16" Padding="0"
                        Visibility="{Binding IsProjectDirty, Converter={StaticResource boolToVisi}}"/>
                 <Separator/>
                 <Label Content="Size:"/>

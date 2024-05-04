@@ -9,6 +9,7 @@
         ShowInTaskbar="False"
         WindowStartupLocation="CenterScreen"
         WindowStyle="SingleBorderWindow"
+        Icon="{x:Null}"
         Title="Input text" Height="143" Width="400" >
     <Grid Margin="10">
         <Grid.RowDefinitions>
