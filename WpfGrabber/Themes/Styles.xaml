@@ -49,7 +49,7 @@
     <Style TargetType="ComboBox" x:Key="enumCombo">
         <Setter Property="SelectedValuePath" Value="Value" />
         <Setter Property="DisplayMemberPath" Value="Description" />
-        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Height" Value="22" />
     </Style>
     <converters:EnumItemsConverter x:Key="enumItems"/>
