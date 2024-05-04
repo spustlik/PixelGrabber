@@ -22,7 +22,7 @@ namespace WpfGrabber
             this.reader = reader;
         }
 
-        public static IEnumerable<AlienImage> ReadList(byte[] bytes, int pos, int endpos, bool flipY)
+        public static IEnumerable<AlienImage> ReadImages(byte[] bytes, int pos, int endpos, bool flipY)
         {
             if (endpos <= 0)
                 endpos = bytes.Length;

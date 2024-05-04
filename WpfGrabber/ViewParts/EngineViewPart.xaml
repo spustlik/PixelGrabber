@@ -27,6 +27,12 @@
                 <Separator/>
             </StackPanel>
 
+            <Label Content="Width"/>
+            <c:NumberEditor Value="{Binding Width}" 
+                            Maximum="256" Minimum="1"
+                            Width="80" SliderWidth="0"/>
+            <Separator/>
+
             <Label Content="Max count"/>
             <c:NumberEditor Value="{Binding MaxCount}" 
                             Maximum="256"

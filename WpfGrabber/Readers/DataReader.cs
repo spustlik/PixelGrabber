@@ -40,7 +40,14 @@ namespace WpfGrabber
         public byte[] ReadBytes(int count)
         {
             var result = new byte[count];
-            Array.Copy(Data, BytePosition, result, 0, count);
+            Array.Copy(Data, BytePosition, result, 0, Math.Min(count, DataLength - BytePosition));
+            if (FlipX)
+            {
+                for (var i = 0; i < result.Length; i++)
+                {
+                    result[i] = GetFlippedX(result[i]);
+                }
+            }
             BytePosition = Math.Min(Data.Length, BytePosition + count);
             return result;
         }

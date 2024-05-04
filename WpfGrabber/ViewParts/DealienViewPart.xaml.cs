@@ -121,7 +121,7 @@ namespace WpfGrabber.ViewParts
         private IEnumerable<AlienReader.AlienImage> ReadImages()
         {
             var result = AlienReader
-                .ReadList(
+                .ReadImages(
                     ShellVm.Data,
                     ShellVm.Offset,
                     ViewModel.GetEndPosSafe(),
