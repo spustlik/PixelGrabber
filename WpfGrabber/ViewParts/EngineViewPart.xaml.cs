@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -58,9 +59,14 @@ namespace WpfGrabber.ViewParts
         public EngineViewPartBase() : base() { }
     }
 
-    /// <summary>
-    /// Interaction logic for DealienViewPart.xaml
-    /// </summary>
+    public class ImageData
+    {
+        public ByteBitmap8Bit Bitmap { get; set; }
+        public int Addr { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+    }
+
     public partial class EngineViewPart : EngineViewPartBase
     {
         public EngineViewPart()
@@ -110,7 +116,7 @@ namespace WpfGrabber.ViewParts
             image.RenderTransform = new ScaleTransform(ShellVm.Zoom, ShellVm.Zoom);
         }
 
-        private IEnumerable<(ByteBitmap8Bit Bitmap, int Addr, string Description)> ReadImages()
+        private IEnumerable<ImageData> ReadImages()
         {
             switch (ViewModel.EngineType)
             {
@@ -120,7 +126,7 @@ namespace WpfGrabber.ViewParts
             }
         }
 
-        private IEnumerable<(ByteBitmap8Bit Bitmap, int Addr, string Description)> ReadMovieImages()
+        private IEnumerable<ImageData> ReadMovieImages()
         {
             //Movie game engine, but not complete - user must find sprite starts
             //height(16bit), data(h*WIDTH), mask reversed
@@ -146,7 +152,7 @@ namespace WpfGrabber.ViewParts
                 var datar = new DataReader(rd.ReadBytes(w * h), 0, flipX: true);
 
                 var maskr = new DataReader(rd.ReadBytes(w * h), 0, flipX: false);
-                for (int y = 0; y < h+1; y++)
+                for (int y = 0; y < h + 1; y++)
                 {
                     for (int x = 0; x < w * 8; x++)
                     {
@@ -158,7 +164,13 @@ namespace WpfGrabber.ViewParts
                         bmp.SetPixel(x, ry, d ? (byte)0 : m ? (byte)1 : (byte)2);
                     }
                 }
-                yield return (Bitmap: bmp, Addr: pos, Description: $"Pos={pos:X4}, End={rd.BytePosition:X4}");
+                yield return new ImageData()
+                {
+                    Bitmap = bmp,
+                    Addr = pos,
+                    Title = pos.ToString("X4"),
+                    Description = $"Pos={pos:X4}, End={rd.BytePosition:X4}"
+                };
                 counter++;
                 if (ViewModel.MaxCount != 0 && counter >= ViewModel.MaxCount)
                     break;
