@@ -25,18 +25,26 @@ namespace WpfGrabber.Shell
             {
                 LoadLayout();
             }
-            shellVm.IsChanged = false;
+            SetDirty(false);
+        }
+
+        public void SetDirty(bool dirty)
+        {
+            var shellVm = serviceProvider.GetService<ShellVm>();
+            shellVm.IsProjectDirty = dirty;
         }
 
         public void LoadLayout()
         {
             var layoutSvc = serviceProvider.GetService<LayoutManagerService>();
             layoutSvc.LoadLayoutFile(null);
+            SetDirty(false);
         }
         public void SaveLayout()
         {
             var layoutSvc = serviceProvider.GetService<LayoutManagerService>();
             layoutSvc.SaveLayoutFile(null);
+            SetDirty(false);
         }
 
         public void SaveNamedLayout(string name)

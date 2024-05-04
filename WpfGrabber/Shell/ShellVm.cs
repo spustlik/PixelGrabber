@@ -35,6 +35,16 @@ namespace WpfGrabber.Shell
         }
         #endregion
 
+        #region IsProjectDirty property
+        private bool _isProjectDirty;
+        [XmlIgnore]
+        public bool IsProjectDirty
+        {
+            get => _isProjectDirty;
+            set => Set(ref _isProjectDirty, value);
+        }
+        #endregion
+
         #region Offset property
         private int _offset;
         public int Offset
@@ -95,9 +105,7 @@ namespace WpfGrabber.Shell
             Offset = 0;
             DataLength = Data.Length;
             DoPropertyChanged(nameof(Data));
-            IsChanged = false;
         }
-
         public void SetData(byte[] data)
         {
             Offset = 0;
@@ -105,7 +113,6 @@ namespace WpfGrabber.Shell
             DataLength = data.Length;
             DoPropertyChanged(nameof(Data));
         }
-
         private void AddRecentFile(string fileName)
         {
             var i = RecentFiles.FindIndex(x => String.Compare(x, fileName, StringComparison.OrdinalIgnoreCase) == 0);

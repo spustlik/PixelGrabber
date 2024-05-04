@@ -2,16 +2,18 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Xml.Linq;
+using System.Xml.Serialization;
 using WpfGrabber.Services;
 using WpfGrabber.Shell;
 
 namespace WpfGrabber.ViewParts
 {
-    public abstract class ViewPartDataViewer<TVM> : ViewPart where TVM:SimpleDataObject,new()
+    public abstract class ViewPartDataViewer<TVM> : ViewPart where TVM : SimpleDataObject, new()
     {
         private Throthler _viewer;
 
@@ -32,9 +34,13 @@ namespace WpfGrabber.ViewParts
             ShowData();
         }
 
+
         protected virtual void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            //TODO: ShellVm.IsChanged = true;
+            var xmli = ViewModel.GetType().GetProperty(e.PropertyName).GetCustomAttribute<XmlIgnoreAttribute>();
+            if (xmli != null)
+                return;
+            App.GetService<ProjectManager>().SetDirty(true);
             ShowData();
         }
 

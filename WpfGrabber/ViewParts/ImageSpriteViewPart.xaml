@@ -58,7 +58,6 @@
                         <Separator/>
                         <MenuItem Header="Clear" Click="OnButtonClear_Click"/>
                         <MenuItem Header="Set Width and Height to max" Click="OnSetMax_Click"/>
-                        <MenuItem Header="Enable loading images from data" IsCheckable="true" IsChecked="{Binding LoadFromData}"/>
                         <MenuItem Header="Show labels" IsCheckable="true" IsChecked="{Binding ShowLabels}"/>
                     </ContextMenu>
                 </Button.ContextMenu>

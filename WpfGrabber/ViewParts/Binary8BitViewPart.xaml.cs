@@ -57,7 +57,7 @@ namespace WpfGrabber.ViewParts
         {
             if (ShellVm.DataLength == 0)
                 return;
-            DataReader reader = GetBitReader();
+            var reader = GetBitReader();
 
             var w = ViewModel.Width;
             var (max_w, max_h) = GetDataImageSize(imageBorder);

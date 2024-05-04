@@ -164,7 +164,6 @@ namespace WpfGrabber.ViewParts
         {
             if (textBox.SelectedText.Length > 0)
                 return;
-            //TODO: wait for moment ?
             var pos = e.GetPosition(textBox);
             var textpos = textBox.GetCharacterIndexFromPoint(pos, snapToText: false);
             if (textpos < 0)

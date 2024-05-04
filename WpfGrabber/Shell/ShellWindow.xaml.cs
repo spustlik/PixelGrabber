@@ -49,7 +49,6 @@ namespace WpfGrabber.Shell
             _configSaver = Throthler.Create(TimeSpan.FromMilliseconds(50), () =>
             {
                 AppConfig.Save(ViewModel);
-                //TODO: auto save layout?!?
             });
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
         }

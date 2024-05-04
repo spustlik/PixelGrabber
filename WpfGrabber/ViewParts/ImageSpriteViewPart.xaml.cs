@@ -47,15 +47,6 @@ namespace WpfGrabber.ViewParts
         }
         #endregion
 
-        #region LoadFromData property
-        private bool _loadFromData;
-        public bool LoadFromData
-        {
-            get => _loadFromData;
-            set => Set(ref _loadFromData, value);
-        }
-        #endregion
-
         #region ShowLabels property
         private bool _showLabels;
         public bool ShowLabels
@@ -174,19 +165,6 @@ namespace WpfGrabber.ViewParts
         {
             var (max_w, max_h) = GetDataImageSize(imageBorder);
 
-
-            //try create image from ShellVm.Data + Offset
-            //add it to list of images
-            if (ViewModel.LoadFromData)
-            {
-                var dataBs = TryGetBitmapFromData();
-
-                if (dataBs != null)
-                {
-                    // name images with shell.filename and name=ADDR
-                    //TODO:
-                }
-            }
             if (ViewModel.Width == 0 && ViewModel.Images.Count > 0)
             {
                 ViewModel.Width = ViewModel.Images.Max(a => a.Image.PixelWidth);
