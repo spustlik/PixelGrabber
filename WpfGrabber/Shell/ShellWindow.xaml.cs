@@ -1,27 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Markup;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using WpfGrabber.Services;
-using static WpfGrabber.Shell.ShellWindowMenu;
 
 namespace WpfGrabber.Shell
 {
     /// <summary>
     /// Interaction logic for ShellWindow.xaml
     /// </summary>
-    public partial class ShellWindow : Window
+    public partial class ShellWindow : Window, IShellWindow
     {
         public ShellVm ViewModel => DataContext as ShellVm;
 
@@ -30,6 +17,7 @@ namespace WpfGrabber.Shell
         public ShellWindow()
         {
             DataContext = new ShellVm();
+            App.Current.ServiceContainer.AddService<IShellWindow>(this);
             App.Current.ServiceContainer.AddService(ViewModel);
             App.Current.ServiceContainer.AddService(new ViewParts.ViewPartFactory());
             App.Current.ServiceContainer.AddService(ProjectManager = new ProjectManager(App.Current.ServiceProvider));
@@ -57,22 +45,38 @@ namespace WpfGrabber.Shell
         private void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             _configSaver.Start();
+            if (!XmlHelper.IsPropertyIgnored(ViewModel, e.PropertyName))
+                ProjectManager.SetDirty(true);
         }
 
         private void OnWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            e.Cancel = !CanClose();
+        }
+
+        bool IShellWindow.CanClose()
+        {
+            return CanClose();
+        }
+
+        private bool CanClose()
+        {
             if (!ViewModel.IsProjectDirty)
-                return;
-            var r = MessageBox.Show(this, "Do you want to save layout?", "Close application", MessageBoxButton.YesNoCancel);
+                return true;
+            var r = MessageBox.Show(
+                this, 
+                $"Do you want to save layout of {Path.GetFileName( ViewModel.FileName)}?", 
+                "Question", 
+                MessageBoxButton.YesNoCancel);
             if (r == MessageBoxResult.Cancel)
             {
-                e.Cancel = true;
-                return;
+                return false;
             }
             if (r == MessageBoxResult.Yes)
             {
                 ProjectManager.SaveLayout();
             }
+            return true;
         }
     }
 }

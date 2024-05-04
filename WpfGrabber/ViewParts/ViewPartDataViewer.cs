@@ -37,8 +37,7 @@ namespace WpfGrabber.ViewParts
 
         protected virtual void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            var xmli = ViewModel.GetType().GetProperty(e.PropertyName).GetCustomAttribute<XmlIgnoreAttribute>();
-            if (xmli != null)
+            if (XmlHelper.IsPropertyIgnored(ViewModel, e.PropertyName))
                 return;
             App.GetService<ProjectManager>().SetDirty(true);
             ShowData();

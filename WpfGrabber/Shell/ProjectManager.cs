@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace WpfGrabber.Shell
 {
-    
+
     public class ProjectManager
     {
         private IServiceProvider serviceProvider;
@@ -17,9 +17,14 @@ namespace WpfGrabber.Shell
             this.serviceProvider = serviceProvider;
         }
 
-        internal void LoadFile(string fileName)
+        public void LoadFile(string fileName)
         {
             var shellVm = serviceProvider.GetService<ShellVm>();
+            if (shellVm.AutoLoadLayout && !string.IsNullOrEmpty(shellVm.FileName))
+            {
+                if (!serviceProvider.GetService<IShellWindow>().CanClose())
+                    return;
+            }
             shellVm.LoadData(fileName);
             if (shellVm.AutoLoadLayout)
             {

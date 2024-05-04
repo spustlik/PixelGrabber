@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Markup;
 using System.Xml.Linq;
 using WpfGrabber.ViewParts;
 
@@ -26,9 +21,9 @@ namespace WpfGrabber.Shell
         private const string ELE_NAMEDLAYOUT = "Save";
         private const string ATTR_NAME = "Name";
         private const string ELE_LAYOUT = "Layout";
-        private ShellVm shellVm;
-        private IViewPartServiceEx viewPartService;
-        private ViewPartFactory viewPartFactory;
+        private readonly ShellVm shellVm;
+        private readonly IViewPartServiceEx viewPartService;
+        private readonly ViewPartFactory viewPartFactory;
 
         public LayoutManagerService(
             ShellVm shellVm,

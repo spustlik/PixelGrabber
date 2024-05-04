@@ -81,9 +81,10 @@
     <Compile Include="Readers\Z80\Z80Reader.cs" />
     <Compile Include="Services\Throthler.cs" />
     <Compile Include="Shell\AppData.cs" />
+    <Compile Include="Shell\IShellWindow.cs" />
     <Compile Include="Shell\IViewPartService.cs" />
     <Compile Include="Shell\ProjectManager.cs" />
-    <Compile Include="Shell\ShellWindowContent.LayoutManagerService.cs" />
+    <Compile Include="Shell\LayoutManagerService.cs" />
     <Compile Include="Themes\ResourceEvents.cs" />
     <Compile Include="ViewParts\FontBinaryViewPart.xaml.cs">
       <DependentUpon>FontBinaryViewPart.xaml</DependentUpon>

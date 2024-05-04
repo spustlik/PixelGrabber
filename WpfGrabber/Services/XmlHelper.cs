@@ -96,15 +96,18 @@ namespace WpfGrabber.Services
                 e.SetAttributeValue(p.Name, s);
             }
         }
-        private static bool IsIgnored(PropertyInfo p, string[] ignore)
+        private static bool IsIgnored(PropertyInfo pi, params string[] ignore)
         {
-            if (p.GetCustomAttribute<XmlIgnoreAttribute>() != null)
+            if (pi.GetCustomAttribute<XmlIgnoreAttribute>() != null)
                 return true;
-            if (ignore.Contains(p.Name))
+            if (ignore.Contains(pi.Name))
                 return true;
             return false;
         }
-
+        public static bool IsPropertyIgnored(object o, string propertyName)
+        {
+            return IsIgnored(o.GetType().GetProperty(propertyName));
+        }
 
         public static void SaveToFile<T>(string fileName, T data) where T : class
         {
@@ -122,6 +125,8 @@ namespace WpfGrabber.Services
             LoadProperties(doc.Root, data);
             return data;
         }
+
+
 
         /*
         public static void SaveToFile<T>(string fileName, T data) where T : class

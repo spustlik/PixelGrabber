@@ -27,6 +27,7 @@ namespace WpfGrabber.Shell
             partsGrid.Children.Add(new ViewPartControl() { Content = viewPart });
             FixGridLayout();
             viewPart.OnInitialize();
+            projectManager.SetDirty(true);
         }
 
         public void Remove(ViewPart viewPart)
@@ -47,6 +48,7 @@ namespace WpfGrabber.Shell
                 partsGrid.Children.RemoveAt(i - 1); //remove splitter before deleted VP
             }
             FixGridLayout();
+            projectManager.SetDirty(true);
         }
 
         public void RemoveAll()

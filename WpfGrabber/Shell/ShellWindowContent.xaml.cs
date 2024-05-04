@@ -24,10 +24,10 @@ namespace WpfGrabber.Shell
     {
         //MORE IN partial classes !
 
-
         private const int DEFAULT_WIDTH = 300;
         private ViewPartFactory viewPartFactory;
         private ShellVm shellVm;
+        private ProjectManager projectManager;
 
         public ShellWindowContent()
         {
@@ -44,6 +44,7 @@ namespace WpfGrabber.Shell
             App.Current?.ServiceContainer?.AddService<IViewPartServiceEx>(this);
             viewPartFactory = App.Current?.ServiceProvider.GetService<ViewPartFactory>();
             shellVm = App.Current?.ServiceProvider.GetService<ShellVm>();
+            projectManager = App.Current?.ServiceProvider.GetService<ProjectManager>();
             var lms = new LayoutManagerService(shellVm, this, viewPartFactory);
             App.Current?.ServiceContainer?.AddService(lms);
         }
