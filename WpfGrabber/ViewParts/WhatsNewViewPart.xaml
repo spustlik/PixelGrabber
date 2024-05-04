@@ -28,6 +28,7 @@
 - multiselect in imagesprite              
 - end offset for bit8, masked - count?
 - show whatsnew viewpart...
+- z80 - orgs, sym addr, dumps
                 </Run>
             </TextBlock>
         </ScrollViewer>

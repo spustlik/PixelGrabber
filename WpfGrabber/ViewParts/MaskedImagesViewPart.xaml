@@ -36,7 +36,7 @@
             <StackPanel>
                 <Label Content="Type"/>
                 <ComboBox Style="{StaticResource enumCombo}" 
-                      ItemsSource="{Binding ReaderType, Converter={StaticResource eumItems}, Mode=OneTime}"
+                      ItemsSource="{Binding ReaderType, Converter={StaticResource enumItems}, Mode=OneTime}"
                       SelectedValue="{Binding ReaderType, UpdateSourceTrigger=PropertyChanged}" 
                       />
                 <Separator/>
@@ -44,7 +44,7 @@
             <StackPanel>
                 <Label Content="Preambule"/>
                 <ComboBox Style="{StaticResource enumCombo}" 
-                      ItemsSource="{Binding Preambule, Converter={StaticResource eumItems}, Mode=OneTime}"
+                      ItemsSource="{Binding Preambule, Converter={StaticResource enumItems}, Mode=OneTime}"
                       SelectedValue="{Binding Preambule, UpdateSourceTrigger=PropertyChanged}" 
                       />
                 <Separator/>

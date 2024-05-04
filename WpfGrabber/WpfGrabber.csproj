@@ -86,6 +86,9 @@
     <Compile Include="Shell\ProjectManager.cs" />
     <Compile Include="Shell\LayoutManagerService.cs" />
     <Compile Include="Themes\ResourceEvents.cs" />
+    <Compile Include="ViewParts\EngineViewPart.xaml.cs">
+      <DependentUpon>EngineViewPart.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewParts\FontBinaryViewPart.xaml.cs">
       <DependentUpon>FontBinaryViewPart.xaml</DependentUpon>
     </Compile>
@@ -150,6 +153,10 @@
     <Page Include="ExceptionWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ViewParts\EngineViewPart.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="ViewParts\FontBinaryViewPart.xaml">
       <SubType>Designer</SubType>

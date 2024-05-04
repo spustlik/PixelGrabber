@@ -18,7 +18,7 @@
             <CheckBox Content="Bool" IsChecked="{Binding TestBool}"/>
             <Separator/>
             <ComboBox Style="{StaticResource enumCombo}" 
-                      ItemsSource="{Binding TestEnum, Converter={StaticResource eumItems}, Mode=OneTime}"
+                      ItemsSource="{Binding TestEnum, Converter={StaticResource enumItems}, Mode=OneTime}"
                       SelectedValue="{Binding TestEnum, UpdateSourceTrigger=PropertyChanged}" 
                       />
             <Separator/>

@@ -3,40 +3,26 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Windows;
-using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using WpfGrabber.Shell;
 
 namespace WpfGrabber.ViewParts
 {
-    public class DealienViewPartVM : SimpleDataObject
+    public enum EngineType
     {
-        #region EndPos property
-        private int _endPos;
-        public int EndPos
-        {
-            get => _endPos;
-            set => Set(ref _endPos, value);
-        }
-        #endregion
+        Movie
+    }
+    public class EngineViewPartVM : SimpleDataObject
+    {
 
-        public int GetEndPosSafe()
+        #region EngineType property
+        private EngineType _engineType;
+        public EngineType EngineType
         {
-            var end = EndPos;
-            if (end == 0 || end > EndPosMax)
-                end = EndPosMax - 1;
-            return end;
-        }
-
-        #region EndPosMax property
-        private int _endPosMax;
-        public int EndPosMax
-        {
-            get => _endPosMax;
-            set => Set(ref _endPosMax, value);
+            get => _engineType;
+            set => Set(ref _engineType, value);
         }
         #endregion
 
@@ -57,19 +43,18 @@ namespace WpfGrabber.ViewParts
             set => Set(ref _flipVertical, value);
         }
         #endregion
-
     }
-    public class DealienViewPartBase : ViewPartDataViewer<DealienViewPartVM>
+    public class EngineViewPartBase : ViewPartDataViewer<EngineViewPartVM>
     {
-        public DealienViewPartBase() : base() { }
+        public EngineViewPartBase() : base() { }
     }
 
     /// <summary>
     /// Interaction logic for DealienViewPart.xaml
     /// </summary>
-    public partial class DealienViewPart : DealienViewPartBase
+    public partial class EngineViewPart : EngineViewPartBase
     {
-        public DealienViewPart()
+        public EngineViewPart()
         {
             InitializeComponent();
         }
@@ -77,7 +62,6 @@ namespace WpfGrabber.ViewParts
         public override void OnInitialize()
         {
             base.OnInitialize();
-            ViewModel.EndPosMax = ShellVm.DataLength;
         }
         private void BorderSize_Changed(object sender, SizeChangedEventArgs e)
         {
@@ -85,6 +69,7 @@ namespace WpfGrabber.ViewParts
         }
         protected override void OnShowData()
         {
+            /*
             //0x4902
             //0x466E
             if (ViewModel.EndPos < ShellVm.Offset)
@@ -116,20 +101,7 @@ namespace WpfGrabber.ViewParts
             var bmp = rgba.ToBitmapSource();
             image.Source = bmp;
             image.RenderTransform = new ScaleTransform(ShellVm.Zoom, ShellVm.Zoom);
-        }
-
-        private IEnumerable<AlienReader.AlienImage> ReadImages()
-        {
-            var result = AlienReader
-                .ReadList(
-                    ShellVm.Data,
-                    ShellVm.Offset,
-                    ViewModel.GetEndPosSafe(),
-                    flipY: ViewModel.FlipVertical
-                );
-            if (ViewModel.MaxCount > 0)
-                result = result.Take(ViewModel.MaxCount);
-            return result;
+            */
         }
 
         private void OnButtonSaveImages_Click(object sender, RoutedEventArgs e)
@@ -139,6 +111,7 @@ namespace WpfGrabber.ViewParts
             dlg.FileName = Path.ChangeExtension(ShellVm.FileName, ".png");
             if (dlg.ShowDialog() != true)
                 return;
+            /*
             var images = ReadImages();
             var id = 0;
             foreach (var item in images)
@@ -151,6 +124,7 @@ namespace WpfGrabber.ViewParts
                 bs.SaveToPngFile(fileName);
                 id++;
             }
+            */
         }
 
         private void OnButtonSave_Click(object sender, RoutedEventArgs e)
