@@ -21,7 +21,7 @@ namespace UnitTests
             {
                 var s = EnumItemsConverter.AddSpacesToUpperCase("ABCDEF");
                 Assert.AreEqual("ABCDEF", s);
-            //}
+            }
             //{
             //    var s = EnumItemsConverter.AddSpacesToUpperCase("Taky1Nejaka2cisla");
             //    Assert.AreEqual("Taky 1 Nejaka 2 cisla", s);

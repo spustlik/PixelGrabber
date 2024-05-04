@@ -5,18 +5,22 @@ namespace WpfGrabber
     public class DataReader
     {
         public byte[] Data { get; }
+        public int DataLength => Data.Length;
         public int BitPosition { get; private set; }
         public int BytePosition
         {
             get => BitPosition / 8;
             set => BitPosition = value * 8;
         }
-        
+
+        public bool IsEmpty => this.BytePosition >= DataLength;
+
+
         /// <summary>
         /// flips each byte
         /// </summary>
         public bool FlipX { get; set; } = true;
-        public int DataLength => Data.Length;
+        
 
         public DataReader(byte[] bytes, int offset = 0)
         {
@@ -25,7 +29,7 @@ namespace WpfGrabber
         }
         public byte ReadByte()
         {
-            if (BytePosition >= DataLength)
+            if (IsEmpty)
                 return 0;
             var b = Data[BytePosition++];
             if (FlipX)
@@ -47,7 +51,7 @@ namespace WpfGrabber
         }
         public Boolean ReadBit()
         {
-            if (BytePosition >= Data.Length)
+            if (IsEmpty)
                 return false;
             var b = Data[BytePosition];
             int shift = (BitPosition % 8);

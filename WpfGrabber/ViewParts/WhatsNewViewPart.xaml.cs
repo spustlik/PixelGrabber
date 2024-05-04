@@ -26,7 +26,7 @@ namespace WpfGrabber.ViewParts
         //public ObservableCollection<string> Lines { get; private set; } = new ObservableCollection<string>();
     }
 
-    public class WhatsNewViewPartBase : ViewPartDataViewer<HexDumpVM>
+    public class WhatsNewViewPartBase : ViewPartDataViewer<WhatsNewVM>
     {
 
     }
@@ -46,30 +46,6 @@ namespace WpfGrabber.ViewParts
         public override void OnLoadLayout(XElement ele)
         {
             //base.OnLoadLayout(ele);
-        }
-
-        protected override void ShellVm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(Shell.ShellVm.Data)
-                || e.PropertyName == nameof(Shell.ShellVm.Offset)
-                )
-            {
-                base.ShellVm_PropertyChanged(sender, e);
-            }
-        }
-        protected override void OnShowData()
-        {
-            if (ShellVm.DataLength <= 0)
-                return;
-            var rd = new HexReader(ShellVm.Data, ShellVm.Offset);
-            var lines = rd.ReadLines(
-                showAddr: ViewModel.ShowAddr,
-                showAscii: ViewModel.ShowAscii,
-                showHex: ViewModel.ShowHex)
-                .Take(100)
-                .ToArray();
-            ViewModel.HexDump = string.Join("\n", lines);
-            ViewModel.HexLines.AddRange(lines, clear: true);
         }
 
     }

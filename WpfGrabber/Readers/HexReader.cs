@@ -9,22 +9,15 @@ namespace WpfGrabber.Readers
 {
     public class HexReader
     {
-        public int Position { get; set; }
-        public byte[] Data { get; private set; }
-        public HexReader(byte[] data, int offset)
-        {
-            Data = data;
-            Position = offset;
-        }
-
-        public (string Hex, string Ascii) ReadLineStr()
+        public (string Hex, string Ascii) ReadLineStr(DataReader rd)
         {
             var hexline = new StringBuilder();
             var asciiLine = new StringBuilder();
             var x = 0;
-            while (Position < Data.Length)
+            
+            while (!rd.IsEmpty)
             {
-                var b = Data[Position++];
+                var b = rd.ReadByte();
                 Char c = (char)b;
                 //if (b < 32)
                 //    c = '☺';
@@ -46,18 +39,15 @@ namespace WpfGrabber.Readers
             }
             return (Hex: hexline.ToString(), Ascii: asciiLine.ToString());
         }
-        public string ReadLine()
+
+        public IEnumerable<string> ReadLines(DataReader rd, bool showAddr = false, bool showAscii = false, bool showHex = false)
         {
-            return ReadLineStr().Hex;
-        }
-        public IEnumerable<string> ReadLines(bool showAddr = false, bool showAscii = false, bool showHex = false)
-        {
-            while (Position < Data.Length)
+            while (!rd.IsEmpty)
             {
                 var sb = new StringBuilder();
                 if (showAddr)
-                    sb.Append(ToHex(Position)).Append(": ");
-                var line = ReadLineStr();
+                    sb.Append(ToHex(rd.BytePosition)).Append(": ");
+                var line = ReadLineStr(rd);
                 if (showHex)
                     sb.Append(line.Hex);
                 if (showHex && showAscii)

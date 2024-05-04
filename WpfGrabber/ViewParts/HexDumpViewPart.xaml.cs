@@ -91,8 +91,10 @@ namespace WpfGrabber.ViewParts
         {
             if (ShellVm.DataLength <= 0)
                 return;
-            var rd = new HexReader(ShellVm.Data, ShellVm.Offset);
-            var lines = rd.ReadLines(
+            var br = new DataReader(ShellVm.Data, ShellVm.Offset);
+            var hexrd = new HexReader();
+            var lines = hexrd.ReadLines(
+                br,
                 showAddr: ViewModel.ShowAddr,
                 showAscii: ViewModel.ShowAscii,
                 showHex: ViewModel.ShowHex)
