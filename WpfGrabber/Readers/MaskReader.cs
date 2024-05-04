@@ -50,9 +50,9 @@ namespace WpfGrabber.Readers
 
     public class MaskReader
     {
-        public BitReader BitReader { get; }
+        public DataReader BitReader { get; }
 
-        public MaskReader(BitReader bitReader)
+        public MaskReader(DataReader bitReader)
         {
             this.BitReader = bitReader;
         }
@@ -199,7 +199,7 @@ namespace WpfGrabber.Readers
             {
                 var b = BitReader.ReadByte();
                 if (FlipByte)
-                    b = BitReader.GetFlippedX(b);
+                    b = DataReader.GetFlippedX(b);
                 result[i] = b;
             }
             return result;

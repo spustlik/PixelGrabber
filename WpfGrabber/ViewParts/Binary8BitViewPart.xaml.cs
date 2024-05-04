@@ -57,7 +57,7 @@ namespace WpfGrabber.ViewParts
         {
             if (ShellVm.DataLength == 0)
                 return;
-            BitReader reader = GetBitReader();
+            DataReader reader = GetBitReader();
 
             var w = ViewModel.Width;
             var (max_w, max_h) = GetDataImageSize(imageBorder);
@@ -69,9 +69,9 @@ namespace WpfGrabber.ViewParts
             image.RenderTransform = new ScaleTransform(ShellVm.Zoom, ShellVm.Zoom);
         }
 
-        private BitReader GetBitReader()
+        private DataReader GetBitReader()
         {
-            var reader = new BitReader(ShellVm.Data);
+            var reader = new DataReader(ShellVm.Data);
             reader.BytePosition = ShellVm.Offset;
             reader.FlipX = ViewModel.Reversed;
             return reader;

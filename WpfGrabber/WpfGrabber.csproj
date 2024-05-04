@@ -69,7 +69,7 @@
     <Compile Include="Data\FontData.cs" />
     <Compile Include="Readers\AlienReader.cs" />
     <Compile Include="Readers\BitImageReader.cs" />
-    <Compile Include="Readers\BitReader.cs" />
+    <Compile Include="Readers\DataReader.cs" />
     <Compile Include="Data\ByteBitmapRgba.cs" />
     <Compile Include="ExceptionWindow.xaml.cs">
       <DependentUpon>ExceptionWindow.xaml</DependentUpon>

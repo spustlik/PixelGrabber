@@ -16,7 +16,7 @@ namespace WpfGrabber.Readers
             Height = height;
         }
 
-        public IEnumerable<BitBitmap> ReadImages(BitReader br, int count = 256)
+        public IEnumerable<BitBitmap> ReadImages(DataReader br, int count = 256)
         {
             const int width = 8;
             int counter = 0;

@@ -160,7 +160,7 @@ namespace WpfGrabber.ViewParts
 
         private IEnumerable<ByteBitmap8Bit> ReadImages()
         {
-            BitReader bitReader = new BitReader(ShellVm.Data)
+            DataReader bitReader = new DataReader(ShellVm.Data)
             {
                 BytePosition = ShellVm.Offset,
                 FlipX = false //!!needed for preambule-reading
