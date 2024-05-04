@@ -19,13 +19,14 @@ namespace WpfGrabber
         /// <summary>
         /// flips each byte
         /// </summary>
-        public bool FlipX { get; set; } = true;
-        
+        public bool FlipX { get; private set; }
 
-        public DataReader(byte[] bytes, int offset = 0)
+
+        public DataReader(byte[] bytes, int offset, bool flipX = false)
         {
             this.Data = bytes;
             this.BytePosition = offset;
+            this.FlipX = flipX;
         }
         public byte ReadByte()
         {
@@ -38,7 +39,7 @@ namespace WpfGrabber
         }
         public byte[] ReadBytes(int count)
         {
-            var result=new byte[count];
+            var result = new byte[count];
             Array.Copy(Data, BytePosition, result, 0, count);
             BytePosition = Math.Min(Data.Length, BytePosition + count);
             return result;
@@ -56,7 +57,7 @@ namespace WpfGrabber
             var b = Data[BytePosition];
             int shift = (BitPosition % 8);
             if (FlipX)
-                shift = 7 - shift; 
+                shift = 7 - shift;
             var bit = (b >> shift) & 1;
             BitPosition++;
             return bit == 1;

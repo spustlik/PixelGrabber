@@ -14,7 +14,7 @@ namespace WpfGrabber.Readers
             var hexline = new StringBuilder();
             var asciiLine = new StringBuilder();
             var x = 0;
-            
+
             while (!rd.IsEmpty)
             {
                 var b = rd.ReadByte();

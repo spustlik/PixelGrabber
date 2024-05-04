@@ -153,18 +153,14 @@ namespace WpfGrabber.ViewParts
                 (b, o) => b > 1 ? 0 : b == 0 ? 0xFFFFFFFF : 0xFF00FF00,
                 (b, o) => b > 1 ? 0 : b == 1 ? 0xFFFFFFFF : 0xFF00FF00
             };
-            if (ViewModel.Colorize>=colorizers.Count)
+            if (ViewModel.Colorize >= colorizers.Count)
                 throw new NotImplementedException();
             return colorizers[ViewModel.Colorize];
         }
 
         private IEnumerable<ByteBitmap8Bit> ReadImages()
         {
-            DataReader bitReader = new DataReader(ShellVm.Data)
-            {
-                BytePosition = ShellVm.Offset,
-                FlipX = false //!!needed for preambule-reading
-            };
+            DataReader bitReader = new DataReader(ShellVm.Data, ShellVm.Offset, flipX: false);
             var rd = new MaskReader(bitReader)
             {
                 FlipX = ViewModel.FlipX,

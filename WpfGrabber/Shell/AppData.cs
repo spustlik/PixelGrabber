@@ -13,7 +13,7 @@ namespace WpfGrabber.Shell
         public static FontData GetFont()
         {
             const string chars = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            var rd = new DataReader(Properties.Resources.AppFont) { FlipX = false };
+            var rd = new DataReader(Properties.Resources.AppFont, 0, flipX: false);
             var fr = new FontReader(8);
             var letters = fr.ReadImages(rd, chars.Length).ToArray();
             var result = new FontData(letters, 0, chars);

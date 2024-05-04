@@ -71,15 +71,13 @@ namespace WpfGrabber.ViewParts
 
         private DataReader GetBitReader()
         {
-            var reader = new DataReader(ShellVm.Data);
-            reader.BytePosition = ShellVm.Offset;
-            reader.FlipX = ViewModel.Reversed;
+            var reader = new DataReader(ShellVm.Data, ShellVm.Offset, flipX: ViewModel.Reversed);
             return reader;
         }
 
         private BitmapSource ReadDataImage()
         {
-            var reader = GetBitReader();            
+            var reader = GetBitReader();
             var bir = new BitImageReader();
             var bmp = bir.ReadBitmap(reader,
                 ViewModel.Width,

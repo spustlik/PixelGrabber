@@ -52,7 +52,7 @@ namespace WpfGrabber.ViewParts
         [XmlIgnore]
         public ObservableCollection<string> HexLines { get; private set; } = new ObservableCollection<string>();
 
-        
+
         #region HexDump property
         private string _hexDump;
         [XmlIgnore]
@@ -91,7 +91,7 @@ namespace WpfGrabber.ViewParts
         {
             if (ShellVm.DataLength <= 0)
                 return;
-            var br = new DataReader(ShellVm.Data, ShellVm.Offset);
+            var br = new DataReader(ShellVm.Data, ShellVm.Offset, flipX: false);
             var hexrd = new HexReader();
             var lines = hexrd.ReadLines(
                 br,

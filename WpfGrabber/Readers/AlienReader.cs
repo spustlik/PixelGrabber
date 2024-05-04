@@ -14,12 +14,34 @@ namespace WpfGrabber
 
     public class AlienReader
     {
-        private readonly byte[] bytes;
-        public int Position { get; set; }
+        private DataReader reader;
+
         public bool FlipY { get; set; }
-        public AlienReader(byte[] bytes)
+        public AlienReader(DataReader reader)
         {
-            this.bytes = bytes;
+            this.reader = reader;
+        }
+
+        public static IEnumerable<AlienImage> ReadList(byte[] bytes, int pos, int endpos, bool flipY)
+        {
+            if (endpos <= 0)
+                endpos = bytes.Length;
+            var dr = new DataReader(bytes, pos, flipX: false);
+            var ar = new AlienReader(dr) { FlipY = flipY };
+            var images = new List<AlienImage>();
+            while (!dr.IsEmpty)
+            {
+                var start = dr.BytePosition;
+                if (endpos > 0 && dr.BytePosition >= endpos)
+                    break;
+                if (!ar.TryRead(out var w, out var h))
+                    break;
+                if (pos > endpos || w >= 64 || h >= 64)
+                    break;
+                var aimg = ar.ReadMaskedImage();
+                images.Add(new AlienImage() { Bitmap = aimg, Position = start });
+            }
+            return images;
         }
 
         public class AlienImage
@@ -28,57 +50,29 @@ namespace WpfGrabber
             public int Position { get; set; }
         }
 
-        public static IEnumerable<AlienImage> ReadList(byte[] bytes, int pos, int endpos, bool flipY)
-        {
-            if (endpos <= 0)
-                endpos = bytes.Length;
-            var ar = new AlienReader(bytes) { Position = pos, FlipY = flipY };
-            var images = new List<AlienImage>();
-            while (true)
-            {
-                var start=ar.Position;
-                if (endpos > 0 && ar.Position >= endpos)
-                    break;
-                if (!ar.TryRead(out var w, out var h))
-                    break;
-                if (pos>endpos || w >= 64 || h >= 64)
-                    break;
-                var aimg = ar.ReadMaskedImage();
-                images.Add(new AlienImage() { Bitmap = aimg, Position = start });
-            }
-            return images;
-        }
-
-        public byte Read()
-        {
-            if (Position >= bytes.Length)
-                return 0;
-            return bytes[Position++];
-        }
-
         public bool TryRead(out int w, out int h)
         {
             w = 0;
             h = 0;
-            if (Position > bytes.Length - 2)
+            if (reader.BytePosition > reader.DataLength - 2)
                 return false;
-            w = bytes[Position];
-            h = bytes[Position + 1];
+            w = reader.Data[reader.BytePosition];
+            h = reader.Data[reader.BytePosition + 1];
             return w != 0 && h != 0;
         }
         public ByteBitmap8Bit ReadMaskedImage()
         {
-            var w = Read();
-            var h = Read();
+            var w = reader.ReadByte();
+            var h = reader.ReadByte();
             var result = new ByteBitmap8Bit(w * 8, h);
             for (int y = 0; y < h; y++)
             {
                 for (int x = 0; x < w; x++)
                 {
-                    if (Position >= bytes.Length)
+                    if (reader.IsEmpty)
                         break;
-                    var d = Read();
-                    var m = Read();
+                    var d = reader.ReadByte();
+                    var m = reader.ReadByte();
                     for (int i = 0; i < 8; i++)
                     {
                         int shift = (7 - i);
@@ -100,8 +94,5 @@ namespace WpfGrabber
             }
             return result;
         }
-
-
-
     }
 }

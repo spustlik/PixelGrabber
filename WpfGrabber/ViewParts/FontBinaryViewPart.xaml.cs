@@ -106,8 +106,8 @@ namespace WpfGrabber.ViewParts
             ViewModel.FontCharacters = CharRange('0', '9') + CharRange('A', 'Z');
             ViewModel.TestText = "HELLO WORLD";
         }
-    
-            
+
+
         private static string CharRange(char start, char end)
         {
             return String.Join("", Enumerable.Range((int)start, (int)end - (int)start + 1).Select(x => (char)x));
@@ -120,7 +120,7 @@ namespace WpfGrabber.ViewParts
 
         private FontData CreateFont()
         {
-            var br = new DataReader(ShellVm.Data) { BytePosition = ShellVm.Offset, FlipX = ViewModel.FlipX };
+            var br = new DataReader(ShellVm.Data, ShellVm.Offset, flipX: ViewModel.FlipX);
             var fr = new FontReader(ViewModel.Height)
             {
                 FlipY = ViewModel.FlipY,
@@ -215,7 +215,7 @@ namespace WpfGrabber.ViewParts
             if (dlg.ShowDialog() != true)
                 return;
             var font = CreateFont();
-            var bmp = new ByteBitmapRgba(ViewModel.TestText.Length * font.Letters.First().WidthPixels, font.Letters.Max(x=>x.Height));
+            var bmp = new ByteBitmapRgba(ViewModel.TestText.Length * font.Letters.First().WidthPixels, font.Letters.Max(x => x.Height));
             font.DrawString(bmp, 0, 0, ViewModel.TestText, 0xFFFFFFFF);
             bmp.ToBitmapSource().SaveToPngFile(dlg.FileName);
         }

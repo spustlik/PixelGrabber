@@ -128,7 +128,7 @@ namespace WpfGrabber.ViewParts
                     ViewModel.GetEndPosSafe(),
                     flipY: ViewModel.FlipVertical
                 );
-            if(ViewModel.MaxCount>0)
+            if (ViewModel.MaxCount > 0)
                 result = result.Take(ViewModel.MaxCount);
             return result;
         }
