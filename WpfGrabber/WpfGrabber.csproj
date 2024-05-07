@@ -151,6 +151,8 @@
       <DependentUpon>HexDumpViewPart.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewParts\ViewPart.cs" />
+    <Compile Include="ViewParts\Z80Syntax\CustomLinkVisualLineText.cs" />
+    <Compile Include="ViewParts\Z80Syntax\CustomLinkElementGenerator.cs" />
     <Compile Include="ViewParts\Z80Syntax\Z80SyntaxHighlighter.cs" />
     <Compile Include="_ObjectExtensions.cs" />
     <Compile Include="_WpfExtensions.cs" />
@@ -272,6 +274,7 @@
     </None>
     <Compile Include="Shell\ShellWindowContent.ViewPartService.cs" />
     <None Include="Resources\AppFont.fnt" />
+    <EmbeddedResource Include="ViewParts\Z80Syntax\Z80Dump.xshd" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

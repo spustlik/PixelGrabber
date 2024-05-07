@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<SyntaxDefinition name="Z80Dump" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+	<!-- The named colors 'Comment' and 'String' are used in SharpDevelop to detect if a line is inside a multiline string/comment -->
+	<Color name="Comment" foreground="Gray" exampleText="/*comment*/ // 2nd comment"/>
+	<Color name="String" foreground="Red" exampleText=' "this is an \"string\"" '/>
+	<!--<Color name="SpecialChar" foreground="DarkGreen" exampleText=" first.second"/>-->
+	<Color name="Keyword" fontWeight="bold" foreground="Blue" exampleText="var x => x.Name"/>
+	<Color name="Register" fontWeight="bold" foreground="#B8D7A3" />
+	<!--<Color name="Function" foreground="MidnightBlue" fontWeight="bold"/>-->
+	<Color name="Number" foreground="Green" />
+
+	<!-- uncomment #define DEBUGXSHD line in Highlighters.cs to debug this file in runtime -->
+
+	<!-- This is the main ruleset. -->
+	<RuleSet ignoreCase="true">
+
+		<Span color="Comment">
+			<Begin>//</Begin>
+		</Span>
+
+		<Span color="Comment" multiline="true">
+			<Begin>/\*</Begin>
+			<End>\*/</End>
+		</Span>
+
+		<Span color="String">
+			<Begin>"</Begin>
+			<End>"</End>
+			<RuleSet>
+				<!-- span for escape sequences -->
+				<Span begin="\\" end="."/>
+			</RuleSet>
+		</Span>
+
+		<!--<Keywords color="SpecialChar">
+			<Word>?</Word>
+			<Word>,</Word>
+			<Word>.</Word>
+			<Word>(</Word>
+			<Word>)</Word>
+			<Word>[</Word>
+			<Word>]</Word>
+			<Word>+</Word>
+			<Word>-</Word>
+			<Word>/</Word>
+			<Word>*</Word>
+			<Word>=&gt;</Word>
+			<Word>&lt;&gt;</Word>
+			<Word>&lt;=</Word>
+			<Word>&gt;=</Word>
+			<Word>&lt;</Word>
+			<Word>&gt;</Word>
+			<Word>=</Word>
+		</Keywords>-->
+
+		<!-- Digits -->
+		<Rule color="Number">
+			\b0[xX][0-9a-fA-F]+  # hex number
+			|	\b
+			(	\d+(\.[0-9]+)?   #number with optional floating point
+			|	\.[0-9]+         #or just starting with floating point
+			)
+			([eE][+-]?[0-9]+)? # optional exponent
+		</Rule>
+
+	</RuleSet>
+</SyntaxDefinition>

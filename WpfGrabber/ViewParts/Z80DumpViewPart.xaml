@@ -6,11 +6,10 @@
              xmlns:local="clr-namespace:WpfGrabber.ViewParts" 
              xmlns:avalon="http://icsharpcode.net/sharpdevelop/avalonedit"
              mc:Ignorable="d" 
-             d:DesignHeight="350" d:DesignWidth="300"
+             d:DesignHeight="350" d:DesignWidth="628.667"
              x:Name="root"
              Background="LightYellow"
              >
-    
     <Grid>
         <Grid.Resources>
             <Style TargetType="{x:Type avalon:TextEditor}">
@@ -34,8 +33,13 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="3"/>
+            <ColumnDefinition Width="250"/>
+        </Grid.ColumnDefinitions>
 
-        <ItemsControl Style="{StaticResource toolbar}">
+        <ItemsControl Style="{StaticResource toolbar}" Grid.ColumnSpan="99">
             <CheckBox Content="Address" IsChecked="{Binding ShowAddr}"/>
             <Separator/>
             <CheckBox Content="Op codes" IsChecked="{Binding ShowOpcodes}"/>
@@ -51,10 +55,9 @@
 
         <TabControl Grid.Row="1">
             <TabItem Header="Avalon edit">
-                <avalon:TextEditor x:Name="editor">
+                <avalon:TextEditor x:Name="editor" MouseHover="Editor_MouseHover" MouseHoverStopped="Editor_MouseHoverStopped">
                     Lorem ipsum...
                 </avalon:TextEditor>
-
             </TabItem>
             <TabItem Header="TextBox">
                 <Grid>
@@ -86,5 +89,19 @@
                 </Grid>
             </TabItem>
         </TabControl>
+
+        <GridSplitter Grid.Row="1" Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+        <Grid Grid.Row="1" Grid.Column="2" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Border Background="#606060">
+                <TextBlock Text="Map" Foreground="White" FontWeight="Bold" Padding=" 5,2"/>
+            </Border>
+            <TextBox Grid.Row="1" FontFamily="Courier New" FontSize="11">
+                lorem ipsum...
+            </TextBox>
+        </Grid>
     </Grid>
 </local:Z80DumpViewPartBase>

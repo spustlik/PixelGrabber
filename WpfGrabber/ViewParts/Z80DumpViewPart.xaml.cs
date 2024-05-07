@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using ICSharpCode.AvalonEdit.Rendering;
+using Microsoft.Win32;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -73,8 +74,19 @@ namespace WpfGrabber.ViewParts
         public Z80DumpViewPart()
         {
             InitializeComponent();
+        }
+        public override void OnInitialize()
+        {
+            base.OnInitialize();
             Z80SyntaxHighlighter.Init();
             editor.SyntaxHighlighting = Z80SyntaxHighlighter.GetDefinition();
+            var gen = CustomLinkElementGenerator.Install(editor);
+            gen.CustomLinkClicked += Gen_CustomLinkClicked;
+        }
+
+        private void Gen_CustomLinkClicked(string link)
+        {
+            MessageBox.Show(link,"Clicked!");
         }
 
         protected override void ShellVm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -234,6 +246,50 @@ namespace WpfGrabber.ViewParts
         private void textBox_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
             hyperLinkSimulation.Height = 0;
+        }
+
+        private void Editor_MouseHover(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            //if (editor.SelectedText.Length > 0)
+            //    return;
+            /*
+            var pos = e.GetPosition(editor);
+            var textpos = editor.GetPositionFromPoint(pos);
+            if (textpos == null)
+                return;
+
+            var docLine = editor.Document.GetLineByNumber(textpos.Value.Line); //by offset?
+            var lineText = editor.Document.GetText(docLine.Offset, docLine.Length);  
+            var mousePos = textpos.Value.Column;
+
+            if(!SearchAddr(lineText,mousePos, out var found)) 
+                return;
+            ViewModel.GoToAddrText = found;
+            //ShowHyperLink(startLineTextPos, matches);
+            //var editor.Document.GetLineByNumber(textpos.Value.Line);
+            */
+        }
+
+        private bool SearchAddr(string line, int startPos, out string found)
+        {
+            found = null;
+            var matches = _regex.Match(line, startPos);
+            while (!matches.Success)
+            {
+                startPos--;
+                if (startPos < 0)
+                    break;
+                matches = _regex.Match(line, startPos);
+            }
+            if (!matches.Success)
+                return false;
+            found = matches.Captures[0].Value;
+            return true;
+        }
+
+        private void Editor_MouseHoverStopped(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+
         }
     }
 }

@@ -6,19 +6,21 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
+using WpfGrabber.Readers.Z80;
+using System.Windows.Media;
 
 namespace WpfGrabber.ViewParts.Z80Syntax
 {
     public class Z80SyntaxHighlighter
     {
-        private const string LANGNAME = "z80dump";
+        private const string LANGNAME = "Z80Dump";
 
         private static bool _initialized = false;
 
         public static void Init()
         {
 #if DEBUGXSHD
-            var path = Path.Combine(Tools.DeploymentHelper.GetApplicationPath(), "../../SyntaxHighlighting/ActionLang.xshd");
+            var path = Path.Combine(Tools.DeploymentHelper.GetApplicationPath(), "../../ViewPart/Z80Syntax/Z80.xshd");
             if (File.Exists(path))
             {
                 using( var s = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
@@ -45,31 +47,41 @@ namespace WpfGrabber.ViewParts.Z80Syntax
                         ReadHighlighter(highlightingName, identity.Assembly.GetManifestResourceStream(name));
                     }
                 }
-                var alang = GetDefinition();
-                /*TODO
-                var keywords = Keywords.GetKeywords().Where(kw => kw.Options.HasFlag(KeywordOptions.Highlight)).ToArray();
-                AddKewords(alang, true, keywords.Where(kw => kw.Options.HasFlag(KeywordOptions.CaseSensitive)).Select(kw => kw.Text));
-                AddKewords(alang, false, keywords.Where(kw => !kw.Options.HasFlag(KeywordOptions.CaseSensitive)).Select(kw => kw.Text));
+                var lang = GetDefinition();
+                var keywords = GetEnumValues<Z80Op>();
+                AddKewords(lang, true, keywords.Select(k => k.ToString()));
+
+                var registers = GetEnumValues<Z80Register>();
+                AddKewords(lang, true, registers.Select(k => k.ToString()), "Register");
+
                 _initialized = true;
-                */
             }
         }
 
-        private static void AddKewords(IHighlightingDefinition alang, bool caseSensitive, IEnumerable<string> keywords)
+        private static T[] GetEnumValues<T>() where T : struct
+        {
+            return Enum.GetValues(typeof(T)).Cast<T>().ToArray();
+        }
+
+        private static void AddKewords(
+            IHighlightingDefinition lang,
+            bool caseSensitive,
+            IEnumerable<string> keywords,
+            string color = null)
         {
             if (!keywords.Any())
                 return;
-
+            keywords = keywords.OrderByDescending(k => k.Length).ThenBy(x => x).ToArray();
             var options = RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture | RegexOptions.Compiled;
             if (!caseSensitive)
             {
                 options |= RegexOptions.IgnoreCase;
             }
-            alang.MainRuleSet.Rules.Add(
+            lang.MainRuleSet.Rules.Add(
                 new HighlightingRule()
                 {
-                    Color = alang.GetNamedColor("Keyword"),
-                    Regex = new Regex(@"\b(?>" + String.Join("|", keywords) + @")\b", options)
+                    Color = lang.GetNamedColor(color ?? "Keyword"),
+                    Regex = new Regex(@"\b(?>" + string.Join("|", keywords) + @")\b", options)
                 });
         }
 
