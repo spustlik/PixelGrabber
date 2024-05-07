@@ -82,7 +82,10 @@
     <Compile Include="Readers\FontReader.cs" />
     <Compile Include="Readers\MaskReader.cs" />
     <Compile Include="Readers\Z80\Z80Instruction.cs" />
+    <Compile Include="Readers\Z80\Z80Op.cs" />
+    <Compile Include="Readers\Z80\Z80Param.cs" />
     <Compile Include="Readers\Z80\Z80Reader.cs" />
+    <Compile Include="Readers\Z80\Z80Register.cs" />
     <Compile Include="Services\Throthler.cs" />
     <Compile Include="Shell\AppData.cs" />
     <Compile Include="Shell\IShellWindow.cs" />

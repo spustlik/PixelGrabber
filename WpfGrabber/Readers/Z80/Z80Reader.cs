@@ -14,12 +14,12 @@ namespace WpfGrabber.Readers.Z80
     {
         public byte[] Data { get; private set; }
         public int Addr { get; private set; }
-        private int _lastInstr = 0;
+        private int _lastInstrAddr = 0;
         public Z80Reader(byte[] data, int start = 0)
         {
             Data = data;
             Addr = start;
-            _lastInstr = start;
+            _lastInstrAddr = start;
         }
 
         public byte ReadByte()
@@ -407,6 +407,7 @@ namespace WpfGrabber.Readers.Z80
         }
         public string GetR(int r)
         {
+            //var regs = new[] { Z80Register.B, Z80Register.C, Z80Register.D, Z80Register.E, Z80Register.H, Z80Register.L, "(HL)", Z80Register.A };
             return new[] { "B", "C", "D", "E", "H", "L", "(HL)", "A" }[r];
         }
         private string GetAddrLabel(int addr)
@@ -419,11 +420,10 @@ namespace WpfGrabber.Readers.Z80
             return CreateInstr(Z80Op.Unknown, opcode.Op.ToString("X2"));
         }
 
-        //params should be InstructionParam with implicit cast from Register enum, int addr, etc
-        private Z80Instruction CreateInstr(Z80Op op, string p1 = null, string p2 = null)
+        private Z80Instruction CreateInstr(Z80Op op, Z80Param p1 = null, Z80Param p2 = null)
         {
-            var r = new Z80Instruction(op, _lastInstr, Addr - _lastInstr, p1, p2);
-            _lastInstr = Addr;
+            var r = new Z80Instruction(op, _lastInstrAddr, Addr - _lastInstrAddr, p1, p2);
+            _lastInstrAddr = Addr;
             return r;
         }
     }
