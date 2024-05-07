@@ -3,13 +3,33 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:WpfGrabber.ViewParts"
+             xmlns:local="clr-namespace:WpfGrabber.ViewParts" 
+             xmlns:avalon="http://icsharpcode.net/sharpdevelop/avalonedit"
              mc:Ignorable="d" 
              d:DesignHeight="350" d:DesignWidth="300"
              x:Name="root"
              Background="LightYellow"
              >
+    
     <Grid>
+        <Grid.Resources>
+            <Style TargetType="{x:Type avalon:TextEditor}">
+                <Setter Property="Options">
+                    <Setter.Value>
+                        <avalon:TextEditorOptions
+                            EnableEmailHyperlinks="False"
+                            EnableHyperlinks="False"
+                        />
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
+                <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+                <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Hidden"/>
+                <Setter Property="FontFamily" Value="Consolas"/>
+                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="WordWrap" Value="True"/>
+            </Style>
+        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -29,33 +49,42 @@
             </Button>
         </ItemsControl>
 
-        <TextBox Grid.Row="1" IsReadOnly="True"  
-                 x:Name="textBox"
-                 ScrollViewer.VerticalScrollBarVisibility="Auto"
-                 FontFamily="Courier New" FontSize="10" Text="{Binding DumpText}"
-                 SelectionChanged="TextBoxSelection_Changed"
-                 MouseMove="TextBox_MouseMove"
-                 ScrollViewer.ScrollChanged="textBox_ScrollChanged"
-                 >
-        </TextBox>
+        <TabControl Grid.Row="1">
+            <TabItem Header="Avalon edit">
+                <avalon:TextEditor x:Name="editor">
+                    Lorem ipsum...
+                </avalon:TextEditor>
 
-        <Border Grid.Row="1" 
-                CornerRadius="3" BorderBrush="#c0c0c0" BorderThickness="1" Background="#f0f0f0"
-                Margin="4" Padding="10,3" HorizontalAlignment="Right" VerticalAlignment="Top">
-            <TextBlock>
-                <Run>Go to address: </Run>
-                <Hyperlink Click="GoToAddress_Click">
-                    <Run Text="{Binding GoToAddrText}"/>
-                </Hyperlink>
-            </TextBlock>
-        </Border>
+            </TabItem>
+            <TabItem Header="TextBox">
+                <Grid>
+                    <TextBox x:Name="textBox"
+                             IsReadOnly="True"                   
+                             ScrollViewer.VerticalScrollBarVisibility="Auto"
+                             FontFamily="Courier New" FontSize="10" Text="{Binding DumpText}"
+                             SelectionChanged="TextBoxSelection_Changed"
+                             MouseMove="TextBox_MouseMove"
+                             ScrollViewer.ScrollChanged="textBox_ScrollChanged"
+                    />
+                    <Border CornerRadius="3" BorderBrush="#c0c0c0" BorderThickness="1" Background="#f0f0f0"
+                            Margin="4" Padding="10,3" HorizontalAlignment="Right" VerticalAlignment="Top">
+                        <TextBlock>
+                            <Run>Go to address: </Run>
+                            <Hyperlink Click="GoToAddress_Click">
+                                <Run Text="{Binding GoToAddrText}"/>
+                            </Hyperlink>
+                        </TextBlock>
+                    </Border>
 
-        <Canvas Grid.Row="1" IsHitTestVisible="false" x:Name="hyperLinkCanvas">
-            <Border Grid.Row="1" 
-                    Cursor="Wait" Background="DodgerBlue" Opacity="0.6" Width="100" Height="20"
-                    x:Name="hyperLinkSimulation" >
-                <!--<TextBlock Text="{Binding GoToAddrText}" Foreground="White"/>-->
-            </Border>
-        </Canvas>
+                    <Canvas IsHitTestVisible="false" x:Name="hyperLinkCanvas">
+                        <Border x:Name="hyperLinkSimulation" 
+                                Cursor="Wait" Background="DodgerBlue" Opacity="0.6" Width="100" Height="20">
+                            <!--<TextBlock Text="{Binding GoToAddrText}" Foreground="White"/>-->
+                        </Border>
+                    </Canvas>
+
+                </Grid>
+            </TabItem>
+        </TabControl>
     </Grid>
 </local:Z80DumpViewPartBase>

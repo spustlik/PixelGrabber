@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -13,6 +14,7 @@ using System.Windows.Media;
 using System.Xml.Serialization;
 using WpfGrabber.Readers.Z80;
 using WpfGrabber.Shell;
+using WpfGrabber.ViewParts.Z80Syntax;
 
 namespace WpfGrabber.ViewParts
 {
@@ -46,7 +48,6 @@ namespace WpfGrabber.ViewParts
         }
         #endregion
 
-        
         #region GoToAddrText property
         private string _gotoAddrText;
         [XmlIgnore]
@@ -56,7 +57,6 @@ namespace WpfGrabber.ViewParts
             set => Set(ref _gotoAddrText, value);
         }
         #endregion
-
 
         [XmlIgnore]
         public ObservableCollection<string> DumpLines { get; private set; } = new ObservableCollection<string>();
@@ -73,6 +73,8 @@ namespace WpfGrabber.ViewParts
         public Z80DumpViewPart()
         {
             InitializeComponent();
+            Z80SyntaxHighlighter.Init();
+            editor.SyntaxHighlighting = Z80SyntaxHighlighter.GetDefinition();
         }
 
         protected override void ShellVm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -84,6 +86,15 @@ namespace WpfGrabber.ViewParts
                 base.ShellVm_PropertyChanged(sender, e);
             }
         }
+        protected override void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            base.ViewModel_PropertyChanged(sender, e);
+            if (e.PropertyName == nameof(Z80DumpVM.DumpText))
+            {
+                editor.Text = ViewModel.DumpText;
+            }
+        }
+
         Dictionary<int,int> _addressMap = new Dictionary<int, int>();
         protected override void OnShowData()
         {

@@ -50,7 +50,10 @@ namespace WpfGrabber.Readers.Z80
                     break;
             }
         }
+        class Context
+        {
 
+        }
         public struct Opcode
         {
             public int x { get; set; }
@@ -75,16 +78,7 @@ namespace WpfGrabber.Readers.Z80
         {
             return CreateOpCode(ReadByte());
         }
-        private Opcode ReadOpCodeData(out int x, out int y, out int z, out int p, out int q)
-        {
-            var r = CreateOpCode(ReadByte());
-            x = r.x; 
-            y = r.y; 
-            z = r.z; 
-            p = r.p; 
-            q = r.q;
-            return r;
-        }
+
 
         public Z80Instruction ReadInstruction()
         {
@@ -118,16 +112,16 @@ namespace WpfGrabber.Readers.Z80
 
         private Z80Instruction ReadED()
         {
-            var opcode = ReadOpCodeData(out var x, out var y, out var z, out _, out _);
-            if (x == 0 || x == 3)
+            var op = ReadOpCode();
+            if (op.x == 0 || op.x == 3)
                 return CreateInstr(Z80Op.NoniNOP);
-            switch (x)
+            switch (op.x)
             {
-                case 1: return ReadED1(opcode);
+                case 1: return ReadED1(op);
                 case 2:
-                    if (y < 4 || z > 3)
+                    if (op.y < 4 || op.z > 3)
                         return CreateInstr(Z80Op.NoniNOP);
-                    return CreateInstr(Z80Op.ByParam, GetBli(y, z));
+                    return CreateInstr(Z80Op.ByParam, GetBli(op.y, op.z));
                 default: throw new InvalidOperationException();
             }
         }
@@ -189,13 +183,13 @@ namespace WpfGrabber.Readers.Z80
 
         private Z80Instruction ReadCB()
         {
-            ReadOpCodeData(out var x, out var y, out var z, out _, out _);
-            switch (x)
+            var op = ReadOpCode();
+            switch (op.x)
             {
-                case 0: return CreateInstr(Z80Op.ByParam, GetRot(y), GetR(z));
-                case 1: return CreateInstr(Z80Op.BIT, y + "", GetR(z));
-                case 2: return CreateInstr(Z80Op.RES, y + "", GetR(z));
-                case 3: return CreateInstr(Z80Op.SET, y + "", GetR(z));
+                case 0: return CreateInstr(Z80Op.ByParam, GetRot(op.y), GetR(op.z));
+                case 1: return CreateInstr(Z80Op.BIT, op.y + "", GetR(op.z));
+                case 2: return CreateInstr(Z80Op.RES, op.y + "", GetR(op.z));
+                case 3: return CreateInstr(Z80Op.SET, op.y + "", GetR(op.z));
                 default: throw new InvalidOperationException();
             }
         }
