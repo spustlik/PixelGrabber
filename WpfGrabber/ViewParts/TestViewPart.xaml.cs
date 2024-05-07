@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,34 +17,6 @@ using WpfGrabber.Shell;
 
 namespace WpfGrabber.ViewParts
 {
-    /// <summary>
-    /// Interaction logic for TestViewPart.xaml
-    /// </summary>
-    public partial class TestViewPart : ViewPartDataViewer<TestViewPartVM>
-    {
-        public TestViewPart():base()
-        {
-            InitializeComponent();
-        }
-
-        private void TestMenu_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        protected override void OnShowData()
-        {
-            var (max_w, max_h) = GetDataImageSize(imageBorder);
-            var rgba = new ByteBitmapRgba(max_w, max_h);
-            var font = AppData.GetFont();
-
-            font.DrawString(rgba, 0, 0, "TEST TEXT");
-            var bmp = rgba.ToBitmapSource();
-            image.Source = bmp;
-            image.RenderTransform = new ScaleTransform(ShellVm.Zoom, ShellVm.Zoom);
-        }
-    }
-
     public class TestViewPartVM : SimpleDataObject
     {
 
@@ -73,4 +46,49 @@ namespace WpfGrabber.ViewParts
         Done,
         Waiting
     }
+    public partial class TestViewPart : ViewPartDataViewer<TestViewPartVM>
+    {
+        public TestViewPart():base()
+        {
+            InitializeComponent();
+        }
+
+        private void TestMenu_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        protected override void OnShowData()
+        {
+            var (max_w, max_h) = GetDataImageSize(imageBorder);
+            var rgba = new ByteBitmapRgba(max_w, max_h);
+            var font = AppData.GetFont();
+
+            font.DrawString(rgba, 0, 0, "TEST TEXT");
+            var bmp = rgba.ToBitmapSource();
+            image.Source = bmp;
+            image.RenderTransform = new ScaleTransform(ShellVm.Zoom, ShellVm.Zoom);
+        }
+
+        private void MergeLayouts_Click(object sender, RoutedEventArgs e)
+        {
+            var list= ShellVm.Layouts.OrderBy(x => x).ToList();
+            int i = 0; 
+            while(i < list.Count)
+            {
+                var layout = list[i];
+                if (layout.Length != 4 || 
+                    !int.TryParse(layout, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var res))
+                {
+                    list.RemoveAt(i);
+                    continue;
+                }
+                i++;
+            }
+
+            Clipboard.SetText(string.Join("\n", list));
+        }
+    }
+
+
 }

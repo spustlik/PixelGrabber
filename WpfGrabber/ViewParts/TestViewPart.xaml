@@ -7,7 +7,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WpfGrabber.ViewParts" 
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="200" d:DesignWidth="180">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -26,6 +26,7 @@
                 <Button.ContextMenu>
                     <ContextMenu>
                         <MenuItem  Header="Test menu..." Click="TestMenu_Click"/>
+                        <MenuItem  Header="Merge layouts" Click="MergeLayouts_Click"/>
                     </ContextMenu>
                 </Button.ContextMenu>
             </Button>
