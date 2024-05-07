@@ -7,7 +7,7 @@ namespace WpfGrabber.Readers.Z80
 {
     public abstract class Z80Param
     {
-        public static implicit operator Z80Param(string value) => new Z80ParamString(value);
+
         public static implicit operator Z80Param(Z80Flag flag) => new Z80ParamFlag(flag);
         public static implicit operator Z80Param(Z80Register register)
         {
@@ -85,19 +85,18 @@ namespace WpfGrabber.Readers.Z80
             return "0x" + Value.ToString("X4");
         }
     }
-
-    public class Z80ParamString : Z80Param
+    public class Z80ParamAddressLabel : Z80Param
     {
-        public string Value { get; }
-
-        public Z80ParamString(string value)
+        public int Addr { get; }
+        public string Alias { get; set; }
+        public Z80ParamAddressLabel(int addr)
         {
-            this.Value = value;
+            Addr = addr;
         }
+        public override string ToString() => Alias ?? ("L" + Addr.ToString("X4"));
 
-        public override string ToString() => Value;
     }
-
+    
     public class Z80ParamFlag : Z80Param
     {
         public Z80Flag Flag { get; }
@@ -108,5 +107,16 @@ namespace WpfGrabber.Readers.Z80
         }
 
         public override string ToString() => Flag.ToString();
+    }
+
+    public class Z80ParamIndirect : Z80Param
+    {
+        public Z80Param DirectParam { get; }
+        public Z80ParamIndirect(Z80Param directParam)
+        {
+            DirectParam = directParam;
+        }
+
+        public override string ToString() => "(" + DirectParam + ")";
     }
 }

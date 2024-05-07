@@ -105,7 +105,7 @@ namespace WpfGrabber.Readers.Z80
                 case 1: return Read1(opcode);
                 case 2: return Read2(opcode);
                 case 3: return Read3(opcode);
-                default: return ReadUnknown(opcode);
+                default: return GetUnknown(opcode);
             }
         }
 
@@ -114,7 +114,7 @@ namespace WpfGrabber.Readers.Z80
             //this need to refactor Read0-3 and call it with replacement of HL,H,L, not (HL) registers as IX,IXH,IXL
             // (HL) is replaced by (IX+d) d=ReadSignedByte()
             // and more (read)
-            return CreateInstr(Z80Op.Unknown, opcode.Op.ToString("X2"), reg);
+            return GetUnknown(opcode, reg);
         }
 
         private Z80Instruction ReadED()
@@ -159,8 +159,8 @@ namespace WpfGrabber.Readers.Z80
                 case 3:
                     switch (opcode.q)
                     {
-                        case 0: return CreateInstr(Z80Op.LD, ReadIndirectAddr16(), GetRegister16Pair(opcode.p));
-                        case 1: return CreateInstr(Z80Op.LD, GetRegister16Pair(opcode.p), ReadIndirectAddr16());
+                        case 0: return CreateInstr(Z80Op.LD, GetIndirectAddr16(ReadUnsigned16()), GetRegister16Pair(opcode.p));
+                        case 1: return CreateInstr(Z80Op.LD, GetRegister16Pair(opcode.p), GetIndirectAddr16(ReadUnsigned16()));
                         default: throw new InvalidOperationException();
                     }
                 case 4: return CreateInstr(Z80Op.NEG);
@@ -226,8 +226,8 @@ namespace WpfGrabber.Readers.Z80
                     {
                         case 0: return CreateInstr(Z80Op.JP, GetAddrLabel(ReadUnsigned16()));
                         //case 1: CB prefix
-                        case 2: return CreateInstr(Z80Op.OUT, ReadInOutPort(), Z80Register.A);
-                        case 3: return CreateInstr(Z80Op.IN, Z80Register.A, ReadInOutPort());
+                        case 2: return CreateInstr(Z80Op.OUT, GetInOutPort(ReadByte()), Z80Register.A);
+                        case 3: return CreateInstr(Z80Op.IN, Z80Register.A, GetInOutPort(ReadByte()));
                         case 4: return CreateInstr(Z80Op.EX, Z80Register.SP, Z80Param8BitRegister.From(Z80Register.HL));
                         case 5: return CreateInstr(Z80Op.EX, Z80Register.DE, Z80Register.HL);
                         case 6: return CreateInstr(Z80Op.DI);
@@ -312,19 +312,19 @@ namespace WpfGrabber.Readers.Z80
                         case 0:
                             switch (opcode.p)
                             {
-                                case 0: return CreateInstr(Z80Op.LD, "(BC)", Z80Register.A);
-                                case 1: return CreateInstr(Z80Op.LD, "(DE)", Z80Register.A);
-                                case 2: return CreateInstr(Z80Op.LD, ReadIndirectAddr16(), Z80Register.HL);
-                                case 3: return CreateInstr(Z80Op.LD, ReadIndirectAddr16(), Z80Register.A);
+                                case 0: return CreateInstr(Z80Op.LD, new Z80ParamIndirect(Z80Register.BC), Z80Register.A);
+                                case 1: return CreateInstr(Z80Op.LD, new Z80ParamIndirect(Z80Register.DE), Z80Register.A);
+                                case 2: return CreateInstr(Z80Op.LD, GetIndirectAddr16(ReadUnsigned16()), Z80Register.HL);
+                                case 3: return CreateInstr(Z80Op.LD, GetIndirectAddr16(ReadUnsigned16()), Z80Register.A);
                                 default: throw new InvalidOperationException();
                             }
                         case 1:
                             switch (opcode.p)
                             {
-                                case 0: return CreateInstr(Z80Op.LD, Z80Register.A, "(BC)");
-                                case 1: return CreateInstr(Z80Op.LD, Z80Register.A, "(DE)");
-                                case 2: return CreateInstr(Z80Op.LD, Z80Register.HL, ReadIndirectAddr16());
-                                case 3: return CreateInstr(Z80Op.LD, Z80Register.A, ReadIndirectAddr16());
+                                case 0: return CreateInstr(Z80Op.LD, Z80Register.A, new Z80ParamIndirect(Z80Register.BC));
+                                case 1: return CreateInstr(Z80Op.LD, Z80Register.A, new Z80ParamIndirect(Z80Register.DE));
+                                case 2: return CreateInstr(Z80Op.LD, Z80Register.HL, GetIndirectAddr16(ReadUnsigned16()));
+                                case 3: return CreateInstr(Z80Op.LD, Z80Register.A, GetIndirectAddr16(ReadUnsigned16()));
                                 default: throw new InvalidOperationException();
                             }
                         default: throw new InvalidOperationException();
@@ -374,25 +374,29 @@ namespace WpfGrabber.Readers.Z80
             };
             return bli[y - 4, z];
         }
-        private string GetIMCode(int i)
+        private Z80Param GetIMCode(int i)
         {
-            return new[] { "0", "0/1", "1", "2", "0", "0/1", "1", "2" }[i];
+            //return new[] {"0", "0/1", "1", "2"}[i % 4];
+            // in manuals 0/1 is not used
+            return new Z80ParamLiteral(i, 1);
         }
-        private string ReadIndirectAddr16()
-        {
-            return $"(0x{ReadUnsigned16():X4})";
+        private Z80Param GetIndirectAddr16(int addr)
+        {           
+            var lit = new Z80ParamLiteral(addr, 4);
+            return new Z80ParamIndirect(lit);
         }
-        private static string GetInOutRegisterC()
+        private Z80Param GetInOutRegisterC()
         {
-            return "(C)";
+            // (C);
+            return new Z80ParamIndirect(Z80Register.C);
         }
-        private string ReadInOutPort()
+        private Z80Param GetInOutPort(byte b)
         {
-            return $"({ReadByte()})";
+            return new Z80ParamIndirect(new Z80ParamLiteral(b,2));
         }
-        private string GetAddrLabel(int addr)
+        private Z80Param GetAddrLabel(int addr)
         {
-            return "L" + addr.ToString("X4");
+            return new Z80ParamAddressLabel(addr);
         }
 
         private Z80Param GetRegister16Pair(int rp)
@@ -418,9 +422,9 @@ namespace WpfGrabber.Readers.Z80
         }
 
 
-        private Z80Instruction ReadUnknown(Opcode opcode)
+        private Z80Instruction GetUnknown(Opcode opcode, Z80Param p2 = null)
         {
-            return CreateInstr(Z80Op.Unknown, opcode.Op.ToString("X2"));
+            return CreateInstr(Z80Op.Unknown, new Z80ParamLiteral(opcode.Op, 2), p2);
         }
 
         private Z80Instruction CreateInstr(Z80Op op, Z80Param p1 = null, Z80Param p2 = null)
