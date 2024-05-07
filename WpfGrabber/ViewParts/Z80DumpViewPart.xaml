@@ -26,7 +26,7 @@
                 <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
                 <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Hidden"/>
                 <Setter Property="FontFamily" Value="Consolas"/>
-                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="FontSize" Value="11"/>
                 <Setter Property="WordWrap" Value="True"/>
             </Style>
         </Grid.Resources>

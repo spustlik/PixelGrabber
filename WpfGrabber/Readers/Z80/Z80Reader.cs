@@ -365,12 +365,6 @@ namespace WpfGrabber.Readers.Z80
         }
         private Z80Op GetBliOp(int y, int z)
         {
-            /* 0 1 2 3
-            a=4	LDI	CPI	INI	OUTI
-            a=5	LDD	CPD	IND	OUTD
-            a=6	LDIR	CPIR	INIR	OTIR
-            a=7	LDDR	CPDR	INDR	OTDR
-            */
             var bli = new Z80Op[4, 4]
             {
                 { Z80Op.LDI,Z80Op.CPI,Z80Op.INI,Z80Op.OUTI },
