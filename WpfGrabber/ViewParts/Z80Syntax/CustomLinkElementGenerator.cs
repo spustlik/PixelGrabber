@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace WpfGrabber.ViewParts.Z80Syntax
 {
+    //http://danielgrunwald.de/coding/AvalonEdit/rendering.php
     public class CustomLinkElementGenerator : VisualLineElementGenerator
     {
         private static string HEXNUM = @"[0-9A-F]{4}";

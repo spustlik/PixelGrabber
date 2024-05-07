@@ -7,6 +7,7 @@ namespace WpfGrabber.ViewParts.Z80Syntax
 {
     /// <summary>
     /// VisualLineElement that represents a piece of text and is a clickable link.
+    /// https://stackoverflow.com/questions/28379206/custom-hyperlinks-using-avalonedit
     /// </summary>
     public class CustomLinkVisualLineText : VisualLineText
     {

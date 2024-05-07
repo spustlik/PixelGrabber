@@ -1,17 +1,11 @@
-﻿using ICSharpCode.AvalonEdit.Rendering;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Media;
 using System.Xml.Serialization;
 using WpfGrabber.Readers.Z80;
 using WpfGrabber.Shell;
@@ -49,16 +43,6 @@ namespace WpfGrabber.ViewParts
         }
         #endregion
 
-        #region GoToAddrText property
-        private string _gotoAddrText;
-        [XmlIgnore]
-        public string GoToAddrText
-        {
-            get => _gotoAddrText;
-            set => Set(ref _gotoAddrText, value);
-        }
-        #endregion
-
         [XmlIgnore]
         public ObservableCollection<string> DumpLines { get; private set; } = new ObservableCollection<string>();
     }
@@ -80,13 +64,12 @@ namespace WpfGrabber.ViewParts
             base.OnInitialize();
             Z80SyntaxHighlighter.Init();
             editor.SyntaxHighlighting = Z80SyntaxHighlighter.GetDefinition();
+        }
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
             var gen = CustomLinkElementGenerator.Install(editor);
             gen.CustomLinkClicked += Gen_CustomLinkClicked;
-        }
-
-        private void Gen_CustomLinkClicked(string link)
-        {
-            MessageBox.Show(link,"Clicked!");
         }
 
         protected override void ShellVm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -106,8 +89,22 @@ namespace WpfGrabber.ViewParts
                 editor.Text = ViewModel.DumpText;
             }
         }
+        private void Gen_CustomLinkClicked(string s)
+        {
+            if (s.StartsWith("0x"))
+                s = s.Substring(2);
+            if (s.StartsWith("L"))
+                s = s.Substring(1);
+            var addr = int.Parse(s, System.Globalization.NumberStyles.HexNumber);
+            //MessageBox.Show(addr.ToString("X4") + " " + ViewModel.GoToAddrText, "Go to");
+            if (!_addressMap.TryGetValue(addr, out var line))
+                return;
+            //textBox.ScrollToLine(line);
+            var vertOffset = (editor.TextArea.TextView.DefaultLineHeight) * line;
+            editor.ScrollToVerticalOffset(vertOffset);
+        }
 
-        Dictionary<int,int> _addressMap = new Dictionary<int, int>();
+        private Dictionary<int,int> _addressMap = new Dictionary<int, int>();
         protected override void OnShowData()
         {
             if (ShellVm.DataLength <= 0)
@@ -152,13 +149,9 @@ namespace WpfGrabber.ViewParts
                 dumpLines.Add(sb.ToString());
                 result.AppendLine(sb.ToString());
             }
-            ViewModel.DumpText = result.ToString(); //to use from TextBox Text={Binding DumpText}
+            ViewModel.DumpText = result.ToString(); 
             ViewModel.DumpLines.AddRange(dumpLines, clear: true);
         }
-
-        private static string HEXNUM = @"[0-9A-F]{4}";
-        private static Regex _regex = new Regex($"(0x{HEXNUM})|(L{HEXNUM})", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
 
         private void SaveText_Click(object sender, RoutedEventArgs e)
         {
@@ -169,127 +162,5 @@ namespace WpfGrabber.ViewParts
             File.WriteAllText(dlg.FileName, ViewModel.DumpText);
         }
 
-        private void TextBoxSelection_Changed(object sender, RoutedEventArgs e)
-        {
-            if (String.IsNullOrEmpty(textBox.SelectedText))
-                return;
-            var match = _regex.Match(textBox.SelectedText);
-            if (!match.Success)
-            {
-                ViewModel.GoToAddrText = null;
-                return;
-            }
-            //+ matches[0].Index .. +Length
-            ViewModel.GoToAddrText = match.Value;
-            ShowHyperLink(textBox.SelectionStart + match.Index, match);
-        }
-        private void TextBox_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            if (textBox.SelectedText.Length > 0)
-                return;
-            var pos = e.GetPosition(textBox);
-            var textpos = textBox.GetCharacterIndexFromPoint(pos, snapToText: false);
-            if (textpos < 0)
-                return;
-            var startLineTextPos = textBox.GetCharacterIndexFromPoint(new Point(0, pos.Y), snapToText: true);
-            if (startLineTextPos < 0)
-                return;
-            var lineIndex = textBox.GetLineIndexFromCharacterIndex(textpos);
-            var line = textBox.GetLineText(lineIndex);
-            var mousePos = textpos - startLineTextPos;
-
-            var matches = _regex.Match(line, mousePos);
-            while (!matches.Success)
-            {
-                mousePos--;
-                if (mousePos < 0)
-                    break;
-                matches = _regex.Match(line, mousePos);
-            }
-            if (!matches.Success)
-                return;
-
-            ViewModel.GoToAddrText = matches.Captures[0].Value;
-            ShowHyperLink(startLineTextPos, matches);
-        }
-
-        private void ShowHyperLink(int startLineTextPos, Match matches)
-        {
-            var b1 = textBox.GetRectFromCharacterIndex(startLineTextPos + matches.Captures[0].Index);
-            var b2 = textBox.GetRectFromCharacterIndex(startLineTextPos + matches.Captures[0].Index + matches.Captures[0].Length);
-            if (b1.Top != b2.Top || b1.Left > b2.Left)
-                return;
-            var p1 = textBox.TranslatePoint(b1.TopLeft, hyperLinkCanvas);
-            var p2 = textBox.TranslatePoint(b2.BottomRight, hyperLinkCanvas);
-            Canvas.SetLeft(hyperLinkSimulation, p1.X);
-            Canvas.SetTop(hyperLinkSimulation, p1.Y);
-            hyperLinkSimulation.Width = p2.X - p1.X;
-            hyperLinkSimulation.Height = p2.Y - p1.Y;
-            hyperLinkCanvas.Visibility = Visibility.Visible;
-        }
-
-        private void GoToAddress_Click(object sender, RoutedEventArgs e)
-        {
-            var s = ViewModel.GoToAddrText;
-            if (s.StartsWith("0x"))
-                s = s.Substring(2);
-            if (s.StartsWith("L"))
-                s = s.Substring(1);
-            var addr = int.Parse(s, System.Globalization.NumberStyles.HexNumber);
-            //MessageBox.Show(addr.ToString("X4") + " " + ViewModel.GoToAddrText, "Go to");
-            if (!_addressMap.TryGetValue(addr, out var line))
-                return;
-            textBox.ScrollToLine(line);
-        }
-
-
-        private void textBox_ScrollChanged(object sender, ScrollChangedEventArgs e)
-        {
-            hyperLinkSimulation.Height = 0;
-        }
-
-        private void Editor_MouseHover(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            //if (editor.SelectedText.Length > 0)
-            //    return;
-            /*
-            var pos = e.GetPosition(editor);
-            var textpos = editor.GetPositionFromPoint(pos);
-            if (textpos == null)
-                return;
-
-            var docLine = editor.Document.GetLineByNumber(textpos.Value.Line); //by offset?
-            var lineText = editor.Document.GetText(docLine.Offset, docLine.Length);  
-            var mousePos = textpos.Value.Column;
-
-            if(!SearchAddr(lineText,mousePos, out var found)) 
-                return;
-            ViewModel.GoToAddrText = found;
-            //ShowHyperLink(startLineTextPos, matches);
-            //var editor.Document.GetLineByNumber(textpos.Value.Line);
-            */
-        }
-
-        private bool SearchAddr(string line, int startPos, out string found)
-        {
-            found = null;
-            var matches = _regex.Match(line, startPos);
-            while (!matches.Success)
-            {
-                startPos--;
-                if (startPos < 0)
-                    break;
-                matches = _regex.Match(line, startPos);
-            }
-            if (!matches.Success)
-                return false;
-            found = matches.Captures[0].Value;
-            return true;
-        }
-
-        private void Editor_MouseHoverStopped(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-
-        }
     }
 }
