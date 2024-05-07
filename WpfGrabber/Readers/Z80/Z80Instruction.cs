@@ -6,7 +6,7 @@ namespace WpfGrabber.Readers.Z80
     public enum Z80Op
     {
         Unknown,
-        ByParam,
+        NoniNOP,
         NOP,
         EX,
         DJNZ,
@@ -33,7 +33,71 @@ namespace WpfGrabber.Readers.Z80
         RES,
         SET,
         NEG,
-        NoniNOP,
+        LDI,
+        CPI,
+        INI,
+        OUTI,
+        LDD,
+        CPD,
+        IND,
+        OUTD,
+        LDIR,
+        CPIR,
+        INIR,
+        OTIR,
+        LDDR,
+        CPDR,
+        INDR,
+        OTDR,
+        RETI,
+        RETN,
+        IM,
+        RRD,
+        RLD,
+        RLC,
+        RRC,
+        RL,
+        RR,
+        SLA,
+        SRA,
+        SLL,
+        SRL,
+        EXX,
+        DI,
+        EI,
+        RST,
+        HALT,
+        RLCA,
+        RRCA,
+        RLA,
+        RRA,
+        DAA,
+        CPL,
+        SCF,
+        CCF,
+    }
+
+    public enum Z80Register
+    {
+        A,
+        B,
+        C, 
+        D, 
+        E, 
+        F,
+        H,
+        L,
+        I,
+        R,
+
+        BC,
+        DE,
+        HL,
+        
+        IX,
+        IY,
+        SP,
+        PC
     }
 
     public class Z80Instruction
@@ -69,7 +133,7 @@ namespace WpfGrabber.Readers.Z80
                 sb.Append(Op.ToString());
             }
             var args = ops.Skip(skip).Where(x => x != null).ToArray();
-            if(args.Length > 0)
+            if (args.Length > 0)
             {
                 sb.Append(" ");
                 sb.Append(string.Join(", ", args));

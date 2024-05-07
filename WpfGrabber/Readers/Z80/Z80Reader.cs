@@ -62,25 +62,32 @@ namespace WpfGrabber.Readers.Z80
             public int p { get; set; }
             public int q { get; set; }
             public byte Op { get; set; }
+            public Opcode(byte opcode)
+            {
+                Op = opcode;
+                x = (opcode & 0b11000000) >> 6;
+                y = (opcode & 0b00111000) >> 3;
+                z = (opcode & 0b00000111);
+                p = y >> 1;
+                q = y % 2;
+                if (y < 0 || y > 7)
+                    throw new InvalidOperationException();
+            }
         }
-        private Opcode CreateOpCode(byte opcode)
-        {
-            var x = (opcode & 0b11000000) >> 6;
-            var y = (opcode & 0b00111000) >> 3;
-            var z = (opcode & 0b00000111);
-            var p = y >> 1;
-            var q = y % 2;
-            if (y < 0 || y > 7)
-                throw new InvalidOperationException();
-            return new Opcode() { Op = opcode, x = x, y = y, z = z, p = p, q = q };
-        }
+
         private Opcode ReadOpCode()
         {
-            return CreateOpCode(ReadByte());
+            return new Opcode(ReadByte());
         }
 
 
         public Z80Instruction ReadInstruction()
+        {
+            var ctx = new Context();
+            return ReadInstr(ctx);
+        }
+
+        private Z80Instruction ReadInstr(Context ctx)
         {
             var opcode = ReadOpCode();
             if (opcode.Op == 0xCB) // b11001011
@@ -90,7 +97,7 @@ namespace WpfGrabber.Readers.Z80
             if (opcode.Op == 0xDD)
                 return ReadDDFD(opcode, "IX");
             if (opcode.Op == 0xFD)
-                return ReadDDFD(opcode,"IY");
+                return ReadDDFD(opcode, "IY");
 
             switch (opcode.x)
             {
@@ -121,7 +128,7 @@ namespace WpfGrabber.Readers.Z80
                 case 2:
                     if (op.y < 4 || op.z > 3)
                         return CreateInstr(Z80Op.NoniNOP);
-                    return CreateInstr(Z80Op.ByParam, GetBli(op.y, op.z));
+                    return CreateInstr(GetBli(op.y, op.z));
                 default: throw new InvalidOperationException();
             }
         }
@@ -160,10 +167,10 @@ namespace WpfGrabber.Readers.Z80
                 case 5:
                     switch (opcode.y)
                     {
-                        case 1: return CreateInstr(Z80Op.ByParam, "RETI");
-                        default: return CreateInstr(Z80Op.ByParam, "RETN");
+                        case 1: return CreateInstr(Z80Op.RETI);
+                        default: return CreateInstr(Z80Op.RETN);
                     }
-                case 6: return CreateInstr(Z80Op.ByParam, "IM", GetIM(opcode.y));
+                case 6: return CreateInstr(Z80Op.IM, GetIMCode(opcode.y));
                 case 7:
                     switch (opcode.y)
                     {
@@ -171,8 +178,8 @@ namespace WpfGrabber.Readers.Z80
                         case 1: return CreateInstr(Z80Op.LD, "R", "A");
                         case 2: return CreateInstr(Z80Op.LD, "A", "I");
                         case 3: return CreateInstr(Z80Op.LD, "A", "R");
-                        case 4: return CreateInstr(Z80Op.ByParam, "RRD");
-                        case 5: return CreateInstr(Z80Op.ByParam, "RLD");
+                        case 4: return CreateInstr(Z80Op.RRD);
+                        case 5: return CreateInstr(Z80Op.RLD);
                         case 6: return CreateInstr(Z80Op.NOP);
                         case 7: return CreateInstr(Z80Op.NOP);
                         default: throw new InvalidOperationException();
@@ -186,7 +193,7 @@ namespace WpfGrabber.Readers.Z80
             var op = ReadOpCode();
             switch (op.x)
             {
-                case 0: return CreateInstr(Z80Op.ByParam, GetRot(op.y), GetR(op.z));
+                case 0: return CreateInstr(GetRotationOp(op.y), GetR(op.z));
                 case 1: return CreateInstr(Z80Op.BIT, op.y + "", GetR(op.z));
                 case 2: return CreateInstr(Z80Op.RES, op.y + "", GetR(op.z));
                 case 3: return CreateInstr(Z80Op.SET, op.y + "", GetR(op.z));
@@ -194,9 +201,9 @@ namespace WpfGrabber.Readers.Z80
             }
         }
 
-        private string GetRot(int i)
+        private Z80Op GetRotationOp(int i)
         {
-            return new[] { "RLC", "RRC", "RL", "RR", "SLA", "SRA", "SLL", "SRL" }[i];
+            return new Z80Op[] { Z80Op.RLC, Z80Op.RRC, Z80Op.RL, Z80Op.RR, Z80Op.SLA, Z80Op.SRA, Z80Op.SLL, Z80Op.SRL }[i];
         }
 
         private Z80Instruction Read3(Opcode opcode)
@@ -212,7 +219,7 @@ namespace WpfGrabber.Readers.Z80
                             switch (opcode.p)
                             {
                                 case 0: return CreateInstr(Z80Op.RET);
-                                case 1: return CreateInstr(Z80Op.ByParam, "EXX");
+                                case 1: return CreateInstr(Z80Op.EXX);
                                 case 2: return CreateInstr(Z80Op.JP, "HL");
                                 case 3: return CreateInstr(Z80Op.LD, "SP", "HL");
                                 default: throw new InvalidOperationException();
@@ -229,8 +236,8 @@ namespace WpfGrabber.Readers.Z80
                         case 3: return CreateInstr(Z80Op.IN, "A", $"({ReadByte()})");
                         case 4: return CreateInstr(Z80Op.EX, "SP", "(HL)");
                         case 5: return CreateInstr(Z80Op.EX, "DE", "HL");
-                        case 6: return CreateInstr(Z80Op.ByParam, "DI");
-                        case 7: return CreateInstr(Z80Op.ByParam, "EI");
+                        case 6: return CreateInstr(Z80Op.DI);
+                        case 7: return CreateInstr(Z80Op.EI);
                         default: throw new InvalidOperationException();
                     }
                 case 4: return CreateInstr(Z80Op.CALL, GetCC(opcode.y), GetAddrLabel(ReadUnsigned16()));
@@ -250,7 +257,7 @@ namespace WpfGrabber.Readers.Z80
                         default: throw new InvalidOperationException();
                     }
                 case 6: return ReadAlu(opcode.y, $"0x{ReadByte():X2}");
-                case 7: return CreateInstr(Z80Op.ByParam, "RST", $"0x{opcode.y * 8:X2}");
+                case 7: return CreateInstr(Z80Op.RST, $"0x{opcode.y * 8:X2}");
                 default: throw new InvalidOperationException();
             }
         }
@@ -283,8 +290,8 @@ namespace WpfGrabber.Readers.Z80
 
         private Z80Instruction Read1(Opcode opcode)
         {
-            if(opcode.y==6 && opcode.z==6)
-                return CreateInstr(Z80Op.ByParam, "HALT");
+            if (opcode.y == 6 && opcode.z == 6)
+                return CreateInstr(Z80Op.HALT);
             return CreateInstr(Z80Op.LD, GetR(opcode.y), GetR(opcode.z));
         }
 
@@ -348,14 +355,14 @@ namespace WpfGrabber.Readers.Z80
                 case 7:
                     switch (opcode.y)
                     {
-                        case 0: return CreateInstr(Z80Op.ByParam, "RLCA");
-                        case 1: return CreateInstr(Z80Op.ByParam, "RRCA");
-                        case 2: return CreateInstr(Z80Op.ByParam, "RLA");
-                        case 3: return CreateInstr(Z80Op.ByParam, "RRA");
-                        case 4: return CreateInstr(Z80Op.ByParam, "DAA");
-                        case 5: return CreateInstr(Z80Op.ByParam, "CPL");
-                        case 6: return CreateInstr(Z80Op.ByParam, "SCF");
-                        case 7: return CreateInstr(Z80Op.ByParam, "CCF");
+                        case 0: return CreateInstr(Z80Op.RLCA);
+                        case 1: return CreateInstr(Z80Op.RRCA);
+                        case 2: return CreateInstr(Z80Op.RLA);
+                        case 3: return CreateInstr(Z80Op.RRA);
+                        case 4: return CreateInstr(Z80Op.DAA);
+                        case 5: return CreateInstr(Z80Op.CPL);
+                        case 6: return CreateInstr(Z80Op.SCF);
+                        case 7: return CreateInstr(Z80Op.CCF);
                         default: throw new InvalidOperationException();
                     }
                 default: throw new InvalidOperationException();
@@ -367,7 +374,7 @@ namespace WpfGrabber.Readers.Z80
             return $"(0x{ReadUnsigned16():X4})";
         }
 
-        private string GetBli(int y, int z)
+        private Z80Op GetBli(int y, int z)
         {
             /* 0 1 2 3
             a=4	LDI	CPI	INI	OUTI
@@ -375,16 +382,16 @@ namespace WpfGrabber.Readers.Z80
             a=6	LDIR	CPIR	INIR	OTIR
             a=7	LDDR	CPDR	INDR	OTDR
             */
-            var bli = new string[4, 4]
+            var bli = new Z80Op[4, 4]
             {
-                { "LDI","CPI","INI","OUTI" },
-                { "LDD","CPD","IND","OUTD" },
-                { "LDIR","CPIR","INIR","OTIR" },
-                { "LDDR","CPDR","INDR","OTDR" }
+                { Z80Op.LDI,Z80Op.CPI,Z80Op.INI,Z80Op.OUTI },
+                { Z80Op.LDD,Z80Op.CPD,Z80Op.IND,Z80Op.OUTD },
+                { Z80Op.LDIR,Z80Op.CPIR,Z80Op.INIR,Z80Op.OTIR },
+                { Z80Op.LDDR,Z80Op.CPDR,Z80Op.INDR,Z80Op.OTDR }
             };
             return bli[y - 4, z];
         }
-        private string GetIM(int i)
+        private string GetIMCode(int i)
         {
             return new[] { "0", "0/1", "1", "2", "0", "0/1", "1", "2" }[i];
         }
