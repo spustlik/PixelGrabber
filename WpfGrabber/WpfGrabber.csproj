@@ -82,6 +82,7 @@
     <Compile Include="Readers\FontReader.cs" />
     <Compile Include="Readers\MaskReader.cs" />
     <Compile Include="Readers\MovieReader.cs" />
+    <Compile Include="Readers\ReaderImageResult.cs" />
     <Compile Include="Readers\Z80\SnaData.cs" />
     <Compile Include="Readers\Z80\Z80Instruction.cs" />
     <Compile Include="Readers\Z80\Z80Op.cs" />
@@ -145,9 +146,6 @@
     <Compile Include="Controls\ViewPartControl.cs" />
     <Compile Include="ViewParts\Binary8BitViewPart.xaml.cs">
       <DependentUpon>Binary8BitViewPart.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ViewParts\DealienViewPart.xaml.cs">
-      <DependentUpon>DealienViewPart.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewParts\HexDumpViewPart.xaml.cs">
       <DependentUpon>HexDumpViewPart.xaml</DependentUpon>
@@ -239,10 +237,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="ViewParts\Binary8BitViewPart.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ViewParts\DealienViewPart.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

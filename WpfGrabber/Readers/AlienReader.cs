@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WpfGrabber.Readers;
 
 namespace WpfGrabber
 {
@@ -23,22 +24,21 @@ namespace WpfGrabber
             this.reader = reader;
         }
 
-        public IEnumerable<(ByteBitmap8Bit bitmap, int position)> ReadImages(int endpos, bool flipY)
+        public IEnumerable<ReaderImageResult> ReadImages(int endpos)
         {
             if (endpos <= 0)
                 endpos = this.reader.DataLength;
-            var ar = new AlienReader(reader) { FlipY = flipY };
             while (!reader.IsEmpty)
             {
                 var start = reader.BytePosition;
                 if (endpos > 0 && reader.BytePosition >= endpos)
                     break;
-                if (!ar.TryRead(out var w, out var h))
+                if (!TryRead(out var w, out var h))
                     break;
                 if (reader.BytePosition >= endpos || w >= 64 || h >= 64)
                     break;
-                var aimg = ar.ReadMaskedImage();
-                yield return (aimg, start);
+                var aimg = ReadMaskedImage();
+                yield return new ReaderImageResult(aimg, start, reader.BytePosition);
             }
         }
 

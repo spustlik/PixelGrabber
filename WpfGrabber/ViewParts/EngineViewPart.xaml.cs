@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Windows;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml.Serialization;
 using WpfGrabber.Readers;
@@ -143,8 +141,10 @@ namespace WpfGrabber.ViewParts
         {
             var fnt = AppData.GetFont();
             var images = ReadImages();
-            ViewModel.Images.Clear();
+            if (ViewModel.MaxCount != 0)
+                images = images.Take(ViewModel.MaxCount);
 
+            ViewModel.Images.Clear();
             foreach (var a in images)
             {
                 var img = ByteBitmapRgba.FromBitmap(a.Bitmap);
@@ -169,92 +169,34 @@ namespace WpfGrabber.ViewParts
 
         private IEnumerable<ImageData> ReadAlienImages()
         {
-            throw new NotImplementedException();
+            var rd = new DataReader(ShellVm.Data, ShellVm.Offset);
+            var r = new AlienReader(rd) { FlipY = ViewModel.FlipVertical };
+            return r
+                .ReadImages(0)
+                .Select(x => CreateImageData(x));
         }
 
         private IEnumerable<ImageData> ReadMovieImages()
         {
-            //Movie game engine, but not complete - user must find sprite starts
-            //height(16bit), data(h*WIDTH), mask reversed
             var rd = new DataReader(ShellVm.Data, ShellVm.Offset);
-            //var w = ViewModel.Width;
-            var counter = 0;
-            while (!rd.IsEmpty)
+            var r = new MovieReader(rd) { FlipVertical = ViewModel.FlipVertical, Width = ViewModel.Width };
+            return r
+                .ReadImages()
+                .Select(x => CreateImageData(x));
+        }
+
+        private ImageData CreateImageData(ReaderImageResult r)
+        {
+            var dumpBytes = ShellVm.Data.Skip(r.position).Take(8).ToArray();
+            var dump = String.Join(" ", dumpBytes.Select(b => HexReader.ToHex(b, 2)));
+            return new ImageData()
             {
-                var pos = rd.BytePosition;
-
-                int w = rd.ReadByte();
-                if (w == 0xc0)
-                {
-                    var unknown = rd.ReadByte(); //skip,  next is 0x8? or 0xC1
-                    //6B3D: C0 00 C1 39 
-                    w = rd.ReadByte();
-                }
-
-                int h = 0;
-                var readmask = true;
-                if ((w & 0b11000000) == 0b10000000)
-                {
-                    //highest bit(s?) can mean that there is mask & data, data otherwise
-                    //0x81(w=2), 0x83 BOM (w=4), 0x82(0x98FF-man)
-                    w = 1 + (byte)(w & 0b0111111);
-                    h = rd.ReadByte();
-                }
-                else if ((w & 0b11000000) == 0b11000000)
-                {
-                    //0xC1, 0xC0
-                    
-                    if (w == 0xC1)
-                    {
-                        w = 1 + (byte)(w & 0b0011111);
-                        h = rd.ReadByte();
-                    }
-                    else
-                    {
-                        //???
-                        // E3
-                        //F1,FB,F8
-                    }
-                    readmask = false;
-                }
-                else
-                {
-                    w = ViewModel.Width;
-                    h = rd.ReadByte();
-                }
-                var bmp = new ByteBitmap8Bit(w * 8, h);
-                var datar = new DataReader(rd.ReadBytes(w * h), 0, flipX: true);
-                var maskr = new DataReader(rd.ReadBytes(w * h), 0, flipX: false);
-                for (int y = 0; y < bmp.Height; y++)
-                {
-                    for (int x = 0; x < w; x++)
-                    {
-                        for (int i = 0; i < 8; i++)
-                        {
-                            var d = datar.ReadBit();
-                            var m = readmask ? maskr.ReadBit() : false;
-                            var ry = y;
-                            if (ViewModel.FlipVertical)
-                                ry = bmp.Height - y - 1;
-                            //bmp.SetPixel(x * 8 + i, ry, (byte)(m ? 1 : 2));
-                            bmp.SetPixel(x * 8 + i, ry, (byte)(m ? 1 : d ? 0 : 2));
-                        }
-                    }
-                }
-                var dumpBytes = rd.Data.Skip(pos).Take(8).ToArray();
-                var dump = String.Join(" ", dumpBytes.Select(b => HexReader.ToHex(b, 2)));
-                yield return new ImageData()
-                {
-                    Bitmap = bmp,
-                    Addr = pos,
-                    AddrEnd = rd.BytePosition,
-                    Title = pos.ToString("X4"),
-                    Description = $"Pos={pos:X4}, End={rd.BytePosition:X4}, {dump}"
-                };
-                counter++;
-                if (ViewModel.MaxCount != 0 && counter >= ViewModel.MaxCount)
-                    break;
-            }
+                Bitmap = r.bitmap,
+                Addr = r.position,
+                AddrEnd = r.end,
+                Title = r.position.ToString("X4"),
+                Description = $"Pos={r.position:X4}, End={r.end:X4}, {dump}"
+            };
         }
 
         private void OnButtonSaveImages_Click(object sender, RoutedEventArgs e)

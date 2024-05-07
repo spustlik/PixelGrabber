@@ -17,7 +17,6 @@ namespace WpfGrabber.ViewParts
                 new ViewPartDef<HexDumpViewPart>(){Title = "Hex dump" },
                 new ViewPartDef<MaskedImagesViewPart>(){Title = "Binary masked images"},
                 new ViewPartDef<FontBinaryViewPart>(){Title = "Font"},
-                new ViewPartDef<DealienViewPart>(){Title = "Dealien"},
                 new ViewPartDef<EngineViewPart>(){Title = "Engine"},
                 new ViewPartDef<Z80DumpViewPart>(){Title = "Z80 disasm"},
                 new ViewPartDef<ImageSpriteViewPart>(){Title = "Image sprite sheet"},
