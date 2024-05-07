@@ -67,29 +67,9 @@ namespace WpfGrabber.ViewParts
             set => Set(ref _selectedImage, value);
         }
         #endregion
-
-        public ImageSpritesVM()
-        {
-            Images.CollectionChanged += (sender, args) =>
-            {
-                DoPropertyChanged(nameof(SelectedIndex));
-            };
-        }
-        protected override void DoPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            base.DoPropertyChanged(propertyName);
-            if (propertyName == nameof(SelectedImage))
-            {
-                DoPropertyChanged(nameof(SelectedIndex));
-            }
-        }
-
-        [XmlIgnore]
-        public int SelectedIndex => Images.FindIndex(x => x == SelectedImage);
     }
     public class ImageVM : SimpleDataObject
     {
-
         #region Name property
         private string _name;
         public string Name
@@ -126,8 +106,6 @@ namespace WpfGrabber.ViewParts
             set => Set(ref _image, value);
         }
         #endregion
-
-
     }
 
 
@@ -215,7 +193,7 @@ namespace WpfGrabber.ViewParts
             {
                 var img = new BitmapImage();
                 img.LoadFromFile(file);
-                var image = CreateImageVMFromFile(img, file);
+                CreateImageVMFromFile(img, file);
             }
         }
 

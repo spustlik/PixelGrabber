@@ -30,34 +30,40 @@
             <Label Content="Width"/>
             <c:NumberEditor Value="{Binding Width}" 
                             Maximum="256" Minimum="1"
-                            Width="80" SliderWidth="0"/>
+                            Width="80" SliderWidth="0" LargeChange="0"/>
             <Separator/>
 
             <Label Content="Max count"/>
             <c:NumberEditor Value="{Binding MaxCount}" 
                             Maximum="256"
-                            Width="80" SliderWidth="0"/>
+                            Width="110" SliderWidth="0"/>
             <Separator/>
             <CheckBox Content="Flip V" IsChecked="{Binding FlipVertical}"/>
             <Separator/>
-            <Button Content="Save" Style="{StaticResource dropDown}">
+            <Button Content="Menu" Style="{StaticResource dropDown}">
                 <Button.ContextMenu>
                     <ContextMenu Placement="Bottom">
                         <MenuItem Header="Save images to folder..." Click="OnButtonSaveImages_Click"/>
-                        <MenuItem Header="Save to one image..." Click="OnButtonSave_Click"/>
+                        <!--<MenuItem Header="Save to one image..." Click="OnButtonSave_Click"/>-->
+                        <Separator/>
+                        <MenuItem Header="Show labels" IsCheckable="true" IsChecked="{Binding ShowLabels}"/>
+                        <!--<MenuItem Header="Show border" IsCheckable="true" IsChecked="{Binding ShowBorder}"/>-->
                     </ContextMenu>
                 </Button.ContextMenu>
             </Button>
         </ItemsControl>
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <Border x:Name="imageBorder" 
-                    SizeChanged="BorderSize_Changed"
-                    Style="{StaticResource checkerBorder}">
-                <Canvas Margin="10">
-                    <Image x:Name="image" Stretch="None" RenderOptions.BitmapScalingMode="NearestNeighbor"
-                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-                </Canvas>
-            </Border>
-        </ScrollViewer>
+
+        <ListBox Grid.Row="1" Style="{StaticResource listBoxImages}" Background="{StaticResource checkerBrush}">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Vertical"/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Goto end" Click="OnGotoEnd_Click"/>
+                </ContextMenu>
+            </ListBox.ContextMenu>
+        </ListBox>
     </Grid>
 </local:EngineViewPartBase>

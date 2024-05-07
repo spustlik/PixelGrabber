@@ -45,7 +45,8 @@
                     </Label.Content>
                 </Label>
                 <c:NumberEditor 
-                        SliderWidth="160" Width="250"
+                        ToolTip="Use 0x or x prefix for hex numbers"
+                        SliderWidth="130" Width="260"
                         Value="{Binding Offset}" Minimum="0" Maximum="{Binding DataLength}" />
                 <Separator/>
                 <Label Content="{Binding FileName}"/>

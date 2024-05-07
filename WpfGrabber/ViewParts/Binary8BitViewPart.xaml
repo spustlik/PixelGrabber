@@ -19,7 +19,7 @@
         <ItemsControl Style="{StaticResource toolbar}">
             <Label>Width</Label>
             <!--<TextBox Text="{Binding Width}"/>-->
-            <c:NumberEditor Maximum="256" Value="{Binding Width}" Minimum="1" Width="200" SliderWidth="120"/>
+            <c:NumberEditor Maximum="256" Value="{Binding Width}" Minimum="1" Width="180" SliderWidth="60"/>
             <Separator/>
             <CheckBox Content="Flip X" IsChecked="{Binding Reversed}"/>
             <Separator/>

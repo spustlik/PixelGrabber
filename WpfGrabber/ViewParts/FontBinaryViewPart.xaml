@@ -33,17 +33,17 @@
             </ItemsControl.ItemsPanel>
             <StackPanel>
                 <Label>Space</Label>
-                <c:NumberEditor Value="{Binding SpaceX}" Maximum="10" Width="70" SliderWidth="0"/>
+                <c:NumberEditor Value="{Binding SpaceX}" Maximum="10" Width="70" SliderWidth="0" LargeChange="0"/>
             </StackPanel>
             <Separator/>
             <StackPanel>
                 <Label>Height</Label>
-                <c:NumberEditor Value="{Binding Height}" Maximum="40" Width="70" SliderWidth="0"/>
+                <c:NumberEditor Value="{Binding Height}" Maximum="40" Width="70" SliderWidth="0" LargeChange="0"/>
             </StackPanel>
             <Separator/>
             <StackPanel>
                 <Label>Border</Label>
-                <c:NumberEditor Value="{Binding Border}" Maximum="8" Width="70" SliderWidth="0"/>
+                <c:NumberEditor Value="{Binding Border}" Maximum="8" Width="70" SliderWidth="0" LargeChange="0"/>
             </StackPanel>
             <Separator/>
             <CheckBox IsChecked="{Binding FlipX}">FlipX</CheckBox>

@@ -51,24 +51,24 @@
             </StackPanel>
             <StackPanel>
                 <Label Content="Width"/>
-                <c:NumberEditor Value="{Binding Width}" Minimum="1" Width="70"/>
+                <c:NumberEditor Value="{Binding Width}" Minimum="1" Width="80" LargeChange="0"/>
                 <Separator/>
             </StackPanel>
             <StackPanel>
                 <Label Content="Height"/>
-                <c:NumberEditor Value="{Binding Height}" Minimum="1" Width="70"/>
+                <c:NumberEditor Value="{Binding Height}" Minimum="1" Width="80" LargeChange="0"/>
                 <Separator/>
             </StackPanel>
             <Separator/>
             <StackPanel>
                 <Label Content="Mask type"/>
-                <c:NumberEditor Value="{Binding MaskType}" Minimum="0" Maximum="7" Width="70"/>
+                <c:NumberEditor Value="{Binding MaskType}" Minimum="0" Maximum="7" Width="70" LargeChange="0"/>
                 <Separator/>
             </StackPanel>
             <Separator/>
             <StackPanel>
                 <Label Content="Colorize"/>
-                <c:NumberEditor Value="{Binding Colorize}" Minimum="0" Maximum="5" Width="70"/>
+                <c:NumberEditor Value="{Binding Colorize}" Minimum="0" Maximum="5" Width="70" LargeChange="0"/>
                 <Separator/>
             </StackPanel>
             <Button Content="Save" Style="{StaticResource dropDown}">

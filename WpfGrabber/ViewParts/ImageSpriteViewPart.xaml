@@ -37,17 +37,17 @@
             </ItemsControl.ItemsPanel>
             <StackPanel>
                 <Label Content="Columns"/>
-                <c:NumberEditor Value="{Binding Columns}" Minimum="1" Maximum="16" Width="70"/>
+                <c:NumberEditor Value="{Binding Columns}" Minimum="1" Maximum="16" Width="70" LargeChange="0"/>
                 <Separator/>
             </StackPanel>
             <StackPanel>
                 <Label Content="Width"/>
-                <c:NumberEditor Value="{Binding Width}" Minimum="1" Maximum="256" Width="70"/>
+                <c:NumberEditor Value="{Binding Width}" Minimum="1" Maximum="256" Width="110"/>
                 <Separator/>
             </StackPanel>
             <StackPanel>
                 <Label Content="Height"/>
-                <c:NumberEditor Value="{Binding Height}" Minimum="1" Maximum="256" Width="70"/>
+                <c:NumberEditor Value="{Binding Height}" Minimum="1" Maximum="256" Width="110"/>
                 <Separator/>
             </StackPanel>
             <Button Content="Menu" Style="{StaticResource dropDown}">
@@ -66,53 +66,7 @@
         <Border x:Name="imageBorder" Grid.Row="1"
                     SizeChanged="BorderSize_Changed"
                     Style="{StaticResource checkerBorder}">
-            <ListBox ItemsSource="{Binding Images}" SelectedValue="{Binding SelectedImage}"
-                     Background="Transparent">
-                <ListBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <UniformGrid Columns="{Binding Columns}" HorizontalAlignment="Left"/>
-                    </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
-                <ListBox.Template>
-                    <ControlTemplate TargetType="ListBox">
-                        <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="1" SnapsToDevicePixels="true">
-                            <ScrollViewer Focusable="false" Padding="{TemplateBinding Padding}">
-                                <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
-                            </ScrollViewer>
-                        </Border>
-                    </ControlTemplate>
-                </ListBox.Template>
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem">
-                        <Setter Property="Padding" Value="0,0,2,2" />
-                        <Setter Property="Margin" Value="0" />
-                    </Style>
-                </ListBox.ItemContainerStyle>
-                <ListBox.LayoutTransform>
-                    <ScaleTransform 
-                        ScaleX="{Binding ShellVm.Zoom, ElementName=root}"
-                        ScaleY="{Binding ShellVm.Zoom, ElementName=root}"
-                        />
-                </ListBox.LayoutTransform>
-                <ListBox.ItemTemplate>
-                    <DataTemplate DataType="{x:Type local:ImageVM}">
-                        <Border BorderBrush="DodgerBlue" BorderThickness="1" Margin="0"
-                                    ToolTip="{Binding Description}">
-                            <Grid>
-                                <Image Source="{Binding Image}" Stretch="None" x:Name="image"/>
-
-                                <Canvas Visibility="{Binding DataContext.ShowLabels, ElementName=root, Converter={StaticResource visiConv}}">
-                                    <Border Background="DodgerBlue" Opacity="0.6" 
-                                                Width="{Binding ActualWidth, ElementName=image}">
-                                        <TextBlock Margin="4,0" Foreground="White" 
-                                                   Text="{Binding Name}" FontSize="10"/>
-                                    </Border>
-                                </Canvas>
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+            <ListBox Style="{StaticResource listBoxImages}"/>
         </Border>
         <GridSplitter Grid.Column="1" Grid.RowSpan="99" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
         <Border x:Name="properties" Grid.Column="2" Grid.RowSpan="99" 

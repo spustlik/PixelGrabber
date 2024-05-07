@@ -1,12 +1,15 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Xml.Serialization;
+using WpfGrabber.Readers;
 using WpfGrabber.Shell;
 
 namespace WpfGrabber.ViewParts
@@ -53,6 +56,56 @@ namespace WpfGrabber.ViewParts
             set => Set(ref _flipVertical, value);
         }
         #endregion
+
+        [XmlIgnore]
+        public ObservableCollection<EngineImageVM> Images { get; private set; } = new ObservableCollection<EngineImageVM>();
+
+        #region SelectedImage property
+        private EngineImageVM _selectedImage;
+        [XmlIgnore]
+        public EngineImageVM SelectedImage
+        {
+            get => _selectedImage;
+            set => Set(ref _selectedImage, value);
+        }
+        #endregion
+
+        #region ShellVm property
+        private ShellVm _shellVm;
+        [XmlIgnore]
+        public ShellVm ShellVm
+        {
+            get => _shellVm;
+            set => Set(ref _shellVm, value);
+        }
+        #endregion
+
+        #region Columns property
+        private int _columns;
+        public int Columns
+        {
+            get => _columns;
+            set => Set(ref _columns, value);
+        }
+        #endregion
+
+        #region ShowLabels property
+        private bool _showLabels;
+        public bool ShowLabels
+        {
+            get => _showLabels;
+            set => Set(ref _showLabels, value);
+        }
+        #endregion
+
+    }
+
+    public class EngineImageVM
+    {
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public BitmapSource Image { get; set; }
+        public ImageData ImageData { get; set; }
     }
     public class EngineViewPartBase : ViewPartDataViewer<EngineViewPartVM>
     {
@@ -63,6 +116,7 @@ namespace WpfGrabber.ViewParts
     {
         public ByteBitmap8Bit Bitmap { get; set; }
         public int Addr { get; set; }
+        public int AddrEnd { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
     }
@@ -77,6 +131,8 @@ namespace WpfGrabber.ViewParts
         public override void OnInitialize()
         {
             base.OnInitialize();
+            ViewModel.Columns = 1;
+            ViewModel.ShellVm = ShellVm;
         }
         private void BorderSize_Changed(object sender, SizeChangedEventArgs e)
         {
@@ -86,6 +142,7 @@ namespace WpfGrabber.ViewParts
         {
             var fnt = AppData.GetFont();
             var images = ReadImages();
+            /*
             var (max_w, max_h) = GetDataImageSize(imageBorder);
             var rgba = new ByteBitmapRgba(max_w, max_h);
             var posX = 0;
@@ -114,6 +171,18 @@ namespace WpfGrabber.ViewParts
             var bmp = rgba.ToBitmapSource();
             image.Source = bmp;
             image.RenderTransform = new ScaleTransform(ShellVm.Zoom, ShellVm.Zoom);
+            */
+            ViewModel.Images.Clear();
+
+            foreach (var a in images)
+            {
+                var img = ByteBitmapRgba.FromBitmap(a.Bitmap);
+                var s = a.Description + $"\nWidth: {img.Width}, Height: {img.Height}";
+                if (img.Width == 0 || img.Height == 0)
+                    img = null;
+                ViewModel.Images.Add(
+                    new EngineImageVM() { Name = a.Title, ImageData = a, Image = img?.ToBitmapSource(), Description = s });
+            }
         }
 
         private IEnumerable<ImageData> ReadImages()
@@ -137,39 +206,73 @@ namespace WpfGrabber.ViewParts
             {
                 var pos = rd.BytePosition;
 
-                int w = rd.ReadByte();//0x81(w=2), 0x83 BOM (w=4)
-                if ((w & 0b10000000) == 0b10000000)
+                int w = rd.ReadByte();
+                if (w == 0xc0)
                 {
+                    var unknown = rd.ReadByte(); //skip,  next is 0x8? or 0xC1
+                    //6B3D: C0 00 C1 39 
+                    w = rd.ReadByte();
+                }
+
+                int h = 0;
+                var readmask = true;
+                if ((w & 0b11000000) == 0b10000000)
+                {
+                    //highest bit(s?) can mean that there is mask & data, data otherwise
+                    //0x81(w=2), 0x83 BOM (w=4), 0x82(0x98FF-man)
                     w = 1 + (byte)(w & 0b0111111);
-                    //highest bit can mean that there is mask & data, data otherwise
+                    h = rd.ReadByte();
+                }
+                else if ((w & 0b11000000) == 0b11000000)
+                {
+                    //0xC1, 0xC0
+                    
+                    if (w == 0xC1)
+                    {
+                        w = 1 + (byte)(w & 0b0011111);
+                        h = rd.ReadByte();
+                    }
+                    else
+                    {
+                        //???
+                        // E3
+                        //F1,FB,F8
+                    }
+                    readmask = false;
                 }
                 else
                 {
                     w = ViewModel.Width;
+                    h = rd.ReadByte();
                 }
-                var h = rd.ReadByte();
                 var bmp = new ByteBitmap8Bit(w * 8, h);
                 var datar = new DataReader(rd.ReadBytes(w * h), 0, flipX: true);
-
                 var maskr = new DataReader(rd.ReadBytes(w * h), 0, flipX: false);
-                for (int y = 0; y < h + 1; y++)
+                for (int y = 0; y < bmp.Height; y++)
                 {
-                    for (int x = 0; x < w * 8; x++)
+                    for (int x = 0; x < w; x++)
                     {
-                        var d = datar.ReadBit();
-                        var m = maskr.ReadBit();
-                        var ry = y;
-                        if (ViewModel.FlipVertical)
-                            ry = h - y - 1;
-                        bmp.SetPixel(x, ry, d ? (byte)0 : m ? (byte)1 : (byte)2);
+                        for (int i = 0; i < 8; i++)
+                        {
+                            var d = datar.ReadBit();
+                            var m = readmask ? maskr.ReadBit() : false;
+                            var ry = y;
+                            if (ViewModel.FlipVertical)
+                                ry = bmp.Height - y - 1;
+                            //bmp.SetPixel(x * 8 + i, ry, (byte)(m ? 1 : 2));
+                            bmp.SetPixel(x * 8 + i, ry, (byte)(m ? 1 : d ? 0 : 2));
+                        }
                     }
                 }
+                var dumpBytes = rd.Data.Skip(pos).Take(8).ToArray();
+                var dump = String.Join(" ", dumpBytes.Select(b => HexReader.ToHex(b, 2)));
                 yield return new ImageData()
                 {
                     Bitmap = bmp,
                     Addr = pos,
+                    AddrEnd = rd.BytePosition,
                     Title = pos.ToString("X4"),
-                    Description = $"Pos={pos:X4}, End={rd.BytePosition:X4}"
+                    Description = $"Pos={pos:X4}, End={rd.BytePosition:X4}, {dump}"
                 };
                 counter++;
                 if (ViewModel.MaxCount != 0 && counter >= ViewModel.MaxCount)
@@ -184,32 +287,30 @@ namespace WpfGrabber.ViewParts
             dlg.FileName = Path.ChangeExtension(ShellVm.FileName, ".png");
             if (dlg.ShowDialog() != true)
                 return;
-            /*
-            var images = ReadImages();
-            var id = 0;
-            foreach (var item in images)
+            foreach (var item in ViewModel.Images)
             {
-                var img = item.Bitmap;
-                var bmp = new ByteBitmapRgba(img.Width, img.Height);
-                bmp.DrawBitmap(img, 0, 0);
-                var bs = bmp.ToBitmapSource();
-                var fileName = Path.ChangeExtension(dlg.FileName, $"{id:00}-{item.Position:X4}-{img.Width}x{img.Height}.png");
-                bs.SaveToPngFile(fileName);
-                id++;
+                var fileName = Path.ChangeExtension(dlg.FileName, $"{item.Name}-{item.ImageData.Addr:X4}-{item.Image.Width}x{item.Image.Height}.png");
+                item.Image?.SaveToPngFile(fileName);
             }
-            */
         }
 
         private void OnButtonSave_Click(object sender, RoutedEventArgs e)
         {
-            var dlg = new SaveFileDialog();
-            dlg.DefaultExt = ".png";
-            dlg.FileName = Path.ChangeExtension(ShellVm.FileName, "-data.png");
-            if (dlg.ShowDialog() != true)
-                return;
-            ((BitmapSource)image.Source).SaveToPngFile(dlg.FileName);
+            //var dlg = new SaveFileDialog();
+            //dlg.DefaultExt = ".png";
+            //dlg.FileName = Path.ChangeExtension(ShellVm.FileName, "-data.png");
+            //if (dlg.ShowDialog() != true)
+            //    return;
+            //((BitmapSource)image.Source).SaveToPngFile(dlg.FileName);
         }
 
+        private void OnGotoEnd_Click(object sender, RoutedEventArgs e)
+        {
+            //originalSource as MenuItem
+            if (ViewModel.SelectedImage == null)
+                return;
+            ShellVm.Offset = ViewModel.SelectedImage.ImageData.AddrEnd;
+        }
     }
 
 }
