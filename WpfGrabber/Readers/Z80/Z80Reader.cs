@@ -56,21 +56,21 @@ namespace WpfGrabber.Readers.Z80
         }
         public struct Opcode
         {
-            public int x { get; set; }
-            public int y { get; set; }
-            public int z { get; set; }
-            public int p { get; set; }
-            public int q { get; set; }
-            public byte Op { get; set; }
+            public int X { get; }
+            public int Y { get; }
+            public int Z { get; }
+            public int P { get; }
+            public int Q { get; }
+            public byte Op { get; }
             public Opcode(byte opcode)
             {
                 Op = opcode;
-                x = (opcode & 0b11000000) >> 6;
-                y = (opcode & 0b00111000) >> 3;
-                z = (opcode & 0b00000111);
-                p = y >> 1;
-                q = y % 2;
-                if (y < 0 || y > 7)
+                X = (opcode & 0b11000000) >> 6;
+                Y = (opcode & 0b00111000) >> 3;
+                Z = (opcode & 0b00000111);
+                P = Y >> 1;
+                Q = Y % 2;
+                if (Y < 0 || Y > 7)
                     throw new InvalidOperationException();
             }
         }
@@ -99,7 +99,7 @@ namespace WpfGrabber.Readers.Z80
             if (opcode.Op == 0xFD)
                 return ReadDDFD(opcode, Z80Register.IY);
 
-            switch (opcode.x)
+            switch (opcode.X)
             {
                 case 0: return Read0(opcode);
                 case 1: return Read1(opcode);
@@ -120,59 +120,59 @@ namespace WpfGrabber.Readers.Z80
         private Z80Instruction ReadED()
         {
             var op = ReadOpCode();
-            if (op.x == 0 || op.x == 3)
+            if (op.X == 0 || op.X == 3)
                 return CreateInstr(Z80Op.NoniNOP);
-            switch (op.x)
+            switch (op.X)
             {
                 case 1: return ReadED1(op);
                 case 2:
-                    if (op.y < 4 || op.z > 3)
+                    if (op.Y < 4 || op.Z > 3)
                         return CreateInstr(Z80Op.NoniNOP);
-                    return CreateInstr(GetBliOp(op.y, op.z));
+                    return CreateInstr(GetBliOp(op.Y, op.Z));
                 default: throw new InvalidOperationException();
             }
         }
 
         private Z80Instruction ReadED1(Opcode opcode)
         {
-            switch (opcode.z)
+            switch (opcode.Z)
             {
                 case 0:
-                    switch (opcode.y)
+                    switch (opcode.Y)
                     {
                         case 6: return CreateInstr(Z80Op.IN, GetInOutRegisterC());
-                        default: return CreateInstr(Z80Op.IN, GetRegister8(opcode.y), GetInOutRegisterC());
+                        default: return CreateInstr(Z80Op.IN, GetRegister8(opcode.Y), GetInOutRegisterC());
                     }
                 case 1:
-                    switch (opcode.y)
+                    switch (opcode.Y)
                     {
                         case 6: return CreateInstr(Z80Op.OUT, GetInOutRegisterC());
-                        default: return CreateInstr(Z80Op.OUT, GetRegister8(opcode.y), GetInOutRegisterC());
+                        default: return CreateInstr(Z80Op.OUT, GetRegister8(opcode.Y), GetInOutRegisterC());
                     }
                 case 2:
-                    switch (opcode.q)
+                    switch (opcode.Q)
                     {
-                        case 0: return CreateInstr(Z80Op.SBC, Z80Register.HL, GetRegister16Pair(opcode.p));
-                        case 1: return CreateInstr(Z80Op.ADC, Z80Register.HL, GetRegister16Pair(opcode.p));
+                        case 0: return CreateInstr(Z80Op.SBC, Z80Register.HL, GetRegister16Pair(opcode.P));
+                        case 1: return CreateInstr(Z80Op.ADC, Z80Register.HL, GetRegister16Pair(opcode.P));
                         default: throw new InvalidOperationException();
                     }
                 case 3:
-                    switch (opcode.q)
+                    switch (opcode.Q)
                     {
-                        case 0: return CreateInstr(Z80Op.LD, GetIndirectAddr16(ReadUnsigned16()), GetRegister16Pair(opcode.p));
-                        case 1: return CreateInstr(Z80Op.LD, GetRegister16Pair(opcode.p), GetIndirectAddr16(ReadUnsigned16()));
+                        case 0: return CreateInstr(Z80Op.LD, GetIndirectAddr16(ReadUnsigned16()), GetRegister16Pair(opcode.P));
+                        case 1: return CreateInstr(Z80Op.LD, GetRegister16Pair(opcode.P), GetIndirectAddr16(ReadUnsigned16()));
                         default: throw new InvalidOperationException();
                     }
                 case 4: return CreateInstr(Z80Op.NEG);
                 case 5:
-                    switch (opcode.y)
+                    switch (opcode.Y)
                     {
                         case 1: return CreateInstr(Z80Op.RETI);
                         default: return CreateInstr(Z80Op.RETN);
                     }
-                case 6: return CreateInstr(Z80Op.IM, GetIMCode(opcode.y));
+                case 6: return CreateInstr(Z80Op.IM, GetIMCode(opcode.Y));
                 case 7:
-                    switch (opcode.y)
+                    switch (opcode.Y)
                     {
                         case 0: return CreateInstr(Z80Op.LD, Z80Param8BitRegister.From(Z80Register.I), Z80Register.A);
                         case 1: return CreateInstr(Z80Op.LD, Z80Param8BitRegister.From(Z80Register.R), Z80Register.A);
@@ -191,26 +191,26 @@ namespace WpfGrabber.Readers.Z80
         private Z80Instruction ReadCB()
         {
             var op = ReadOpCode();
-            switch (op.x)
+            switch (op.X)
             {
-                case 0: return CreateInstr(GetRotationOp(op.y), GetRegister8(op.z));
-                case 1: return CreateInstr(Z80Op.BIT, new Z80ParamLiteral(op.y, 1), GetRegister8(op.z));
-                case 2: return CreateInstr(Z80Op.RES, new Z80ParamLiteral(op.y, 1), GetRegister8(op.z));
-                case 3: return CreateInstr(Z80Op.SET, new Z80ParamLiteral(op.y, 1), GetRegister8(op.z));
+                case 0: return CreateInstr(GetRotationOp(op.Y), GetRegister8(op.Z));
+                case 1: return CreateInstr(Z80Op.BIT, new Z80ParamLiteral(op.Y, 1), GetRegister8(op.Z));
+                case 2: return CreateInstr(Z80Op.RES, new Z80ParamLiteral(op.Y, 1), GetRegister8(op.Z));
+                case 3: return CreateInstr(Z80Op.SET, new Z80ParamLiteral(op.Y, 1), GetRegister8(op.Z));
                 default: throw new InvalidOperationException();
             }
         }
         private Z80Instruction Read3(Opcode opcode)
         {
-            switch (opcode.z)
+            switch (opcode.Z)
             {
-                case 0: return CreateInstr(Z80Op.RET, GetCC(opcode.y));
+                case 0: return CreateInstr(Z80Op.RET, GetCC(opcode.Y));
                 case 1:
-                    switch (opcode.q)
+                    switch (opcode.Q)
                     {
-                        case 0: return CreateInstr(Z80Op.POP, GetRegister16Pair_2(opcode.p));
+                        case 0: return CreateInstr(Z80Op.POP, GetRegister16Pair_2(opcode.P));
                         case 1:
-                            switch (opcode.p)
+                            switch (opcode.P)
                             {
                                 case 0: return CreateInstr(Z80Op.RET);
                                 case 1: return CreateInstr(Z80Op.EXX);
@@ -220,9 +220,9 @@ namespace WpfGrabber.Readers.Z80
                             }
                         default: throw new InvalidOperationException();
                     }
-                case 2: return CreateInstr(Z80Op.JP, GetCC(opcode.y), GetAddrLabel(ReadUnsigned16()));
+                case 2: return CreateInstr(Z80Op.JP, GetCC(opcode.Y), GetAddrLabel(ReadUnsigned16()));
                 case 3:
-                    switch (opcode.y)
+                    switch (opcode.Y)
                     {
                         case 0: return CreateInstr(Z80Op.JP, GetAddrLabel(ReadUnsigned16()));
                         //case 1: CB prefix
@@ -235,13 +235,13 @@ namespace WpfGrabber.Readers.Z80
                         default: throw new InvalidOperationException();
                     }
                 case 4:
-                    return CreateInstr(Z80Op.CALL, GetCC(opcode.y), GetAddrLabel(ReadUnsigned16()));
+                    return CreateInstr(Z80Op.CALL, GetCC(opcode.Y), GetAddrLabel(ReadUnsigned16()));
                 case 5:
-                    switch (opcode.q)
+                    switch (opcode.Q)
                     {
-                        case 0: return CreateInstr(Z80Op.PUSH, GetRegister16Pair_2(opcode.p));
+                        case 0: return CreateInstr(Z80Op.PUSH, GetRegister16Pair_2(opcode.P));
                         case 1:
-                            switch (opcode.p)
+                            switch (opcode.P)
                             {
                                 case 0: return CreateInstr(Z80Op.CALL, GetAddrLabel(ReadUnsigned16()));
                                 //case 1: //dd prefix
@@ -251,15 +251,15 @@ namespace WpfGrabber.Readers.Z80
                             }
                         default: throw new InvalidOperationException();
                     }
-                case 6: return ReadAlu(opcode.y, new Z80ParamLiteral(ReadByte(), 2));
-                case 7: return CreateInstr(Z80Op.RST, new Z80ParamLiteral(opcode.y * 8, 2));
+                case 6: return ReadAlu(opcode.Y, new Z80ParamLiteral(ReadByte(), 2));
+                case 7: return CreateInstr(Z80Op.RST, new Z80ParamLiteral(opcode.Y * 8, 2));
                 default: throw new InvalidOperationException();
             }
         }
 
         private Z80Instruction Read2(Opcode opcode)
         {
-            return ReadAlu(opcode.y, GetRegister8(opcode.z));
+            return ReadAlu(opcode.Y, GetRegister8(opcode.Z));
         }
 
         private Z80Instruction ReadAlu(int alu, Z80Param p)
@@ -280,37 +280,37 @@ namespace WpfGrabber.Readers.Z80
 
         private Z80Instruction Read1(Opcode opcode)
         {
-            if (opcode.y == 6 && opcode.z == 6)
+            if (opcode.Y == 6 && opcode.Z == 6)
                 return CreateInstr(Z80Op.HALT);
-            return CreateInstr(Z80Op.LD, GetRegister8(opcode.y), GetRegister8(opcode.z));
+            return CreateInstr(Z80Op.LD, GetRegister8(opcode.Y), GetRegister8(opcode.Z));
         }
 
         private Z80Instruction Read0(Opcode opcode)
         {
-            switch (opcode.z)
+            switch (opcode.Z)
             {
                 case 0:
-                    switch (opcode.y)
+                    switch (opcode.Y)
                     {
                         case 0: return CreateInstr(Z80Op.NOP);
                         case 1: return CreateInstr(Z80Op.EX, Z80Register.AF, Z80Register.AF_EX);
                         case 2: return CreateInstr(Z80Op.DJNZ, GetAddrLabel(Addr + ReadSignedByte() + 1));
                         case 3: return CreateInstr(Z80Op.JR, GetAddrLabel(Addr + ReadSignedByte() + 1));
                         //4-7
-                        default: return CreateInstr(Z80Op.JR, GetCC(opcode.y - 4), GetAddrLabel(Addr + ReadSignedByte() + 1));
+                        default: return CreateInstr(Z80Op.JR, GetCC(opcode.Y - 4), GetAddrLabel(Addr + ReadSignedByte() + 1));
                     }
                 case 1:
-                    switch (opcode.q)
+                    switch (opcode.Q)
                     {
-                        case 0: return CreateInstr(Z80Op.LD, GetRegister16Pair(opcode.p), new Z80ParamLiteral(ReadUnsigned16(), 4));
-                        case 1: return CreateInstr(Z80Op.ADD, Z80Register.HL, GetRegister16Pair(opcode.p));
+                        case 0: return CreateInstr(Z80Op.LD, GetRegister16Pair(opcode.P), new Z80ParamLiteral(ReadUnsigned16(), 4));
+                        case 1: return CreateInstr(Z80Op.ADD, Z80Register.HL, GetRegister16Pair(opcode.P));
                         default: throw new InvalidOperationException();
                     }
                 case 2:
-                    switch (opcode.q)
+                    switch (opcode.Q)
                     {
                         case 0:
-                            switch (opcode.p)
+                            switch (opcode.P)
                             {
                                 case 0: return CreateInstr(Z80Op.LD, new Z80ParamIndirect(Z80Register.BC), Z80Register.A);
                                 case 1: return CreateInstr(Z80Op.LD, new Z80ParamIndirect(Z80Register.DE), Z80Register.A);
@@ -319,7 +319,7 @@ namespace WpfGrabber.Readers.Z80
                                 default: throw new InvalidOperationException();
                             }
                         case 1:
-                            switch (opcode.p)
+                            switch (opcode.P)
                             {
                                 case 0: return CreateInstr(Z80Op.LD, Z80Register.A, new Z80ParamIndirect(Z80Register.BC));
                                 case 1: return CreateInstr(Z80Op.LD, Z80Register.A, new Z80ParamIndirect(Z80Register.DE));
@@ -330,20 +330,20 @@ namespace WpfGrabber.Readers.Z80
                         default: throw new InvalidOperationException();
                     }
                 case 3:
-                    switch (opcode.q)
+                    switch (opcode.Q)
                     {
-                        case 0: return CreateInstr(Z80Op.INC, GetRegister16Pair(opcode.p));
-                        case 1: return CreateInstr(Z80Op.DEC, GetRegister16Pair(opcode.p));
+                        case 0: return CreateInstr(Z80Op.INC, GetRegister16Pair(opcode.P));
+                        case 1: return CreateInstr(Z80Op.DEC, GetRegister16Pair(opcode.P));
                         default: throw new InvalidOperationException();
                     }
                 case 4:
-                    return CreateInstr(Z80Op.INC, GetRegister8(opcode.y));
+                    return CreateInstr(Z80Op.INC, GetRegister8(opcode.Y));
                 case 5:
-                    return CreateInstr(Z80Op.DEC, GetRegister8(opcode.y));
+                    return CreateInstr(Z80Op.DEC, GetRegister8(opcode.Y));
                 case 6:
-                    return CreateInstr(Z80Op.LD, GetRegister8(opcode.y), new Z80ParamLiteral(ReadByte(), 2));
+                    return CreateInstr(Z80Op.LD, GetRegister8(opcode.Y), new Z80ParamLiteral(ReadByte(), 2));
                 case 7:
-                    switch (opcode.y)
+                    switch (opcode.Y)
                     {
                         case 0: return CreateInstr(Z80Op.RLCA);
                         case 1: return CreateInstr(Z80Op.RRCA);
