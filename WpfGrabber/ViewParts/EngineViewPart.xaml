@@ -29,15 +29,24 @@
 
             <Label Content="Width"/>
             <c:NumberEditor Value="{Binding Width}" 
-                            Maximum="256" Minimum="1"
-                            Width="80" SliderWidth="0" LargeChange="0"/>
+                            Maximum="256" Minimum="0"
+                            Width="70" SliderWidth="0" LargeChange="0"/>
             <Separator/>
+
+            <!--<Label Content="Columns"/>
+            <c:NumberEditor Value="{Binding Columns}" 
+                            Maximum="32"
+                            LargeChange="0"
+                            Width="70" SliderWidth="0"/>
+            <Separator/>-->
 
             <Label Content="Max count"/>
             <c:NumberEditor Value="{Binding MaxCount}" 
-                            Maximum="256"
-                            Width="110" SliderWidth="0"/>
+                            Maximum="256" LargeChange="0"
+                            Width="70" SliderWidth="0"/>
             <Separator/>
+            
+            
             <CheckBox Content="Flip V" IsChecked="{Binding FlipVertical}"/>
             <Separator/>
             <Button Content="Menu" Style="{StaticResource dropDown}">
@@ -52,7 +61,8 @@
             </Button>
         </ItemsControl>
 
-        <ListBox Grid.Row="1" Style="{StaticResource listBoxImages}" Background="{StaticResource checkerBrush}">
+        <ListBox Grid.Row="1" Style="{StaticResource listBoxImages}" Background="{StaticResource checkerBrush}"
+                 ScrollViewer.VerticalScrollBarVisibility="Disabled">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel Orientation="Vertical"/>
@@ -64,5 +74,7 @@
                 </ContextMenu>
             </ListBox.ContextMenu>
         </ListBox>
+
+
     </Grid>
 </local:EngineViewPartBase>

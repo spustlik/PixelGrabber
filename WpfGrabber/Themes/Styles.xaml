@@ -72,7 +72,8 @@
             <Setter.Value>
                 <DataTemplate> <!--(ImageVM) Name,Description,Image -->
                     <Border BorderBrush="DodgerBlue" BorderThickness="1" Margin="0"
-                                    Name="itemborder">
+                            Name="itemborder" 
+                            Background="#c0a0ffa0">
                         <Grid>
                             <Image Source="{Binding Image}" Stretch="None" x:Name="image" RenderOptions.BitmapScalingMode="NearestNeighbor">
                                 <Image.LayoutTransform>
