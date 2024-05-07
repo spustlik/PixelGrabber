@@ -24,20 +24,22 @@ namespace WpfGrabber.Readers.Z80
         IX,
         IY,
         SP,
-        PC
+        PC,
+        AF,
+        AF_EX
     }
     public static class Z80Ex
     {
         public static IEnumerable<Z80Register> PairRegisters16 { get; }
-            = new [] { Z80Register.BC, Z80Register.DE, Z80Register.HL, Z80Register.SP};
+            = new[] { Z80Register.BC, Z80Register.DE, Z80Register.HL, Z80Register.SP };
         public static IEnumerable<Z80Register> Registers16 { get; }
-            = PairRegisters16.Concat(new[] { Z80Register.IX, Z80Register.IY, Z80Register.PC });
+            = PairRegisters16.Concat(new[] { Z80Register.IX, Z80Register.IY, Z80Register.PC, Z80Register.AF, Z80Register.AF_EX });
 
         public static bool Is16BitBasic(this Z80Register reg)
         {
             return PairRegisters16.Contains(reg);
         }
-        public static bool Is16Bit(this Z80Register reg)
+        public static bool IsAny16Bit(this Z80Register reg)
         {
             return Registers16.Contains(reg);
         }

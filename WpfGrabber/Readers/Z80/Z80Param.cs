@@ -13,7 +13,7 @@ namespace WpfGrabber.Readers.Z80
         {
             if (register.Is8BitBasic())
                 return Z80Param8BitRegister.From(register);
-            if (register.Is16Bit())
+            if (register.IsAny16Bit())
                 return Z80Param16BitRegister.From(register);
             throw new NotSupportedException();
         }
@@ -32,13 +32,13 @@ namespace WpfGrabber.Readers.Z80
         }
         public static Z80Param From(Z80Register register)
         {
-            return new Z80Param8BitRegister() { register=register };
+            return new Z80Param8BitRegister() { register = register };
         }
 
         public override string ToString()
         {
             if (register == Z80Register.HL)
-                return "(HL)";
+                return "(HL)"; // warning, it can be 16 bit!
             return register.ToString();
         }
 
@@ -58,11 +58,33 @@ namespace WpfGrabber.Readers.Z80
             var register = Z80Ex.PairRegisters16.ElementAt(rp);
             return new Z80Param16BitRegister() { register = register };
         }
-        public override string ToString() => register.ToString();
-
+        public override string ToString()
+        {
+            if (register == Z80Register.AF_EX)
+                return "AF`";
+            return register.ToString();
+        }
     }
 
+    public class Z80ParamLiteral : Z80Param
+    {
+        public int Value { get; }
+        public int Size { get; }
 
+        public Z80ParamLiteral(int value, int size)
+        {
+            Value = value;
+            Size = size;
+        }
+        public override string ToString()
+        {
+            if (Size == 1)
+                return Value.ToString();
+            if (Size == 2)
+                return "0x" + Value.ToString("X2");
+            return "0x" + Value.ToString("X4");
+        }
+    }
 
     public class Z80ParamString : Z80Param
     {
