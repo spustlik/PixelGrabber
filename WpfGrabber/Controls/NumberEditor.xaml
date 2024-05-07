@@ -6,10 +6,10 @@
              xmlns:local="clr-namespace:WpfGrabber"
              mc:Ignorable="d" 
              Height="18"
-             d:DesignHeight="18.536" d:DesignWidth="189.315" 
+             d:DesignHeight="18.536" d:DesignWidth="162.648" 
              x:Name="root">
     <UserControl.Resources>
-        <Style TargetType="RepeatButton">
+        <Style x:Key="repeatButton"  TargetType="RepeatButton">
             <Setter Property="Width" Value="18"/>
             <!--<Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="FontSize" Value="20"/>-->
@@ -21,12 +21,59 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+        <Style x:Key="repeatLargeChange" BasedOn="{StaticResource repeatButton}" TargetType="RepeatButton">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding LargeChange, ElementName=root}" Value="0">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="RepeatButton" BasedOn="{StaticResource repeatButton}">
+        </Style>
+
         <local:HexStringConverter x:Key="hexConv" HexNums="0"/>
         <Style TargetType="Path">
             <Setter Property="Stroke" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RepeatButton}}" />
+            <Setter Property="Fill" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RepeatButton}}" />
+            <Setter Property="StrokeThickness" Value="0" />
         </Style>
+        <Style TargetType="Separator">
+            <Setter Property="Width" Value="2" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="Slider">
+            <Style.Triggers>
+                <Trigger Property="LargeChange" Value="0">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <ContextMenu x:Key="ctxMenu">
+            <ContextMenu.Resources>
+                <Style TargetType="MenuItem">
+                    <Setter Property="IsCheckable" Value="true" />
+                </Style>
+            </ContextMenu.Resources>
+            <MenuItem Header="Page size:" IsEnabled="False"/>
+            <MenuItem Header="1" Click="ButtonPageSize_Click"/>
+            <MenuItem Header="2" Click="ButtonPageSize_Click"/>
+            <MenuItem Header="3" Click="ButtonPageSize_Click"/>
+            <MenuItem Header="4" Click="ButtonPageSize_Click"/>
+            <MenuItem Header="8" Click="ButtonPageSize_Click"/>
+            <MenuItem Header="16" Click="ButtonPageSize_Click"/>
+            <MenuItem Header="24" Click="ButtonPageSize_Click"/>
+            <MenuItem Header="32" Click="ButtonPageSize_Click"/>
+            <MenuItem Header="64" Click="ButtonPageSize_Click"/>
+            <MenuItem Header="128" Click="ButtonPageSize_Click"/>
+            <Separator/>
+        </ContextMenu>
     </UserControl.Resources>
-    <Grid>
+    <Grid ContextMenu="{StaticResource ctxMenu}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
@@ -34,33 +81,36 @@
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <TextBox Text="{Binding Value, ElementName=root, Converter={StaticResource hexConv}}"/>
-        <RepeatButton Grid.Column="1" Margin="0,0,2,0" Click="ButtonMinus_Click">
-            <Path Data="M0,0 L10,0"  
-                  StrokeThickness="2"/>
-        </RepeatButton>
-        <RepeatButton Grid.Column="3" Margin="2,0,0,0" Click="ButtonPlus_Click">
-            <Path Data="M5,0 L5,10 M0,5 L10,5" 
-                  StrokeThickness="2"/>
-        </RepeatButton>
-        <Slider Grid.Column="2" VerticalAlignment="Center" Margin="-2,0,-4,0"
+        <StackPanel Grid.Column="1" Orientation="Horizontal">
+            <Separator/>
+            <RepeatButton CommandParameter="-10" Click="Button_Click"
+                      Style="{StaticResource repeatLargeChange}">
+                <Path Data="M0,5 L 5,0 L5,10 L0,5" />
+            </RepeatButton>
+            <Separator/>
+            <RepeatButton CommandParameter="-1" Click="Button_Click">
+                <Path Data="M0,0 L10,0" StrokeThickness="2"/>
+            </RepeatButton>
+        </StackPanel>
+        <StackPanel Grid.Column="3" Orientation="Horizontal">
+            <Separator/>
+            <RepeatButton CommandParameter="1" Click="Button_Click">
+                <Path Data="M5,0 L5,10 M0,5 L10,5" StrokeThickness="2"/>
+            </RepeatButton>
+            <Separator/>
+            <RepeatButton CommandParameter="10" Click="Button_Click"
+                      Style="{StaticResource repeatLargeChange}">
+                <Path Data="M5,5 L 0,0 L0,10 L5,5" />
+            </RepeatButton>
+
+        </StackPanel>
+        <Slider Grid.Column="2" VerticalAlignment="Center" Margin="2,0,-1,0"
                 Width="{Binding SliderWidth, ElementName=root}"
                 Value="{Binding Value, ElementName=root}" 
                 Minimum="{Binding Minimum, ElementName=root}"                
                 Maximum="{Binding Maximum, ElementName=root}"
                 LargeChange="{Binding LargeChange, ElementName=root}"
                 >
-            <Slider.ContextMenu>
-                <ContextMenu >
-                    <MenuItem Header="Page size:" IsEnabled="False"/>
-                    <MenuItem Header="1" Click="ButtonPageSize_Click"/>
-                    <MenuItem Header="8" Click="ButtonPageSize_Click"/>
-                    <MenuItem Header="16" Click="ButtonPageSize_Click"/>
-                    <MenuItem Header="32" Click="ButtonPageSize_Click"/>
-                    <MenuItem Header="64" Click="ButtonPageSize_Click"/>
-                    <MenuItem Header="128" Click="ButtonPageSize_Click"/>
-                    <Separator/>
-                </ContextMenu>
-            </Slider.ContextMenu>
         </Slider>
     </Grid>
 </UserControl>

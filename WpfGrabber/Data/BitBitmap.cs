@@ -14,13 +14,13 @@ namespace WpfGrabber
         public BitBitmap(int width, int height, bool reverse = false)
         {
             WidthPixels = width;
-            WidthBytes = 1 + ((width-1) / 8);  //0:0, 1-8:1, 9-16:2, 17-24:3, ...
+            WidthBytes = 1 + ((width - 1) / 8);  //0:0, 1-8:1, 9-16:2, 17-24:3, ...
             Height = height;
             ReverseByte = reverse;
-            Data = new byte[WidthBytes*Height];
+            Data = new byte[WidthBytes * Height];
         }
 
-        public void SetPixel(int x,int y, bool value)
+        public void SetPixel(int x, int y, bool value)
         {
             if (x < 0 || x >= WidthPixels || y < 0 || y >= Height)
                 return;
@@ -36,7 +36,7 @@ namespace WpfGrabber
             Data[pos] = b;
         }
 
-        public bool GetPixel(int x,int y)
+        public bool GetPixel(int x, int y)
         {
             if (x < 0 || x >= WidthPixels || y < 0 || y >= Height)
                 return false;
@@ -63,7 +63,7 @@ namespace WpfGrabber
                 {
                     if (x != 0)
                         sb.Append(" ");
-                    GetPixelByte(x*8, y, out _, out var pos);
+                    GetPixelByte(x * 8, y, out _, out var pos);
                     sb.Append(HexReader.ToHex(Data[pos], 2));
                 }
                 sb.AppendLine();

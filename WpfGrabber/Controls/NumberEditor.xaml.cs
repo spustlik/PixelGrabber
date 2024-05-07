@@ -5,10 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -35,7 +37,7 @@ namespace WpfGrabber.Controls
         }
 
         public static readonly DependencyProperty ValueProperty =
-            DependencyProperty.Register("Value", typeof(int), typeof(NumberEditor), 
+            DependencyProperty.Register("Value", typeof(int), typeof(NumberEditor),
                 new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
         #endregion
@@ -62,7 +64,7 @@ namespace WpfGrabber.Controls
 
         // Using a DependencyProperty as the backing store for Maximum.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty MaximumProperty =
-            DependencyProperty.Register("Maximum", typeof(int), typeof(NumberEditor), 
+            DependencyProperty.Register("Maximum", typeof(int), typeof(NumberEditor),
                 new PropertyMetadata(100));
         #endregion
 
@@ -90,21 +92,6 @@ namespace WpfGrabber.Controls
         #endregion
 
 
-
-        private void ButtonMinus_Click(object sender, RoutedEventArgs e)
-        {
-            if (Value == 0)
-                return;
-            Value -= 1;
-        }
-
-        private void ButtonPlus_Click(object sender, RoutedEventArgs e)
-        {
-            if (Value >= Maximum)
-                return;
-            Value += 1;
-        }
-
         private void ButtonPageSize_Click(object sender, RoutedEventArgs e)
         {
             var mi = sender as MenuItem;
@@ -115,7 +102,26 @@ namespace WpfGrabber.Controls
                 return;
             if (!int.TryParse(s, out var page))
                 return;
+            if (!(mi.Parent is ContextMenu menu))
+                return;
+            foreach (var item in menu.Items.OfType<MenuItem>())
+            {
+                item.IsChecked = s.Equals(item.Header);
+            }
             LargeChange = page;
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var ofs = Convert.ToInt32((e.OriginalSource as RepeatButton).CommandParameter);
+            if (ofs < -1)
+                ofs = -LargeChange;
+            if (ofs > 1)
+                ofs = LargeChange;
+            var n = Value + ofs;
+            if (n < 0 || n > Maximum)
+                return;
+            Value = n;
         }
     }
 }
