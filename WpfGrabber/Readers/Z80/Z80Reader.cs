@@ -13,18 +13,18 @@ namespace WpfGrabber.Readers.Z80
     public class Z80Reader
     {
         public byte[] Data { get; private set; }
-        public int Addr { get; private set; }
+        public int DataPosition { get; private set; }
         private int _lastInstrAddr = 0;
         public Z80Reader(byte[] data, int start = 0)
         {
             Data = data;
-            Addr = start;
+            DataPosition = start;
             _lastInstrAddr = start;
         }
 
         public byte ReadByte()
         {
-            return Data[Addr++];
+            return Data[DataPosition++];
         }
         public int ReadSignedByte()
         {
@@ -46,7 +46,7 @@ namespace WpfGrabber.Readers.Z80
             while (true)
             {
                 yield return ReadInstruction();
-                if (Addr >= Data.Length)
+                if (DataPosition >= Data.Length)
                     break;
             }
         }
@@ -105,7 +105,7 @@ namespace WpfGrabber.Readers.Z80
                 case 1: return Read1(opcode);
                 case 2: return Read2(opcode);
                 case 3: return Read3(opcode);
-                default: return GetUnknown(opcode);
+                default: return GetUnknown(opcode); // this is not possible
             }
         }
 
@@ -262,22 +262,6 @@ namespace WpfGrabber.Readers.Z80
             return ReadAlu(opcode.Y, GetRegister8(opcode.Z));
         }
 
-        private Z80Instruction ReadAlu(int alu, Z80Param p)
-        {
-            switch (alu)
-            {
-                case 0: return CreateInstr(Z80Op.ADD, Z80Register.A, p);
-                case 1: return CreateInstr(Z80Op.ADC, Z80Register.A, p);
-                case 2: return CreateInstr(Z80Op.SUB, Z80Register.A, p);
-                case 3: return CreateInstr(Z80Op.SBC, Z80Register.A, p);
-                case 4: return CreateInstr(Z80Op.AND, p);
-                case 5: return CreateInstr(Z80Op.XOR, p);
-                case 6: return CreateInstr(Z80Op.OR, p);
-                case 7: return CreateInstr(Z80Op.CP, p);
-                default: throw new InvalidOperationException();
-            }
-        }
-
         private Z80Instruction Read1(Opcode opcode)
         {
             if (opcode.Y == 6 && opcode.Z == 6)
@@ -294,10 +278,10 @@ namespace WpfGrabber.Readers.Z80
                     {
                         case 0: return CreateInstr(Z80Op.NOP);
                         case 1: return CreateInstr(Z80Op.EX, Z80Register.AF, Z80Register.AF_EX);
-                        case 2: return CreateInstr(Z80Op.DJNZ, GetAddrLabel(Addr + ReadSignedByte() + 1));
-                        case 3: return CreateInstr(Z80Op.JR, GetAddrLabel(Addr + ReadSignedByte() + 1));
+                        case 2: return CreateInstr(Z80Op.DJNZ, GetAddrLabel(DataPosition + ReadSignedByte() + 1));
+                        case 3: return CreateInstr(Z80Op.JR, GetAddrLabel(DataPosition + ReadSignedByte() + 1));
                         //4-7
-                        default: return CreateInstr(Z80Op.JR, GetCC(opcode.Y - 4), GetAddrLabel(Addr + ReadSignedByte() + 1));
+                        default: return CreateInstr(Z80Op.JR, GetCC(opcode.Y - 4), GetAddrLabel(DataPosition + ReadSignedByte() + 1));
                     }
                 case 1:
                     switch (opcode.Q)
@@ -359,6 +343,21 @@ namespace WpfGrabber.Readers.Z80
             }
         }
 
+        private Z80Instruction ReadAlu(int alu, Z80Param p)
+        {
+            switch (alu)
+            {
+                case 0: return CreateInstr(Z80Op.ADD, Z80Register.A, p);
+                case 1: return CreateInstr(Z80Op.ADC, Z80Register.A, p);
+                case 2: return CreateInstr(Z80Op.SUB, Z80Register.A, p);
+                case 3: return CreateInstr(Z80Op.SBC, Z80Register.A, p);
+                case 4: return CreateInstr(Z80Op.AND, p);
+                case 5: return CreateInstr(Z80Op.XOR, p);
+                case 6: return CreateInstr(Z80Op.OR, p);
+                case 7: return CreateInstr(Z80Op.CP, p);
+                default: throw new InvalidOperationException();
+            }
+        }
         private Z80Op GetRotationOp(int i)
         {
             return new Z80Op[] { Z80Op.RLC, Z80Op.RRC, Z80Op.RL, Z80Op.RR, Z80Op.SLA, Z80Op.SRA, Z80Op.SLL, Z80Op.SRL }[i];
@@ -387,21 +386,20 @@ namespace WpfGrabber.Readers.Z80
         }
         private Z80Param GetInOutRegisterC()
         {
-            // (C);
             return new Z80ParamIndirect(Z80Register.C);
         }
         private Z80Param GetInOutPort(byte b)
         {
             return new Z80ParamIndirect(new Z80ParamLiteral(b,2));
         }
-        private Z80Param GetAddrLabel(int addr)
+        private Z80ParamAddressLabel GetAddrLabel(int addr)
         {
             return new Z80ParamAddressLabel(addr);
         }
 
         private Z80Param GetRegister16Pair(int rp)
         {
-            //"BC", "DE", "HL", "SP"
+            //BC, DE, HL, SP
             return Z80Param16BitRegister.From(rp);
         }
         private Z80Register GetRegister16Pair_2(int rp)
@@ -411,16 +409,15 @@ namespace WpfGrabber.Readers.Z80
         }
         private Z80Flag GetCC(int cc)
         {
-            //"NZ", "Z", "NC", "C", "PO", "PE", "P", "M"
+            //NZ, Z, NC, C, PO, PE, P, M
             return Z80Ex.Flags.ElementAt(cc);
         }
 
         public Z80Param GetRegister8(int r)
         {
-            // "B", "C", "D", "E", "H", "L", "(HL)", "A"
+            // B, C, D, E, H, L, (HL), A
             return Z80Param8BitRegister.From(r);
         }
-
 
         private Z80Instruction GetUnknown(Opcode opcode, Z80Param p2 = null)
         {
@@ -429,8 +426,8 @@ namespace WpfGrabber.Readers.Z80
 
         private Z80Instruction CreateInstr(Z80Op op, Z80Param p1 = null, Z80Param p2 = null)
         {
-            var r = new Z80Instruction(op, _lastInstrAddr, Addr - _lastInstrAddr, p1, p2);
-            _lastInstrAddr = Addr;
+            var r = new Z80Instruction(op, _lastInstrAddr, DataPosition - _lastInstrAddr, p1, p2);
+            _lastInstrAddr = DataPosition;
             return r;
         }
     }

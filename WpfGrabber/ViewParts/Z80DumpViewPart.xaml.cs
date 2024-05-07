@@ -157,7 +157,7 @@ namespace WpfGrabber.ViewParts
             var dumpLines = new List<string>();
             var z80 = new Z80Reader(ShellVm.Data, ShellVm.Offset);
             _addressMap.Clear();
-            while (z80.Addr < z80.Data.Length)
+            while (z80.DataPosition < z80.Data.Length)
             {
                 var sb = new StringBuilder();
                 try
@@ -180,7 +180,7 @@ namespace WpfGrabber.ViewParts
                 catch (Exception e)
                 {
                     if (ViewModel.ShowAddr)
-                        sb.Append(z80.Addr.ToString("X4")).Append(": ");
+                        sb.Append(z80.DataPosition.ToString("X4")).Append(": ");
                     var b = z80.ReadByte();//skip byte
                     sb.Append(b.ToString("X2"));
                     sb.Append(" ");

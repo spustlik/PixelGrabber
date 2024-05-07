@@ -19,7 +19,7 @@ namespace UnitTests
             var bytes = File.ReadAllBytes(@"E:\GameWork\8bitgames\sord\DISK64\BATMAN.COM");
             var z80 = new Z80Reader(bytes, 0);
             var sb = new StringBuilder();
-            while (z80.Addr<z80.Data.Length)
+            while (z80.DataPosition<z80.Data.Length)
             {
                 try
                 {
