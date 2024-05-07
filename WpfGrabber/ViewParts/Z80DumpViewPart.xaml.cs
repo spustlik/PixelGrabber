@@ -45,6 +45,16 @@ namespace WpfGrabber.ViewParts
 
         [XmlIgnore]
         public ObservableCollection<string> DumpLines { get; private set; } = new ObservableCollection<string>();
+
+        #region MapText property
+        private string _mapText;
+        public string MapText
+        {
+            get => _mapText;
+            set => Set(ref _mapText, value);
+        }
+        #endregion
+
     }
 
     public class Z80DumpViewPartBase : ViewPartDataViewer<Z80DumpVM>
@@ -62,6 +72,7 @@ namespace WpfGrabber.ViewParts
         public override void OnInitialize()
         {
             base.OnInitialize();
+            ViewModel.ShowAddr = true;
             Z80SyntaxHighlighter.Init();
             editor.SyntaxHighlighting = Z80SyntaxHighlighter.GetDefinition();
         }
@@ -96,11 +107,10 @@ namespace WpfGrabber.ViewParts
             if (s.StartsWith("L"))
                 s = s.Substring(1);
             var addr = int.Parse(s, System.Globalization.NumberStyles.HexNumber);
-            //MessageBox.Show(addr.ToString("X4") + " " + ViewModel.GoToAddrText, "Go to");
             if (!_addressMap.TryGetValue(addr, out var line))
                 return;
             //textBox.ScrollToLine(line);
-            var vertOffset = (editor.TextArea.TextView.DefaultLineHeight) * line;
+            var vertOffset = editor.TextArea.TextView.DefaultLineHeight * line;
             editor.ScrollToVerticalOffset(vertOffset);
         }
 

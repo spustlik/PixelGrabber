@@ -62,13 +62,22 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Border Background="#606060">
                 <TextBlock Text="Map" Foreground="White" FontWeight="Bold" Padding=" 5,2"/>
             </Border>
-            <TextBox Grid.Row="1" FontFamily="Courier New" FontSize="11">
-                lorem ipsum...
+            <TextBox Grid.Row="1" FontFamily="Courier New" FontSize="11" Text="{Binding MapText}">
             </TextBox>
+            <Border Grid.Row="2" Background="LightYellow" Padding="5,4">
+                <TextBlock Foreground="#808080" FontFamily="Courier New" FontSize="11">
+                    <Bold>Syntax</Bold>
+                    <!--<LineBreak/><Separator Width="20"/><Run>item 1</Run>-->
+                    <Run xml:space="preserve">
+  ORG: addr
+  addr: 0x1234, $1234, 65535 (decimal)</Run>
+                </TextBlock>
+            </Border>
         </Grid>
     </Grid>
 </local:Z80DumpViewPartBase>
