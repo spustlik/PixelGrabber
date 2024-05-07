@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Linq;
+using System.Text;
+using WpfGrabber.Readers;
 
 namespace WpfGrabber
 {
@@ -20,7 +23,6 @@ namespace WpfGrabber
         /// flips each byte
         /// </summary>
         public bool FlipX { get; private set; }
-
 
         public DataReader(byte[] bytes, int offset, bool flipX = false)
         {
@@ -70,6 +72,51 @@ namespace WpfGrabber
             return bit == 1;
         }
 
+        public string AsString
+        {
+            get
+            {
+                var sb = new StringBuilder();
+                if (FlipX)
+                    sb.AppendLine("FlipX");
+                if (BytePosition > 0)
+                    sb.AppendLine("Pos=" + HexReader.ToHex(BytePosition));
+                int i = 0;
+                while (i < DataLength)
+                {
+                    if (i != 0)
+                        sb.AppendLine();
+                    sb.Append(HexReader.ToHex(i)).Append(":");
+                    for (int x = 0; x < 16; x++)
+                    {
+                        if (i >= DataLength)
+                            break;
+                        sb.Append(i == BytePosition ? ">" : " ");
+                        sb.Append(HexReader.ToHex(Data[i++], 2));
+                    }
+                }
+                return sb.ToString();
+            }
+        }
+        public string AsBinaryString
+        {
+            get
+            {
+                var sb = new StringBuilder();
+                if (FlipX)
+                    sb.AppendLine("FlipX");
+                if (BytePosition > 0)
+                    sb.AppendLine("Pos=" + HexReader.ToHex(BytePosition));
+                int i = 0;
+                while (i < DataLength)
+                {
+                    if (i != 0)
+                        sb.Append(" ");
+                    sb.Append(HexReader.ToBinary(Data[i++], FlipX));
+                }
+                return sb.ToString();
+            }
+        }
         public static byte GetFlippedX(byte b)
         {
             byte r = 0;

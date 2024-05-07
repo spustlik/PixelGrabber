@@ -13,6 +13,9 @@
             Data = new byte[w, h];
         }
 
+        /// <summary>
+        /// sets pixel value - 0=white, 1=transparent, 2=black
+        /// </summary>
         public void SetPixel(int x, int y, byte value)
         {
             if (x >= Width || y >= Height)

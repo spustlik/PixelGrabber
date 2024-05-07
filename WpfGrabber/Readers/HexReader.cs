@@ -65,9 +65,23 @@ namespace WpfGrabber.Readers
             for (int i = len - 1; i >= 0; i--)
             {
                 s[i] = _HEX[x & 0x0F];
-                x = x >> 4;
+                x >>= 4;
             }
             return new string(s);
+        }
+
+        public static string ToBinary(byte b, bool flipX)
+        {
+            if (flipX)
+                b = DataReader.GetFlippedX(b);
+            var sb = new StringBuilder();
+            for (int i = 0; i < 8; i++)
+            {
+                sb.Append(b & 1);
+                b >>= 1;
+            }
+            return sb.ToString();
+
         }
     }
 }
