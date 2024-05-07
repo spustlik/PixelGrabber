@@ -25,6 +25,8 @@ namespace WpfGrabber.Readers
         ImageDataMaskWithPreambule,
         [Description("4 bits")]
         Bits4DataMask,
+        [Description("Only data")]
+        ImageData
     }
 
     public enum MaskReaderPreambule
@@ -89,9 +91,10 @@ namespace WpfGrabber.Readers
                 case MaskReaderType.Bits4DataMask: return ReadBits4DataMask(width, height);
                 case MaskReaderType.ByteDataMask: return ReadByteDataMask(width, height);
                 case MaskReaderType.LineDataMask: return ReadLineDataMask(width, height);
-                case MaskReaderType.ImageDataMask: return ReadImageDataMask(width, height);
-                case MaskReaderType.ImageMaskData: return ReadImageDataMask(width, height, maskData: true);
-                case MaskReaderType.ImageDataMaskWithPreambule: return ReadImageDataMask(width, height, maskPreambule: true);
+                case MaskReaderType.ImageData: return ReadImageDataMask(width, height, Type);
+                case MaskReaderType.ImageDataMask: return ReadImageDataMask(width, height, Type);
+                case MaskReaderType.ImageMaskData: return ReadImageDataMask(width, height, Type);
+                case MaskReaderType.ImageDataMaskWithPreambule: return ReadImageDataMask(width, height, Type);
                 default: throw new NotImplementedException($"Reading mask type {Type}");
             }
         }
@@ -147,19 +150,23 @@ namespace WpfGrabber.Readers
             }
         }
 
-        private ByteBitmap8Bit ReadImageDataMask(int width, int height,
-            bool maskPreambule = false,
-            bool maskData = false)
+        private ByteBitmap8Bit ReadImageDataMask(
+            int width, 
+            int height,
+            MaskReaderType type)
         {
             var result = new ByteBitmap8Bit(width * 8, height);
+            bool readPreambule = type == MaskReaderType.ImageDataMaskWithPreambule;
+            bool swapMaskData = type == MaskReaderType.ImageMaskData;
+            bool skipMask = type == MaskReaderType.ImageData;
 
             var dataBytes = ReadBytes(width * height);
-            if (maskPreambule)
+            if (readPreambule)
             {
                 ReadPreambule(ref width, ref height);
             }
-            var maskBytes = ReadBytes(width * height);
-            if (maskData)
+            var maskBytes = skipMask ? new byte[width * height] : ReadBytes(width * height);
+            if (swapMaskData)
             {
                 (dataBytes, maskBytes) = (maskBytes, dataBytes);
             }

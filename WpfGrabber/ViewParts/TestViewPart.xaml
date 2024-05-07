@@ -1,6 +1,5 @@
-﻿<local:ViewPartDataViewer 
-    x:TypeArguments="local:TestViewPartVM"
-    x:Class="WpfGrabber.ViewParts.TestViewPart"
+﻿<local:TestViewPartBase 
+            x:Class="WpfGrabber.ViewParts.TestViewPart"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -31,7 +30,9 @@
                 </Button.ContextMenu>
             </Button>
         </ItemsControl>
-        <Border Grid.Row="1" Margin="100" CornerRadius="20" x:Name="imageBorder">
+        
+        <Border Grid.Row="1" Margin="20" CornerRadius="20" x:Name="imageBorder" 
+                >
             <Border.Background>
                 <RadialGradientBrush>
                     <GradientStop Color="White" Offset="0"/>
@@ -41,4 +42,4 @@
             <Image x:Name="image"/>
         </Border>
     </Grid>
-</local:ViewPartDataViewer>
+</local:TestViewPartBase>

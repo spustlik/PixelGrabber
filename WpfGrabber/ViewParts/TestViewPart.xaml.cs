@@ -46,7 +46,12 @@ namespace WpfGrabber.ViewParts
         Done,
         Waiting
     }
-    public partial class TestViewPart : ViewPartDataViewer<TestViewPartVM>
+
+    public class TestViewPartBase : ViewPartDataViewer<TestViewPartVM>
+    {
+
+    }
+    public partial class TestViewPart : TestViewPartBase
     {
         public TestViewPart():base()
         {
@@ -88,6 +93,7 @@ namespace WpfGrabber.ViewParts
 
             Clipboard.SetText(string.Join("\n", list));
         }
+
     }
 
 

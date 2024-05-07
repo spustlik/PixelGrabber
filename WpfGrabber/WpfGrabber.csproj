@@ -81,6 +81,7 @@
     <Compile Include="Data\Interval.cs" />
     <Compile Include="Readers\FontReader.cs" />
     <Compile Include="Readers\MaskReader.cs" />
+    <Compile Include="Readers\Z80\SnaData.cs" />
     <Compile Include="Readers\Z80\Z80Instruction.cs" />
     <Compile Include="Readers\Z80\Z80Op.cs" />
     <Compile Include="Readers\Z80\Z80Param.cs" />

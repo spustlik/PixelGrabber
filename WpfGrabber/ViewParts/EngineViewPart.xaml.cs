@@ -16,7 +16,7 @@ namespace WpfGrabber.ViewParts
 {
     public enum EngineType
     {
-        Movie
+        Movie,
     }
     public class EngineViewPartVM : SimpleDataObject
     {

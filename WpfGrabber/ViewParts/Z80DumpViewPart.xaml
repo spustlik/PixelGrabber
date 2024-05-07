@@ -76,6 +76,8 @@
                 <Button.ContextMenu>
                     <ContextMenu>
                         <MenuItem  Header="Save as text..." Click="SaveText_Click"/>
+                        <Separator/>
+                        <MenuItem Header="Dump SNA ZX-Spectrum" Click="DumpSNA_Click"/>
                     </ContextMenu>
                 </Button.ContextMenu>
             </Button>

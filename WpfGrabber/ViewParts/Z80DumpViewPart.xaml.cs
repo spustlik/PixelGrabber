@@ -145,7 +145,7 @@ namespace WpfGrabber.ViewParts
             editor.ScrollToVerticalOffset(vertOffset);
         }
 
-        private Dictionary<int,int> _addressMap = new Dictionary<int, int>();
+        private Dictionary<int, int> _addressMap = new Dictionary<int, int>();
         protected override void OnShowData()
         {
             if (ShellVm.DataLength <= 0)
@@ -190,7 +190,7 @@ namespace WpfGrabber.ViewParts
                 dumpLines.Add(sb.ToString());
                 result.AppendLine(sb.ToString());
             }
-            ViewModel.DumpText = result.ToString(); 
+            ViewModel.DumpText = result.ToString();
             ViewModel.DumpLines.AddRange(dumpLines, clear: true);
         }
 
@@ -215,8 +215,8 @@ namespace WpfGrabber.ViewParts
                 //if (dst.LastOrDefault() != last)
                 //    dst.Push(last);
                 var current = GetCurrentLine();
-                if(dst.LastOrDefault() != current)
-                    dst.Push(current);   
+                if (dst.LastOrDefault() != current)
+                    dst.Push(current);
                 ScrollToLine(last);
             }
             var dir = Convert.ToInt32(btn.CommandParameter);
@@ -230,5 +230,24 @@ namespace WpfGrabber.ViewParts
             }
         }
 
+        private void DumpSNA_Click(object sender, RoutedEventArgs e)
+        {
+            var rd = new DataReader(ShellVm.Data, 0);
+            var sna = new SnaData(rd);
+            var sb = new StringBuilder();
+            foreach (var pi in sna.GetType().GetProperties())
+            {
+                var v = pi.GetValue(sna);
+                sb.Append(pi.Name).Append("= ");
+                if (v is int i)
+                    sb.Append(i.ToString("X4"));
+                else
+                    sb.Append(v);
+                sb.AppendLine();
+            }
+            editor.Text = sb.ToString();
+            if (ShellVm.Offset == 0)
+                ShellVm.Offset = rd.BytePosition;
+        }
     }
 }
