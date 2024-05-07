@@ -19,35 +19,27 @@ namespace WpfGrabber
         public bool FlipY { get; set; }
         public AlienReader(DataReader reader)
         {
+            //flipX:false
             this.reader = reader;
         }
 
-        public static IEnumerable<AlienImage> ReadImages(byte[] bytes, int pos, int endpos, bool flipY)
+        public IEnumerable<(ByteBitmap8Bit bitmap, int position)> ReadImages(int endpos, bool flipY)
         {
             if (endpos <= 0)
-                endpos = bytes.Length;
-            var dr = new DataReader(bytes, pos, flipX: false);
-            var ar = new AlienReader(dr) { FlipY = flipY };
-            var images = new List<AlienImage>();
-            while (!dr.IsEmpty)
+                endpos = this.reader.DataLength;
+            var ar = new AlienReader(reader) { FlipY = flipY };
+            while (!reader.IsEmpty)
             {
-                var start = dr.BytePosition;
-                if (endpos > 0 && dr.BytePosition >= endpos)
+                var start = reader.BytePosition;
+                if (endpos > 0 && reader.BytePosition >= endpos)
                     break;
                 if (!ar.TryRead(out var w, out var h))
                     break;
-                if (pos > endpos || w >= 64 || h >= 64)
+                if (reader.BytePosition >= endpos || w >= 64 || h >= 64)
                     break;
                 var aimg = ar.ReadMaskedImage();
-                images.Add(new AlienImage() { Bitmap = aimg, Position = start });
+                yield return (aimg, start);
             }
-            return images;
-        }
-
-        public class AlienImage
-        {
-            public ByteBitmap8Bit Bitmap { get; set; }
-            public int Position { get; set; }
         }
 
         public bool TryRead(out int w, out int h)

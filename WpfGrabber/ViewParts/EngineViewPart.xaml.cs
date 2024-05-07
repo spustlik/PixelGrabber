@@ -17,6 +17,7 @@ namespace WpfGrabber.ViewParts
     public enum EngineType
     {
         Movie,
+        Alien
     }
     public class EngineViewPartVM : SimpleDataObject
     {
@@ -142,36 +143,6 @@ namespace WpfGrabber.ViewParts
         {
             var fnt = AppData.GetFont();
             var images = ReadImages();
-            /*
-            var (max_w, max_h) = GetDataImageSize(imageBorder);
-            var rgba = new ByteBitmapRgba(max_w, max_h);
-            var posX = 0;
-            var posY = 0;
-            const int XSPACER = 10;
-            const int YSPACER = 8;
-            int maxw = 0;
-            foreach (var a in images)
-            {
-                var img = a.Bitmap;
-                if (posY + img.Height > max_h)
-                {
-                    posX += maxw + XSPACER;
-                    posY = 0;
-                    maxw = 0;
-                }
-                rgba.DrawBitmap(img, posX, posY);
-                posY += img.Height;
-                fnt.DrawString(rgba, posX, posY, a.Description);
-                posY += YSPACER;
-
-                maxw = Math.Max(maxw, img.Width);
-                if (posX > max_w)
-                    break;
-            }
-            var bmp = rgba.ToBitmapSource();
-            image.Source = bmp;
-            image.RenderTransform = new ScaleTransform(ShellVm.Zoom, ShellVm.Zoom);
-            */
             ViewModel.Images.Clear();
 
             foreach (var a in images)
@@ -190,9 +161,15 @@ namespace WpfGrabber.ViewParts
             switch (ViewModel.EngineType)
             {
                 case EngineType.Movie: return ReadMovieImages();
+                case EngineType.Alien: return ReadAlienImages();
                 default:
                     throw new NotImplementedException();
             }
+        }
+
+        private IEnumerable<ImageData> ReadAlienImages()
+        {
+            throw new NotImplementedException();
         }
 
         private IEnumerable<ImageData> ReadMovieImages()
@@ -292,16 +269,6 @@ namespace WpfGrabber.ViewParts
                 var fileName = Path.ChangeExtension(dlg.FileName, $"{item.Name}-{item.ImageData.Addr:X4}-{item.Image.Width}x{item.Image.Height}.png");
                 item.Image?.SaveToPngFile(fileName);
             }
-        }
-
-        private void OnButtonSave_Click(object sender, RoutedEventArgs e)
-        {
-            //var dlg = new SaveFileDialog();
-            //dlg.DefaultExt = ".png";
-            //dlg.FileName = Path.ChangeExtension(ShellVm.FileName, "-data.png");
-            //if (dlg.ShowDialog() != true)
-            //    return;
-            //((BitmapSource)image.Source).SaveToPngFile(dlg.FileName);
         }
 
         private void OnGotoEnd_Click(object sender, RoutedEventArgs e)

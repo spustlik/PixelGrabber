@@ -99,7 +99,7 @@ namespace WpfGrabber.ViewParts
             const int XSPACER = 10;
             const int YSPACER = 0;
             int maxw = 0;
-            foreach (var img in images.Select(a => a.Bitmap))
+            foreach (var img in images.Select(a => a.bitmap))
             {
                 if (posY + img.Height > max_h)
                 {
@@ -118,15 +118,11 @@ namespace WpfGrabber.ViewParts
             image.RenderTransform = new ScaleTransform(ShellVm.Zoom, ShellVm.Zoom);
         }
 
-        private IEnumerable<AlienReader.AlienImage> ReadImages()
+        private IEnumerable<(ByteBitmap8Bit bitmap, int position)> ReadImages()
         {
-            var result = AlienReader
-                .ReadImages(
-                    ShellVm.Data,
-                    ShellVm.Offset,
-                    ViewModel.GetEndPosSafe(),
-                    flipY: ViewModel.FlipVertical
-                );
+            var rd = new DataReader(ShellVm.Data, ShellVm.Offset);
+            var r = new AlienReader(rd);
+            var result = r.ReadImages(ViewModel.GetEndPosSafe(),flipY: ViewModel.FlipVertical);
             if (ViewModel.MaxCount > 0)
                 result = result.Take(ViewModel.MaxCount);
             return result;
@@ -143,11 +139,11 @@ namespace WpfGrabber.ViewParts
             var id = 0;
             foreach (var item in images)
             {
-                var img = item.Bitmap;
+                var img = item.bitmap;
                 var bmp = new ByteBitmapRgba(img.Width, img.Height);
                 bmp.DrawBitmap(img, 0, 0);
                 var bs = bmp.ToBitmapSource();
-                var fileName = Path.ChangeExtension(dlg.FileName, $"{id:00}-{item.Position:X4}-{img.Width}x{img.Height}.png");
+                var fileName = Path.ChangeExtension(dlg.FileName, $"{id:00}-{item.position:X4}-{img.Width}x{img.Height}.png");
                 bs.SaveToPngFile(fileName);
                 id++;
             }

@@ -44,7 +44,6 @@
                 <Button.ContextMenu>
                     <ContextMenu Placement="Bottom">
                         <MenuItem Header="Save images to folder..." Click="OnButtonSaveImages_Click"/>
-                        <!--<MenuItem Header="Save to one image..." Click="OnButtonSave_Click"/>-->
                         <Separator/>
                         <MenuItem Header="Show labels" IsCheckable="true" IsChecked="{Binding ShowLabels}"/>
                         <!--<MenuItem Header="Show border" IsCheckable="true" IsChecked="{Binding ShowBorder}"/>-->
