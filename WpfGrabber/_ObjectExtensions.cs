@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.Design;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace WpfGrabber
 {
@@ -25,6 +26,19 @@ namespace WpfGrabber
             {
                 collection.Add(item);
             }
+        }
+
+        public static void Push<T>(this ObservableCollection<T> collection, T item)
+        {
+            collection.Add(item);
+        }
+        public static T Pop<T>(this ObservableCollection<T> collection)
+        {
+            if (collection.Count == 0)
+                return default;
+            var result = collection.Last();
+            collection.RemoveAt(collection.Count - 1);
+            return result;
         }
 
         public static T GetService<T>(this IServiceProvider serviceProvider) where T : class

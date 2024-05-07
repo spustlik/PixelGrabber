@@ -28,6 +28,24 @@
                 <Setter Property="FontSize" Value="11"/>
                 <Setter Property="WordWrap" Value="True"/>
             </Style>
+            <Style TargetType="Button" x:Key="undoRedo">
+                <Setter Property="Width" Value="22" />
+                <Setter Property="Padding" Value="3,0" />
+                <Style.Resources>
+                    <Style TargetType="Path">
+                        <Setter Property="Stroke" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                        <Setter Property="StrokeThickness" Value="2" />
+                    </Style>
+                </Style.Resources>
+                <Style.Triggers>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Foreground" Value="#b0b0b0" />
+                    </Trigger>
+                    <DataTrigger Binding="{Binding Count}" Value="0">
+                        <Setter Property="IsEnabled" Value="false" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
         </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -43,6 +61,16 @@
             <CheckBox Content="Address" IsChecked="{Binding ShowAddr}"/>
             <Separator/>
             <CheckBox Content="Op codes" IsChecked="{Binding ShowOpcodes}"/>
+            <Separator/>
+            <Button Style="{StaticResource undoRedo}" ToolTip="Back" 
+                    Click="BtnUndoRedo_Click" CommandParameter="-1" DataContext="{Binding UndoLine}">
+                <Path Data="M0,6 L6,0 M0,6 L6,12 M0,6 L12,6" />
+            </Button>
+            <Separator Width="5"/>
+            <Button Style="{StaticResource undoRedo}" ToolTip="Forward" 
+                    Click="BtnUndoRedo_Click" CommandParameter="1" DataContext="{Binding RedoLine}">
+                <Path Data="M12,6 L6,0 M12,6 L6,12 M0,6 L12,6" />
+            </Button>
             <Separator/>
             <Button Style="{StaticResource dropDown}" Content="Save...">
                 <Button.ContextMenu>
@@ -76,6 +104,7 @@
                     <Run xml:space="preserve">
   ORG: addr
   addr: 0x1234, $1234, 65535 (decimal)</Run>
+                    <LineBreak/><Run Foreground="Red">NOT WORKING FOR NOW</Run>
                 </TextBlock>
             </Border>
         </Grid>

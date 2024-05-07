@@ -1,11 +1,14 @@
-﻿using Microsoft.Win32;
+﻿using ICSharpCode.AvalonEdit.Rendering;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls.Primitives;
 using System.Xml.Serialization;
 using WpfGrabber.Readers.Z80;
 using WpfGrabber.Shell;
@@ -44,7 +47,7 @@ namespace WpfGrabber.ViewParts
         #endregion
 
         [XmlIgnore]
-        public ObservableCollection<string> DumpLines { get; private set; } = new ObservableCollection<string>();
+        public ObservableCollection<string> DumpLines { get; } = new ObservableCollection<string>();
 
         #region MapText property
         private string _mapText;
@@ -55,6 +58,10 @@ namespace WpfGrabber.ViewParts
         }
         #endregion
 
+        [XmlIgnore]
+        public ObservableCollection<int> UndoLine { get; } = new ObservableCollection<int>();
+        [XmlIgnore]
+        public ObservableCollection<int> RedoLine { get; } = new ObservableCollection<int>();
     }
 
     public class Z80DumpViewPartBase : ViewPartDataViewer<Z80DumpVM>
@@ -107,10 +114,34 @@ namespace WpfGrabber.ViewParts
             if (s.StartsWith("L"))
                 s = s.Substring(1);
             var addr = int.Parse(s, System.Globalization.NumberStyles.HexNumber);
-            if (!_addressMap.TryGetValue(addr, out var line))
+            GoToAddress(addr);
+        }
+
+        private void GoToAddress(int addr)
+        {
+            int firstLine = GetCurrentLine();
+            if (ViewModel.UndoLine.LastOrDefault() != firstLine
+                && ViewModel.RedoLine.LastOrDefault() != firstLine)
+            {
+                ViewModel.UndoLine.Push(firstLine);
+            }
+            if (!_addressMap.TryGetValue(addr, out var lineIndex))
                 return;
+            ScrollToLine(lineIndex);
+
+        }
+
+        private int GetCurrentLine()
+        {
+            var textView = editor.TextArea.TextView;
+            int firstLine = textView.GetDocumentLineByVisualTop(textView.ScrollOffset.Y).LineNumber - 1;
+            return firstLine;
+        }
+
+        private void ScrollToLine(int lineIndex)
+        {
             //textBox.ScrollToLine(line);
-            var vertOffset = editor.TextArea.TextView.DefaultLineHeight * line;
+            var vertOffset = editor.TextArea.TextView.DefaultLineHeight * lineIndex;
             editor.ScrollToVerticalOffset(vertOffset);
         }
 
@@ -170,6 +201,33 @@ namespace WpfGrabber.ViewParts
             if (dlg.ShowDialog() != true)
                 return;
             File.WriteAllText(dlg.FileName, ViewModel.DumpText);
+        }
+
+        private void BtnUndoRedo_Click(object sender, RoutedEventArgs e)
+        {
+            if (!(e.OriginalSource is ButtonBase btn))
+                return;
+            void doUndoRedo(ObservableCollection<int> src, ObservableCollection<int> dst)
+            {
+                if (src.Count == 0)
+                    return;
+                var last = src.Pop();
+                //if (dst.LastOrDefault() != last)
+                //    dst.Push(last);
+                var current = GetCurrentLine();
+                if(dst.LastOrDefault() != current)
+                    dst.Push(current);   
+                ScrollToLine(last);
+            }
+            var dir = Convert.ToInt32(btn.CommandParameter);
+            if (dir < 0)
+            {
+                doUndoRedo(ViewModel.UndoLine, ViewModel.RedoLine);
+            }
+            else if (dir > 0)
+            {
+                doUndoRedo(ViewModel.RedoLine, ViewModel.UndoLine);
+            }
         }
 
     }
