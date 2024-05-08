@@ -39,6 +39,7 @@ namespace WpfGrabber.ViewParts
 
         #region DumpText property
         private string _dumptext;
+        [XmlIgnore] 
         public string DumpText
         {
             get => _dumptext;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,7 +13,8 @@ namespace WpfGrabber.Data
         #region Line
         private static void Swap<T>(ref T lhs, ref T rhs) { (lhs, rhs) = (rhs, lhs); }
 
-        public static void Line(int x0, int y0, int x1, int y1, Func<int, int, bool> plot)
+        public delegate bool PlotDelegate(int x, int y);
+        public static void Line(int x0, int y0, int x1, int y1, PlotDelegate plot)
         {
             bool steep = Math.Abs(y1 - y0) > Math.Abs(x1 - x0);
             if (steep) { Swap(ref x0, ref y0); Swap(ref x1, ref y1); }
@@ -28,18 +30,51 @@ namespace WpfGrabber.Data
             }
         }
 
+        private static bool Plot8(int x, int y, ByteBitmap8Bit bmp, byte pixel)
+        {
+            if (x < 0 || y < 0 || x > bmp.Width || y > bmp.Height)
+                return false;
+            bmp.SetPixel(x, y, pixel);
+            return true;
+        }
+
         public static void DrawLine(this ByteBitmap8Bit bmp, int x0, int y0, int x1, int y1, byte pixel = 2)
         {
-            if (bmp == null)
-                return;
-            Line(x0, y0, x1, y1, (x, y) =>
-            {
-                if (x < 0 || y < 0 || x > bmp.Width || y > bmp.Height)
-                    return false;
-                bmp.SetPixel(x, y, pixel);
-                return true;
-            });
+            Line(x0, y0, x1, y1, (x, y) => Plot8(x, y, bmp, pixel));
         }
+
+
+        public static void Rect(int x0, int y0, int x1, int y1, PlotDelegate plot)
+        {
+            Line(x0, y0, x1, y0, plot);
+            Line(x1, y0, x1, y1, plot);
+            Line(x1, y1, x0, y1, plot);
+            Line(x0, y1, x0, y0, plot);
+        }
+        public static void FillRect(int x0, int y0, int x1, int y1, PlotDelegate plot)
+        {
+            if (x0 > x1) Swap(ref x0, ref x1);
+            if (y0 > y1) Swap(ref y0, ref y1);
+            for (int y = y0; y <= y1; y++)
+            {
+                for (int x = x0; x <= x1; x++)
+                {
+                    plot(x, y);
+                }
+            }
+        }
+
+        public static void DrawRect(this ByteBitmap8Bit bmp, int x0, int y0, int x1, int y1, byte pixel = 2)
+        {
+            Rect(x0, y0, x1, y1, (x, y) => Plot8(x, y, bmp, pixel));
+        }
+
+        public static void DrawFillRect(this ByteBitmap8Bit bmp, int x0, int y0, int x1, int y1, byte pixel = 2)
+        {
+            FillRect(x0, y0, x1, y1, (x, y) => Plot8(x, y, bmp, pixel));
+        }
+
+
         #endregion
 
         #region Draw bitmap
@@ -70,7 +105,8 @@ namespace WpfGrabber.Data
         {
             DrawBitmapFunctioned(width, height,
                 getPixel,
-                (x, y, b) => {
+                (x, y, b) =>
+                {
                     uint orig = dest.GetPixel(posX + x, posY + y);
                     uint c = colorizer(b, orig);
                     dest.SetPixel(posX + x, posY + y, c);
@@ -110,7 +146,8 @@ namespace WpfGrabber.Data
                 colorizer = Colorizers.GetColorCopy;
             Graphics.DrawBitmapFunctioned(src.Width, src.Height,
                 (x, y) => src.GetPixel(x, y),
-                (x, y, pixel) => {
+                (x, y, pixel) =>
+                {
                     uint orig = dest.GetPixel(posX + x, posY + y);
                     uint c = colorizer(pixel, orig);
                     dest.SetPixel(posX + x, posY + y, c);

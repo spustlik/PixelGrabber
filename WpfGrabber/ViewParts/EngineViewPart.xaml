@@ -18,15 +18,15 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <ItemsControl Style="{StaticResource toolbar}">
-            <StackPanel Orientation="Horizontal">
-                <Label Content="Engine"/>
-                <ComboBox Style="{StaticResource enumCombo}" 
-                      ItemsSource="{Binding EngineType, Converter={StaticResource enumItems}, Mode=OneTime}"
-                      SelectedValue="{Binding EngineType, UpdateSourceTrigger=PropertyChanged}" 
-                      />
-                <Separator/>
-            </StackPanel>
+            <Button Content="®" Click="OnReload_Click" Width="20" Height="20" Padding="0"/>
 
+            <Label Content="Engine"/>
+            <ComboBox Style="{StaticResource enumCombo}" 
+                    ItemsSource="{Binding EngineType, Converter={StaticResource enumItems}, Mode=OneTime}"
+                    SelectedValue="{Binding EngineType, UpdateSourceTrigger=PropertyChanged}" 
+                    />
+            <Separator/>
+            
             <Label Content="Width"/>
             <c:NumberEditor Value="{Binding Width}" 
                             Maximum="256" Minimum="0"

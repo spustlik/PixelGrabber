@@ -40,7 +40,13 @@ namespace WpfGrabber
             collection.RemoveAt(collection.Count - 1);
             return result;
         }
-
+        public static T NextItem<T>(this IEnumerable<T> values, Func<T, bool> findCurrent)
+        {
+            var i = values.FindIndex(findCurrent);
+            if (i < 0 || i + 1 > values.Count())
+                return default;
+            return values.ElementAt(i + 1);
+        }
         public static T GetService<T>(this IServiceProvider serviceProvider) where T : class
         {
             if (serviceProvider != null)

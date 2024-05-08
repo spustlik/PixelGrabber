@@ -78,17 +78,17 @@
                             <Image Source="{Binding Image}" Stretch="None" x:Name="image" RenderOptions.BitmapScalingMode="NearestNeighbor">
                                 <Image.LayoutTransform>
                                     <ScaleTransform 
-                                    ScaleX="{Binding DataContext.ShellVm.Zoom, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                    ScaleY="{Binding DataContext.ShellVm.Zoom, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                        ScaleX="{Binding DataContext.ShellVm.Zoom, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                        ScaleY="{Binding DataContext.ShellVm.Zoom, RelativeSource={RelativeSource AncestorType=ListBox}}"
                                     />
                                 </Image.LayoutTransform>
                             </Image>
 
-                            <Canvas Visibility="{Binding DataContext.ShowLabels, RelativeSource={RelativeSource AncestorType=ListBox}, Converter={StaticResource visiConv}}">
-                                <Border Background="DodgerBlue" Opacity="0.6" Width="{Binding ActualWidth, ElementName=image}">
+                            <Border Visibility="{Binding DataContext.ShowLabels, RelativeSource={RelativeSource AncestorType=ListBox}, Converter={StaticResource visiConv}}"
+                                    HorizontalAlignment="Stretch" VerticalAlignment="Top"
+                                    Background="DodgerBlue" Opacity="0.8">
                                     <TextBlock Text="{Binding Name}" Margin="4,0" Foreground="White" FontSize="10"/>
-                                </Border>
-                            </Canvas>
+                            </Border>
                         </Grid>
                     </Border>
                     <DataTemplate.Triggers>

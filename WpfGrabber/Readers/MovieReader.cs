@@ -11,14 +11,14 @@ namespace WpfGrabber.Readers
     public class MovieReader
     {
         private DataReader rd;
+        public bool FlipVertical { get; set; }
+        public int Width { get; set; }
 
         public MovieReader(DataReader reader)
         {
             this.rd = reader;
         }
 
-        public bool FlipVertical { get; set; }
-        public int Width { get; set; }
         public IEnumerable<ReaderImageResult> ReadImages()
         {
             while (!rd.IsEmpty)
@@ -56,7 +56,7 @@ namespace WpfGrabber.Readers
             }
             else if ((w & 0b11110000) == 0xc0)
             {
-                //0xC1, 0xC0
+                //0xC1, 0xC0, 0xC8
                 if (w == 0xC1)
                 {
                     w = 1 + (byte)(w & 0b0011111);
@@ -71,6 +71,7 @@ namespace WpfGrabber.Readers
             else if ((w & 0b11110000) == 0x40)
             {
                 //41, 42
+                //TODO: another colors?!?
                 w = 1 + (w & 0b1111);
                 h = rd.ReadByte();
                 rd.ReadByte(); // ignore C9 8C, 9E 8A
@@ -82,15 +83,15 @@ namespace WpfGrabber.Readers
                 w = Width;
                 h = rd.ReadByte();
             }
-            var bmp = ReadBitmap(w, h, readmask);
+            var bmp = ReadBitmap(w, h, readmask, flipX:true, flipY:FlipVertical);
             var result = new ReaderImageResult(bmp, pos, rd.BytePosition);
             return result;
         }
 
-        private ByteBitmap8Bit ReadBitmap(int w, int h, bool readmask)
+        public ByteBitmap8Bit ReadBitmap(int w, int h, bool readmask, bool flipX, bool flipY)
         {
-            var datar = new DataReader(rd.ReadBytes(w * h), 0, flipX: true);
-            var maskr = new DataReader(rd.ReadBytes(w * h), 0, flipX: false);
+            var datar = new DataReader(rd.ReadBytes(w * h), 0, flipX:flipX);
+            var maskr = readmask ? new DataReader(rd.ReadBytes(w * h), 0, flipX: false) : null;
             var bmp = new ByteBitmap8Bit(w * 8, h);
             for (int y = 0; y < bmp.Height; y++)
             {
@@ -99,9 +100,9 @@ namespace WpfGrabber.Readers
                     for (int i = 0; i < 8; i++)
                     {
                         var d = datar.ReadBit();
-                        var m = readmask ? maskr.ReadBit() : false;
+                        var m = maskr?.ReadBit() ?? false;
                         var ry = y;
-                        if (FlipVertical)
+                        if (flipY)
                             ry = bmp.Height - y - 1;
                         //bmp.SetPixel(x * 8 + i, ry, (byte)(m ? 1 : 2));
                         bmp.SetPixel(x * 8 + i, ry, (byte)(m ? 1 : d ? 0 : 2));

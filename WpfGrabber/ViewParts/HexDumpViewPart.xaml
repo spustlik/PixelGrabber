@@ -26,6 +26,6 @@
             <ItemsControl ItemsSource="{Binding HexLines}" FontFamily="Courier New" FontSize="10"/>
         </ScrollViewer>-->
         <!-- allow selection, it is not so slower -->
-        <TextBox Grid.Row="1" VerticalScrollBarVisibility="Auto" FontFamily="Courier New" FontSize="10" Text="{Binding HexDump}"/>
+        <TextBox Grid.Row="1" VerticalScrollBarVisibility="Auto" FontFamily="Courier New" FontSize="12" Text="{Binding HexDump}"/>
     </Grid>
 </local:HexDumpViewPartBase>
