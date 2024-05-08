@@ -1,0 +1,129 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace WpfGrabber.Data
+{
+
+    public static class Graphics
+    {
+        #region Line
+        private static void Swap<T>(ref T lhs, ref T rhs) { (lhs, rhs) = (rhs, lhs); }
+
+        public static void Line(int x0, int y0, int x1, int y1, Func<int, int, bool> plot)
+        {
+            bool steep = Math.Abs(y1 - y0) > Math.Abs(x1 - x0);
+            if (steep) { Swap(ref x0, ref y0); Swap(ref x1, ref y1); }
+            if (x0 > x1) { Swap(ref x0, ref x1); Swap(ref y0, ref y1); }
+            int dX = (x1 - x0), dY = Math.Abs(y1 - y0), err = (dX / 2), ystep = (y0 < y1 ? 1 : -1), y = y0;
+
+            for (int x = x0; x <= x1; ++x)
+            {
+                if (!(steep ? plot(y, x) : plot(x, y)))
+                    return;
+                err -= dY;
+                if (err < 0) { y += ystep; err += dX; }
+            }
+        }
+
+        public static void DrawLine(this ByteBitmap8Bit bmp, int x0, int y0, int x1, int y1, byte pixel = 2)
+        {
+            if (bmp == null)
+                return;
+            Line(x0, y0, x1, y1, (x, y) =>
+            {
+                if (x < 0 || y < 0 || x > bmp.Width || y > bmp.Height)
+                    return false;
+                bmp.SetPixel(x, y, pixel);
+                return true;
+            });
+        }
+        #endregion
+
+        #region Draw bitmap
+
+        public static void DrawBitmapFunctioned(
+                int width,
+                int height,
+                Func<int, int, uint> getPixel,
+                Action<int, int, uint> setPixel)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    var b = getPixel(x, y);
+                    setPixel(x, y, b);
+                }
+            }
+        }
+        public static void DrawBitmapByFunc(
+            ByteBitmapRgba dest,
+            int width,
+            int height,
+            int posX,
+            int posY,
+            Func<int, int, uint> getPixel,
+            Colorizer colorizer)
+        {
+            DrawBitmapFunctioned(width, height,
+                getPixel,
+                (x, y, b) => {
+                    uint orig = dest.GetPixel(posX + x, posY + y);
+                    uint c = colorizer(b, orig);
+                    dest.SetPixel(posX + x, posY + y, c);
+                });
+        }
+
+
+        public static void DrawBitmap(this ByteBitmapRgba dest, BitBitmap src, int posX, int posY, Colorizer colorizer = null)
+        {
+            DrawBitmapByFunc(
+                dest,
+                src.WidthPixels,
+                src.Height,
+                posX,
+                posY,
+                (x, y) => src.GetPixel(x, y) ? (byte)1 : (byte)0,
+                colorizer);
+        }
+
+
+        public static void DrawBitmap(this ByteBitmapRgba dest, ByteBitmap8Bit src, int posX, int posY, Colorizer colorizer = null)
+        {
+            if (colorizer == null)
+                colorizer = Colorizers.GetColor01Gray;
+            DrawBitmapByFunc(
+                dest,
+                src.Width,
+                src.Height,
+                posX,
+                posY,
+                (x, y) => src.GetPixel(x, y),
+                colorizer);
+        }
+        public static void DrawBitmap(this ByteBitmapRgba dest, ByteBitmapRgba src, int posX, int posY, Colorizer colorizer = null)
+        {
+            if (colorizer == null)
+                colorizer = Colorizers.GetColorCopy;
+            Graphics.DrawBitmapFunctioned(src.Width, src.Height,
+                (x, y) => src.GetPixel(x, y),
+                (x, y, pixel) => {
+                    uint orig = dest.GetPixel(posX + x, posY + y);
+                    uint c = colorizer(pixel, orig);
+                    dest.SetPixel(posX + x, posY + y, c);
+                });
+        }
+
+        #endregion
+        public static ByteBitmapRgba ToRgba(this ByteBitmap8Bit src, Colorizer colorizer = null)
+        {
+            var result = new ByteBitmapRgba(src.Width, src.Height);
+            result.DrawBitmap(src, 0, 0, colorizer);
+            return result;
+        }
+
+    }
+}

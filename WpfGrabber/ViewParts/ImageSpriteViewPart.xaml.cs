@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Xml.Serialization;
+using WpfGrabber.Data;
 using WpfGrabber.Readers;
 using WpfGrabber.Shell;
 
@@ -235,8 +236,8 @@ namespace WpfGrabber.ViewParts
             int posY = 0;
             foreach (var img in ViewModel.Images)
             {
-                var image = ByteBitmapRgba.FromBitmapSource(img.Image);
-                rgba.DrawBitmap(image, posX, posY, null);
+                var image = img.Image.ToRgba();
+                rgba.DrawBitmap(image, posX, posY);
                 posX++;
                 if (posX >= ViewModel.Columns)
                 {

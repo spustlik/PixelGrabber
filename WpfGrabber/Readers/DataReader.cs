@@ -32,9 +32,15 @@ namespace WpfGrabber
         }
         public byte ReadByte()
         {
+            var b = PeekByte();
+            BytePosition++;
+            return b;
+        }
+        public byte PeekByte()
+        {
             if (IsEmpty)
                 return 0;
-            var b = Data[BytePosition++];
+            var b = Data[BytePosition];
             if (FlipX)
                 b = GetFlippedX(b);
             return b;

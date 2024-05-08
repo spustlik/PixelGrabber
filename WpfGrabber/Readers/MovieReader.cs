@@ -23,48 +23,68 @@ namespace WpfGrabber.Readers
         {
             while (!rd.IsEmpty)
             {
-                var pos = rd.BytePosition;
-                int w = rd.ReadByte();
-                if (w == 0xc0)
-                {
-                    var unknown = rd.ReadByte(); //skip,  next is 0x8? or 0xC1
-                    //6B3D: C0 00 C1 39 
-                    w = rd.ReadByte();
-                }
+                yield return ReadImage();
+            }
+        }
 
-                int h = 0;
-                var readmask = true;
-                if ((w & 0b11000000) == 0b10000000)
+        public ReaderImageResult ReadImage()
+        {
+            var pos = rd.BytePosition;
+            int w = rd.ReadByte();
+            if (w == 0xc0)
+            {
+                var unknown = rd.ReadByte(); //skip,  next is 0x8? or 0xC1
+                                             //6B3D: C0 00 C1 39 
+                w = rd.ReadByte();
+            }
+
+            int h = 0;
+            var readmask = true;
+            if ((w & 0b11110000) == 0xF0)
+            {
+                //TODO: ???
+                // E3
+                //F1,FB,F8
+                readmask = false;
+            }
+            else if ((w & 0b11110000) == 0x80)
+            {
+                //highest bit(s?) can mean that there is mask & data, data otherwise
+                //0x81(w=2), 0x83 BOM (w=4), 0x82(0x98FF-man)
+                w = 1 + (byte)(w & 0b0111111);
+                h = rd.ReadByte();
+            }
+            else if ((w & 0b11110000) == 0xc0)
+            {
+                //0xC1, 0xC0
+                if (w == 0xC1)
                 {
-                    //highest bit(s?) can mean that there is mask & data, data otherwise
-                    //0x81(w=2), 0x83 BOM (w=4), 0x82(0x98FF-man)
-                    w = 1 + (byte)(w & 0b0111111);
+                    w = 1 + (byte)(w & 0b0011111);
                     h = rd.ReadByte();
-                }
-                else if ((w & 0b11000000) == 0b11000000)
-                {
-                    //0xC1, 0xC0
-                    if (w == 0xC1)
-                    {
-                        w = 1 + (byte)(w & 0b0011111);
-                        h = rd.ReadByte();
-                    }
-                    else
-                    {
-                        //???
-                        // E3
-                        //F1,FB,F8
-                    }
-                    readmask = false;
                 }
                 else
                 {
-                    w = Width;
-                    h = rd.ReadByte();
+                    //???
                 }
-                var bmp = ReadBitmap(w, h, readmask);
-                yield return new ReaderImageResult(bmp, pos, rd.BytePosition);
+                readmask = false;
             }
+            else if ((w & 0b11110000) == 0x40)
+            {
+                //41, 42
+                w = 1 + (w & 0b1111);
+                h = rd.ReadByte();
+                rd.ReadByte(); // ignore C9 8C, 9E 8A
+                rd.ReadByte();
+                readmask = false;
+            }
+            else
+            {
+                w = Width;
+                h = rd.ReadByte();
+            }
+            var bmp = ReadBitmap(w, h, readmask);
+            var result = new ReaderImageResult(bmp, pos, rd.BytePosition);
+            return result;
         }
 
         private ByteBitmap8Bit ReadBitmap(int w, int h, bool readmask)

@@ -5,6 +5,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using WpfGrabber.Data;
 using WpfGrabber.Readers;
 using WpfGrabber.Shell;
 
@@ -142,12 +143,12 @@ namespace WpfGrabber.ViewParts
             image.RenderTransform = new ScaleTransform(ShellVm.Zoom, ShellVm.Zoom);
         }
 
-        private ByteBitmapRgba.Colorizer GetColorizer()
+        private Colorizer GetColorizer()
         {
-            var colorizers = new List<ByteBitmapRgba.Colorizer>
+            var colorizers = new List<Colorizer>
             {
-                ByteBitmapRgba.GetColor01Gray,
-                ByteBitmapRgba.GetColor10Gray,
+                Colorizers.GetColor01Gray,
+                Colorizers.GetColor10Gray,
                 (b, o) => b == 1 ? 0 : b == 0 ? 0xFFFFFFFF : 0xFF0000FF,
                 (b, o) => b == 0 ? 0 : b == 1 ? 0xFFFFFFFF : 0xFF0000FF,
                 (b, o) => b > 1 ? 0 : b == 0 ? 0xFFFFFFFF : 0xFF00FF00,
@@ -190,7 +191,7 @@ namespace WpfGrabber.ViewParts
             {
                 if (img.Width <= 0 || img.Height <= 0 || img.Width >= 256 || img.Height >= 128)
                     continue;
-                var rgba = ByteBitmapRgba.FromBitmap(img);
+                var rgba = img.ToRgba();
                 string fileName = Path.Combine(
                     Path.GetDirectoryName(dlg.FileName),
                     $"{Path.GetFileNameWithoutExtension(ShellVm.FileName)}-{i:00}.png");

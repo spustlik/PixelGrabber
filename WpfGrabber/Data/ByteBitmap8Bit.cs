@@ -1,4 +1,6 @@
-﻿namespace WpfGrabber
+﻿using System;
+
+namespace WpfGrabber
 {
     public class ByteBitmap8Bit
     {

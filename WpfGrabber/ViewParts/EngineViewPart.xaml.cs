@@ -1,12 +1,16 @@
 ﻿using Microsoft.Win32;
 using System;
+using System.CodeDom.Compiler;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Xml.Serialization;
+using WpfGrabber.Data;
 using WpfGrabber.Readers;
 using WpfGrabber.Shell;
 
@@ -147,7 +151,7 @@ namespace WpfGrabber.ViewParts
             ViewModel.Images.Clear();
             foreach (var a in images)
             {
-                var img = ByteBitmapRgba.FromBitmap(a.Bitmap);
+                var img = a.Bitmap.ToRgba();
                 var s = a.Description + $"\nWidth: {img.Width}, Height: {img.Height}";
                 if (img.Width == 0 || img.Height == 0)
                     img = null;
@@ -176,13 +180,82 @@ namespace WpfGrabber.ViewParts
                 .Select(x => CreateImageData(x));
         }
 
+        internal class MovieMark
+        {
+            public int offset;
+            public int len;
+            public int w;
+            public int h;
+            public int skip;
+        }
         private IEnumerable<ImageData> ReadMovieImages()
         {
             var rd = new DataReader(ShellVm.Data, ShellVm.Offset);
             var r = new MovieReader(rd) { FlipVertical = ViewModel.FlipVertical, Width = ViewModel.Width };
-            return r
-                .ReadImages()
-                .Select(x => CreateImageData(x));
+
+            var eimages = r.ReadImages().GetEnumerator();
+            MovieMark o(int ofs, int len = 0, int w = 0, int h = 0, int skip = 0)
+            {
+                return new MovieMark() { offset = ofs, len = len, w = w, h = h, skip = skip };
+            }
+            var offsets = new[]
+            {
+                o(0x3c3b),
+                //o(0x3e15),
+                o(0x3EB5, skip:0x447B-0x3EB5),
+                o(0x447B,w:32,h:24), //flip byte
+            }.ToList();
+            var eoffsets = offsets.GetEnumerator();
+            //eimages.Reset();
+            eimages.MoveNext();
+            //(eoffsets as IEnumerator).Reset();
+            eoffsets.MoveNext();
+            int counter = 0;
+            while (!rd.IsEmpty)
+            {
+                if (eoffsets.Current == null ||
+                    (eimages.Current != null && eimages.Current.position <= eoffsets.Current?.offset))
+                {
+                    if (eimages.Current.position == eoffsets.Current?.offset)
+                    {
+                        eoffsets.MoveNext();
+                    }
+                    eimages.MoveNext();
+                    yield return CreateImageData(eimages.Current);
+                }
+                else if (eoffsets.Current != null)
+                {
+                    //if (eoffsets.Current.w != 0 && eoffsets.Current.h != 0)
+                    //{
+                    //    var bmp = new ByteBitmap8Bit(eoffsets.Current.w, eoffsets.Current.h);
+                    //    eoffsets.MoveNext();
+                    //    var dummy=new ReaderImageResult(bmp, eoffsets.Current.offset);
+                    //    yield return CreateImageData(dummy);
+                    //}
+                    //else
+                    {
+                        var bmp = new ByteBitmap8Bit(20, 20);
+                        bmp.DrawLine(0, 0, bmp.Width, bmp.Height);
+                        bmp.DrawLine(bmp.Width, 0, 0, bmp.Height);
+                        var len = eoffsets.Current.skip;
+                        if (len == 0)
+                            len = eoffsets.Current.w * eoffsets.Current.h;
+                        if (len == 0)
+                            len = 1;
+                        var dummy = new ReaderImageResult(bmp, eoffsets.Current.offset, eoffsets.Current.offset + len);
+                        eoffsets.MoveNext();
+                        var data = CreateImageData(dummy);
+                        data.Title = $"({data.Title})";
+                        yield return data;
+                    }
+                }
+                counter++;
+                if (ViewModel.MaxCount > 0 && counter > ViewModel.MaxCount)
+                    break;
+            }
+            //return r
+            //    .ReadImages()
+            //    .Select(x => CreateImageData(x));
         }
 
         private ImageData CreateImageData(ReaderImageResult r)
@@ -221,5 +294,6 @@ namespace WpfGrabber.ViewParts
             ShellVm.Offset = ViewModel.SelectedImage.ImageData.AddrEnd;
         }
     }
+
 
 }

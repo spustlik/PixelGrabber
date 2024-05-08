@@ -159,7 +159,7 @@ namespace WpfGrabber.ViewParts
             for (int i = 0; i < font.Letters.Length; i++)
             {
                 BitBitmap letter = font.Letters[i];
-                rgba.DrawBitmap(letter, posX, posY, ByteBitmapRgba.GetColorBlack);
+                rgba.DrawBitmap(letter, posX, posY, Colorizers.GetColorBlack);
                 if (posX >= maxX)
                 {
                     posX = 0;

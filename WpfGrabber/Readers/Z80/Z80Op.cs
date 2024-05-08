@@ -1,6 +1,7 @@
-﻿namespace WpfGrabber.Readers.Z80
-{
+﻿using System;
 
+namespace WpfGrabber.Readers.Z80
+{ 
     public enum Z80Op
     {
         Unknown,
