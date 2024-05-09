@@ -5,13 +5,19 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WpfGrabber.ViewParts" xmlns:c="clr-namespace:WpfGrabber.Controls"
                                 mc:Ignorable="d" 
-             d:DesignHeight="452.516" d:DesignWidth="367.195">
+             d:DesignHeight="284.96" d:DesignWidth="398.305">
     <d:DesignerProperties.DesignStyle>
         <Style TargetType="UserControl">
             <Setter Property="Background" Value="White" />
         </Style>
     </d:DesignerProperties.DesignStyle>
     <Grid>
+        <Grid.Resources>
+            <Style TargetType="Label">
+                <Setter Property="Padding" Value="0,3,3,3" />
+            </Style>
+
+        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -27,45 +33,43 @@
                     <WrapPanel/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
-            <CheckBox Content="Flip image bytes" IsChecked="{Binding FlipBytes}"/>
+            <CheckBox Content="Flip bytes" ToolTip="Flip image bytes" IsChecked="{Binding FlipBytes}"/>
             <Separator/>
             <CheckBox Content="Flip X" IsChecked="{Binding FlipX}"/>
             <Separator/>
             <CheckBox Content="Flip Y" IsChecked="{Binding FlipY}"/>
             <Separator/>
             <StackPanel>
-                <Label Content="Type"/>
-                <ComboBox Style="{StaticResource enumCombo}" 
+                <Label Content="T"/>
+                <ComboBox ToolTip="Mask data type" Style="{StaticResource enumCombo}" 
                       ItemsSource="{Binding ReaderType, Converter={StaticResource enumItems}, Mode=OneTime}"
                       SelectedValue="{Binding ReaderType, UpdateSourceTrigger=PropertyChanged}" 
                       />
                 <Separator/>
             </StackPanel>
             <StackPanel>
-                <Label Content="Preambule"/>
-                <ComboBox Style="{StaticResource enumCombo}" 
+                <Label Content="P"/>
+                <ComboBox ToolTip="Preambule/prefix of data" Style="{StaticResource enumCombo}" 
                       ItemsSource="{Binding Preambule, Converter={StaticResource enumItems}, Mode=OneTime}"
                       SelectedValue="{Binding Preambule, UpdateSourceTrigger=PropertyChanged}" 
                       />
                 <Separator/>
             </StackPanel>
             <StackPanel>
-                <Label Content="Width"/>
-                <c:NumberEditor Value="{Binding Width}" Minimum="1" Width="80" LargeChange="0"/>
+                <Label Content="W"/>
+                <c:NumberEditor ToolTip="Width" Value="{Binding Width}" Minimum="1" Width="80" LargeChange="0"/>
                 <Separator/>
             </StackPanel>
             <StackPanel>
-                <Label Content="Height"/>
-                <c:NumberEditor Value="{Binding Height}" Minimum="1" Width="80" LargeChange="0"/>
+                <Label Content="H"/>
+                <c:NumberEditor ToolTip="Height" Value="{Binding Height}" Minimum="1" Width="80" LargeChange="0"/>
                 <Separator/>
             </StackPanel>
-            <Separator/>
             <StackPanel>
-                <Label Content="Mask type"/>
-                <c:NumberEditor Value="{Binding MaskType}" Minimum="0" Maximum="7" Width="70" LargeChange="0"/>
+                <Label Content="Mask"/>
+                <c:NumberEditor ToolTip="Type of mask" Value="{Binding MaskType}" Minimum="0" Maximum="7" Width="70" LargeChange="0"/>
                 <Separator/>
             </StackPanel>
-            <Separator/>
             <StackPanel>
                 <Label Content="Colorize"/>
                 <c:NumberEditor Value="{Binding Colorize}" Minimum="0" Maximum="5" Width="70" LargeChange="0"/>
