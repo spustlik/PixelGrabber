@@ -15,6 +15,7 @@ namespace WpfGrabber.Shell
         public ShellVm()
         {
             Zoom = 1;
+            UiZoom = 1;
         }
 
         #region FileName property
@@ -62,6 +63,17 @@ namespace WpfGrabber.Shell
             set => Set(ref _zoom, value);
         }
         #endregion
+
+        #region UiZoom property
+        private double _uiZoom;
+        [XmlIgnore]
+        public double UiZoom
+        {
+            get => _uiZoom;
+            set => Set(ref _uiZoom, value);
+        }
+        #endregion
+
 
         #region AutoLoadLayout property
         private bool _autoLoadLayout;

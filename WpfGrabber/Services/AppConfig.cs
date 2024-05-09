@@ -16,17 +16,19 @@ namespace WpfGrabber.Services
     {
         public static string AppConfigFileName => Path.ChangeExtension(Assembly.GetExecutingAssembly().Location, ".cfg");
 
-        public string[] RecentFiles { get; set; }
-        public string LastFile { get; set; }
-        public bool OpenLastFile { get; set; } = true;
-        public double Zoom { get; set; }
-        public bool AutoLoadLayout { get; set; } = true;
+        public string[] RecentFiles { get; private set; }
+        public string LastFile { get; private set; }
+        public bool OpenLastFile { get; private set; } = true;
+        public double Zoom { get; private set; } = 1;
+        public double UiZoom { get; private set; } = 1.0;
+        public bool AutoLoadLayout { get; private set; } = true;
 
         public static void Save(ShellVm vm)
         {
             var data = new AppConfig();
             data.RecentFiles = vm.RecentFiles.ToArray();
             data.Zoom = vm.Zoom;
+            data.UiZoom = vm.UiZoom;
             data.LastFile = vm.FileName;
             data.AutoLoadLayout = vm.AutoLoadLayout;
             XmlHelper.SerializeToFile(AppConfigFileName, data);
@@ -40,6 +42,7 @@ namespace WpfGrabber.Services
             if (data == null)
                 return null;
             vm.Zoom = data.Zoom;
+            vm.UiZoom = data.UiZoom;
             vm.AutoLoadLayout = data.AutoLoadLayout;
             vm.RecentFiles.AddRange(data.RecentFiles, clear: true);
             return data;

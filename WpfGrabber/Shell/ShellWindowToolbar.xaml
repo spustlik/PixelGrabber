@@ -8,18 +8,7 @@
              HorizontalAlignment="Stretch"
              FocusManager.IsFocusScope="true"
              d:DesignHeight="30" d:DesignWidth="414.944">
-    <UserControl.Resources>
-        <BooleanToVisibilityConverter x:Key="boolToVisi"/>
-        <Style TargetType="Grid" x:Key="disableGrid">
-            <!--<Setter Property="IsEnabled" Value="true" />
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding DataLength}" Value="0">
-                    <Setter Property="IsEnabled" Value="false" />
-                </DataTrigger>
-            </Style.Triggers>-->
-        </Style>
-    </UserControl.Resources>
-    <Grid Style="{StaticResource disableGrid}">
+    <Grid>
         <Border Background="#d0d0f0" Padding="0" 
                 CornerRadius="5" BorderBrush="#b0b0b0" BorderThickness="0">
             <StackPanel Orientation="Horizontal">
@@ -37,12 +26,10 @@
                     </Style>
                 </StackPanel.Resources>
                 <Label Content="Offset:"/>
-                <Label>
-                    <Label.Content>
-                        <TextBlock Width="50">
-                            <Run Text="0x"/><Run Text="{Binding Offset, StringFormat=X4}" />
-                        </TextBlock>
-                    </Label.Content>
+                <Label Width="60" FontFamily="Courier New" Padding="0">
+                    <TextBlock Margin="0,3,0,0">
+                        <Run Text="0x"/><Run Text="{Binding Offset, StringFormat=X4}" />
+                    </TextBlock>
                 </Label>
                 <c:NumberEditor 
                         ToolTip="Use 0x or x prefix for hex numbers"
@@ -52,7 +39,7 @@
                 <Label Content="{Binding FileName}"/>
                 <Label Content="*" 
                        Foreground="Red" FontWeight="Bold" FontSize="16" Padding="0"
-                       Visibility="{Binding IsProjectDirty, Converter={StaticResource boolToVisi}}"/>
+                       Visibility="{Binding IsProjectDirty, Converter={StaticResource visiConv}}"/>
                 <Separator/>
                 <Label Content="Size:"/>
                 <Label Content="{Binding DataLength}"/>

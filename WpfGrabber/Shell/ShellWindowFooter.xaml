@@ -7,22 +7,31 @@
              mc:Ignorable="d" x:Name="root" 
              d:DesignHeight="50" d:DesignWidth="800"
              FocusManager.IsFocusScope="True">
+    <FrameworkElement.Resources>
+        <wpfgrabber:PercentTextConverter x:Key="zoomConv"/>
+        <Style TargetType="Button">
+            <Setter Property="Width" Value="22" />
+        </Style>
+        <Style TargetType="Path">
+            <Setter Property="Stroke" Value="{Binding Foreground,RelativeSource={RelativeSource AncestorType=Button}}" />
+        </Style>
+        <Style TargetType="Label">
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Padding" Value="5,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+    </FrameworkElement.Resources>
     <StatusBar>
-        <StatusBar.Resources>
-            <wpfgrabber:PercentTextConverter x:Key="zoomConv"/>
-            <Style TargetType="Button">
-                <Setter Property="Width" Value="22" />
-            </Style>
-            <Style TargetType="Path">
-                <Setter Property="Stroke" Value="{Binding Foreground,RelativeSource={RelativeSource AncestorType=Button}}" />
-            </Style>
-        </StatusBar.Resources>
         <StatusBarItem>
             <TextBlock Text="{Binding StatusBarMessage}"/>
         </StatusBarItem>
         <StatusBarItem HorizontalAlignment="Right">
-            <StackPanel Grid.Column="1" Orientation="Horizontal" >
-                <Label Content="Zoom " Padding="5,0" VerticalAlignment="Center"/>
+            <StackPanel Orientation="Horizontal" >
+                <Label>UI zoom:</Label>
+                <Slider VerticalAlignment="Center" Width="80" 
+                        Minimum="0.5" Maximum="3" Value="{Binding UiZoom}"/>
+                <FrameworkElement Width="10"/>
+                <Label Content="Zoom " />
                 <Button Click="ZoomMinus_Click">
                     <Path Data="M0,0 L10,0" StrokeThickness="2"/>
                 </Button>
@@ -44,7 +53,6 @@
                     <Path Data="M5,0 L5,10 M0,5 L10,5" StrokeThickness="2"/>
                 </Button>
             </StackPanel>
-
         </StatusBarItem>
     </StatusBar>
 </UserControl>

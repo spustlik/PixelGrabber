@@ -9,6 +9,15 @@
         Title="Pixel Grabber" Height="450" Width="800"
         Closing="OnWindow_Closing"
         >
+    <Window.Resources>
+        <Style TargetType="FrameworkElement" x:Key="scaler">
+            <Setter Property="LayoutTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="{Binding UiZoom}" ScaleY="{Binding UiZoom}"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <Grid FocusManager.IsFocusScope="True">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -16,9 +25,9 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <local:ShellWindowMenu />
-        <local:ShellWindowToolbar Grid.Row="1" Margin="3,2,3,0"/>
-        <local:ShellWindowContent Grid.Row="2"/>
+        <local:ShellWindowMenu Style="{StaticResource scaler}"/>
+        <local:ShellWindowToolbar Grid.Row="1" Margin="3,2,3,0" Style="{StaticResource scaler}"/>
+        <local:ShellWindowContent Grid.Row="2" Style="{StaticResource scaler}"/>
         <local:ShellWindowFooter Grid.Row="3"/>
 
     </Grid>
