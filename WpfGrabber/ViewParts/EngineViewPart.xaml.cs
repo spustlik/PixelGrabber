@@ -143,7 +143,12 @@ namespace WpfGrabber.ViewParts
         }
         protected override void OnShowData()
         {
-            var fnt = AppData.GetFont();
+            if (ViewModel.EngineType == EngineType.Movie && ShellVm.Offset == 1)
+            {
+                ShellVm.Offset = 0x3c3b;
+                return;
+            }
+
             var images = ReadImages();
             if (ViewModel.MaxCount != 0)
                 images = images.Take(ViewModel.MaxCount);
@@ -205,9 +210,6 @@ namespace WpfGrabber.ViewParts
 
         private IEnumerable<ImageData> ReadMovieImages()
         {
-            var rd = new DataReader(ShellVm.Data, ShellVm.Offset);
-            var r = new MovieReader(rd) { FlipVertical = ViewModel.FlipVertical, Width = ViewModel.Width };
-
             MovieMark _(int ofs, int w = 0, int h = 0, bool _skip = false)
             {
                 return new MovieMark() { offset = ofs, w = w, h = h, skip = _skip };
@@ -245,17 +247,17 @@ namespace WpfGrabber.ViewParts
                 _(0x5476),
                 s(0x54FC), // 02 16 16 D2 B4 14 B5 80 | 0A 00 06 1E 78 68 68 30 
                 _(0x5503),
-                s(0x5519), //99 81 00 00 00 00 00 00 | 00 00 00 01 E0 00 00 01
+                s(0x5519), // 99 81 00 00 00 00 00 00 | 00 00 00 01 E0 00 00 01
                 _(0x551B, w:-4,h:44),
-                s(0x55CB),//FF 03 80 FF 01 00 FF 00 | 00 FE 01 00 F8 01 00 F0 
+                s(0x55CB), // FF 03 80 FF 01 00 FF 00 | 00 FE 01 00 F8 01 00 F0 
                 _(0x55CC,w:3,h:15),
-                //55F9: 17 FF FF 02 16 16 D2 B4 | 14 B5 80 0A 00 06 1E 78 
+                s(0x55F9), // 17 FF FF 02 16 16 D2 B4 | 14 B5 80 0A 00 06 1E 78 
                 _(0x5603),
-                _(0x5619), // 99 81 FF F0 7F E0 3F C0 | 7F 80 3F 80 1F 00 1F 00
+                s(0x5619), // 99 81 FF F0 7F E0 3F C0 | 7F 80 3F 80 1F 00 1F 00
                 _(0x561b, w:2,h:23), // h?
-                //5649: C0 D0 F8 C4 C9 A8 FF FF | FF 81 25 00 00 02 00 02 
+                s(0x5649), // C0 D0 F8 C4 C9 A8 FF FF | FF 
                 _(0x5652),                
-                //s(0x57FA), // 21 28 17 C6 D3 2D DA 08 | 88 D4 5B DA 09 16 A6 F8 
+                s(0x57FA), // 21 28 17 C6 D3 2D DA 08 | 88 D4 5B DA 09 16 A6 F8 
                 _(0x5864),
                 _(0x5B40,w:-2,h:38),
                 _(0x5B8C,w:2,h:38),
@@ -412,6 +414,9 @@ namespace WpfGrabber.ViewParts
                 _(0x9ABE), //BOM
                 #endregion
             };
+            var rd = new DataReader(ShellVm.Data, ShellVm.Offset);
+            var r = new MovieReader(rd) { FlipVertical = ViewModel.FlipVertical, Width = ViewModel.Width };
+
             var fnt = AppData.GetFont();
             while (!rd.IsEmpty)
             {
@@ -435,7 +440,7 @@ namespace WpfGrabber.ViewParts
                         bmp = new ByteBitmap8Bit(30, 10);
                     bmp.DrawLine(0, 0, bmp.Width - 1, bmp.Height - 1);
                     bmp.DrawLine(bmp.Width - 1, 0, 0, bmp.Height - 1);
-                    //fnt.DrawString()
+                    fnt.DrawString(bmp, 3,3, skipbytes.ToString());
                     var dummy = new ReaderImageResult(bmp, pos, pos + skipbytes);
                     var data = CreateImageData(dummy);
                     data.Description = $"(skip:0x{skip:X4}) {data.Description}";
@@ -452,7 +457,7 @@ namespace WpfGrabber.ViewParts
                 }
                 else
                 {
-
+                    throw new NotImplementedException();
                 }
 
             }
@@ -489,15 +494,22 @@ namespace WpfGrabber.ViewParts
             }
         }
 
+
         private void OnGotoEnd_Click(object sender, RoutedEventArgs e)
         {
-            //originalSource as MenuItem
             if (ViewModel.SelectedImage == null)
                 return;
             ShellVm.Offset = ViewModel.SelectedImage.ImageData.AddrEnd;
         }
 
+        private void OnGoto_Click(object sender, RoutedEventArgs e)
+        {
+            if (ViewModel.SelectedImage == null)
+                return;
+            ShellVm.Offset = ViewModel.SelectedImage.ImageData.Addr;
 
+
+        }
     }
 
 

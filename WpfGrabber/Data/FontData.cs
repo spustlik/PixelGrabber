@@ -29,14 +29,14 @@ namespace WpfGrabber.Data
             font.TryGetValue(c, out var r);
             return r;
         }
-        public void DrawString(ByteBitmapRgba target, int x, int y, string text, uint color = 0xFF000000)
+        public void DrawString(ByteBitmapRgba target, int x, int y, string text, Colorizer colorizer)
         {
             for (int i = 0; i < text.Length; i++)
             {
                 var c = GetCharBmp(text[i]);
                 if (c != null)
                 {
-                    DrawLetter(target, x, y, c, color);
+                    DrawLetter(target, x, y, c, colorizer);
                     x += c.WidthPixels;
                 }
                 else
@@ -46,17 +46,16 @@ namespace WpfGrabber.Data
                 x += SpaceX;
             }
         }
-
-        public void DrawLetter(ByteBitmapRgba target, int posx, int posy, BitBitmap c, uint color = 0xFF000000)
+        public void DrawString(ByteBitmap8Bit bmp, int posx, int posy, string text)
         {
-            for (var y = 0; y < c.Height; y++)
-            {
-                for (var x = 0; x < c.WidthPixels; x++)
-                {
-                    if (c.GetPixel(x, y))
-                        target.SetPixel(posx + x, posy + y, 0xFF000000 | color);
-                }
-            }
+            throw new NotImplementedException();
+        }
+
+        public void DrawLetter(ByteBitmapRgba target, int posx, int posy, BitBitmap chr, Colorizer colorizer = null)
+        {
+            if (colorizer == null)
+                colorizer = Colorizers.GetColorWhite;
+            target.DrawBitmap(chr, posx, posy, colorizer);
         }
 
         public void WriteToStream(Stream s)
@@ -79,20 +78,10 @@ namespace WpfGrabber.Data
             }
         }
 
-        public static byte[] GetLetterData(BitBitmap letter)
+        private static byte[] GetLetterData(BitBitmap letter)
         {
             return letter.Data;
-            /*
-            var data = new byte[letter.Width * letter.Height];
-            for (int y = 0; y < letter.Height; y++)
-            {
-                for (int x = 0; x < letter.Width; x++)
-                {
-                    data[y * letter.Width + x] = letter.GetPixel(x,y);
-                }
-            }
-            return data;
-            */
         }
+
     }
 }

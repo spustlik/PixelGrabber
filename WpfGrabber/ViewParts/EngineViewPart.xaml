@@ -70,6 +70,7 @@
             </ListBox.ItemsPanel>
             <ListBox.ContextMenu>
                 <ContextMenu>
+                    <MenuItem Header="Goto" Click="OnGoto_Click"/>
                     <MenuItem Header="Goto end" Click="OnGotoEnd_Click"/>
                 </ContextMenu>
             </ListBox.ContextMenu>

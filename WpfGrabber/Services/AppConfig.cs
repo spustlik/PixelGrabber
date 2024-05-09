@@ -16,12 +16,12 @@ namespace WpfGrabber.Services
     {
         public static string AppConfigFileName => Path.ChangeExtension(Assembly.GetExecutingAssembly().Location, ".cfg");
 
-        public string[] RecentFiles { get; private set; }
-        public string LastFile { get; private set; }
-        public bool OpenLastFile { get; private set; } = true;
-        public double Zoom { get; private set; } = 1;
-        public double UiZoom { get; private set; } = 1.0;
-        public bool AutoLoadLayout { get; private set; } = true;
+        public string[] RecentFiles { get; set; }
+        public string LastFile { get; set; }
+        public bool OpenLastFile { get; set; } = true;
+        public double Zoom { get; set; } = 1;
+        public double UiZoom { get; set; } = 1.0;
+        public bool AutoLoadLayout { get; set; } = true;
 
         public static void Save(ShellVm vm)
         {
