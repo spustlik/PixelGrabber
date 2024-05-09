@@ -39,7 +39,7 @@ namespace WpfGrabber.ViewParts
 
         #region DumpText property
         private string _dumptext;
-        [XmlIgnore] 
+        [XmlIgnore]
         public string DumpText
         {
             get => _dumptext;
@@ -182,9 +182,12 @@ namespace WpfGrabber.ViewParts
                 {
                     if (ViewModel.ShowAddr)
                         sb.Append(z80.DataPosition.ToString("X4")).Append(": ");
-                    var b = z80.ReadByte();//skip byte
-                    sb.Append(b.ToString("X2"));
-                    sb.Append(" ");
+                    if (z80.DataPosition < z80.Data.Length)
+                    {
+                        var b = z80.ReadByte();//skip byte
+                        sb.Append(b.ToString("X2"));
+                        sb.Append(" ");
+                    }
                     sb.Append(">> ");
                     sb.Append(e.Message);
                 }

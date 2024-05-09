@@ -24,6 +24,8 @@ namespace WpfGrabber.Readers.Z80
 
         public byte ReadByte()
         {
+            if (DataPosition >= Data.Length)
+                return 0;
             return Data[DataPosition++];
         }
         public int ReadSignedByte()

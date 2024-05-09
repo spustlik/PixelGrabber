@@ -103,8 +103,8 @@ namespace WpfGrabber.Shell
                 return;
             var viewPart = def.Create();
             viewPartService.Add(viewPart);
-            var width = (int)ele.Attribute(ATTR_WIDTH);
-            viewPartService.SetOptions(viewPart, new ViewPartOptions() { Title = def.Title, Width = width });
+            var width = (int?)ele.Attribute(ATTR_WIDTH);
+            viewPartService.SetOptions(viewPart, new ViewPartOptions() { Title = def.Title, Width = width??0 });
             var le = ele.Element(ELE_LAYOUT);
             if (le != null)
                 viewPart.OnLoadLayout(le);
@@ -155,6 +155,21 @@ namespace WpfGrabber.Shell
             }
             target.SetAttributeValue(ATTR_ZOOM, shellVm.Zoom);
             target.SetAttributeValue(ATTR_OFFSET, shellVm.Offset);
+            //remove closed viewparts
+            var vpElements = target.Elements(ELE_VIEWPART)
+                .Select(e => new { ele = e, type = e.Attribute(ATTR_TYPE)?.Value })
+                .Select(a => new { a.ele, a.type, def = viewPartFactory.FindTypeDefinition(a.type) })
+                .ToArray();
+            var viewParts = viewPartService
+                .ViewParts
+                .Select(vp => new { vp, def = viewPartFactory.FindDefinition(vp) })
+                .ToArray();
+            foreach (var item in vpElements
+                .Where(a => !viewParts.Any(b => a.def == b.def)))
+            {
+                item.ele.Remove();
+            }
+
             foreach (var viewPart in viewPartService.ViewParts)
             {
                 SaveViewPart(target, viewPart);
@@ -168,11 +183,12 @@ namespace WpfGrabber.Shell
                 .FirstOrDefault(e => e.Attribute(ATTR_TYPE)?.Value == def.TypeId);
             if (ele != null)
                 ele.Remove();
-            var (vpc, index) = viewPartService.GetViewPartControl(viewPart);
+            var (vpc, index, width) = viewPartService.GetViewPartControl(viewPart);
             ele = new XElement(ELE_VIEWPART,
-                new XAttribute(ATTR_TYPE, def.TypeId),
-                new XAttribute(ATTR_WIDTH, (int)vpc.ActualWidth)
+                new XAttribute(ATTR_TYPE, def.TypeId)
                 );
+            if (width != 0)
+                ele.Add(new XAttribute(ATTR_WIDTH, width));
             parent.Add(ele);
             var le = ele.Element(ELE_LAYOUT);
             if (le == null)

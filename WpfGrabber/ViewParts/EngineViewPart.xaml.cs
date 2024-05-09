@@ -19,7 +19,8 @@ namespace WpfGrabber.ViewParts
     public enum EngineType
     {
         Movie,
-        Alien
+        Alien,
+        Filmation
     }
     public class EngineViewPartVM : SimpleDataObject
     {
@@ -174,15 +175,25 @@ namespace WpfGrabber.ViewParts
             {
                 case EngineType.Movie: return ReadMovieImages();
                 case EngineType.Alien: return ReadAlienImages();
+                case EngineType.Filmation: return ReadFilmationImages();
                 default:
                     throw new NotImplementedException();
             }
         }
 
+        private IEnumerable<ImageData> ReadFilmationImages()
+        {
+            var rd = new DataReader(ShellVm.Data, ShellVm.Offset);
+            var fr = new EngineFilmationReader(rd);
+            return fr
+                .ReadImages()
+                .Select(x => CreateImageData(x));
+        }
+
         private IEnumerable<ImageData> ReadAlienImages()
         {
             var rd = new DataReader(ShellVm.Data, ShellVm.Offset);
-            var r = new AlienReader(rd) { FlipY = ViewModel.FlipVertical };
+            var r = new EngineAlienReader(rd) { FlipY = ViewModel.FlipVertical };
             return r
                 .ReadImages(0)
                 .Select(x => CreateImageData(x));
@@ -192,9 +203,9 @@ namespace WpfGrabber.ViewParts
 
         private IEnumerable<ImageData> ReadMovieImages()
         {
-            var marks = MovieMark.GetMarks();
+            var marks = MovieMark.Marks;
             var rd = new DataReader(ShellVm.Data, ShellVm.Offset);
-            var r = new MovieReader(rd) { FlipVertical = ViewModel.FlipVertical, Width = ViewModel.Width };
+            var r = new EngineMovieReader(rd) { FlipVertical = ViewModel.FlipVertical, Width = ViewModel.Width };
 
             var fnt = AppData.GetFont();
             while (!rd.IsEmpty)
@@ -242,7 +253,7 @@ namespace WpfGrabber.ViewParts
             //return r
             //    .ReadImages()
             //    .Select(x => CreateImageData(x));
-        }        
+        }
 
         private ImageData CreateImageData(ReaderImageResult r)
         {

@@ -9,65 +9,63 @@
              x:Name="root"
              d:DesignHeight="30.5" d:DesignWidth="406.222"
              >
-    <Grid>
-        <Grid.Resources>
-            <wpfgrabber:HexStringConverter x:Key="hexConv" Prefix=""/>
-        </Grid.Resources>
-        <Menu>
-            <MenuItem Header="File">
-                <MenuItem Header="Open..." Command="ApplicationCommands.Open"/>
-                <MenuItem Header="Recent" ItemsSource="{Binding ShellVm.RecentFiles}">
-                    <MenuItem.ItemContainerStyle>
-                        <Style TargetType="MenuItem">
-                            <Setter Property="Command" Value="local:ShellWindowMenu.OpenRecentCommand" />
-                            <Setter Property="CommandParameter" Value="{Binding .}" />
-                        </Style>
-                    </MenuItem.ItemContainerStyle>
-                </MenuItem>
-                <Separator/>
-                <MenuItem Header="Exit" Command="ApplicationCommands.Close"/>
-            </MenuItem>
-            <MenuItem Header="Viewer" ItemsSource="{Binding ViewParts}">
+    <UserControl.Resources>
+        <wpfgrabber:HexStringConverter x:Key="hexConv" Prefix=""/>
+    </UserControl.Resources>
+    <Menu LayoutTransform="{Binding LayoutTransform, ElementName=root}">
+        <MenuItem Header="File">
+            <MenuItem Header="Open..." Command="ApplicationCommands.Open"/>
+            <MenuItem Header="Recent" ItemsSource="{Binding ShellVm.RecentFiles}">
                 <MenuItem.ItemContainerStyle>
                     <Style TargetType="MenuItem">
-                        <Setter Property="Command" Value="local:ShellWindowMenu.ShowViewPartCommand" />
-                        <Setter Property="Header" Value="{Binding Title}" />
+                        <Setter Property="Command" Value="local:ShellWindowMenu.OpenRecentCommand" />
                         <Setter Property="CommandParameter" Value="{Binding .}" />
                     </Style>
                 </MenuItem.ItemContainerStyle>
             </MenuItem>
-            <MenuItem Header="Layout">
-                <MenuItem.Resources>
-                    <Style TargetType="MenuItem" x:Key="layoutsMenu">
-                        <Setter Property="ItemsSource" Value="{Binding ShellVm.Layouts}"/>
-                        <Setter Property="ItemContainerStyle" >
-                            <Setter.Value>
-                                <Style TargetType="MenuItem">
-                                    <!--<EventSetter Event="Click" Handler="LoadNamedLayout_Click"/>-->
-                                    <Setter Property="CommandParameter" Value="{Binding .}" />
-                                </Style>
-                            </Setter.Value>
-                        </Setter>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding ShellVm.Layouts.Count}" Value="0">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </MenuItem.Resources>
-                <MenuItem Header="Auto load" IsCheckable="True" IsChecked="{Binding ShellVm.AutoLoadLayout}"/>
-                <MenuItem Header="Load" Click="LoadLayout_Click"/>
-                <MenuItem Header="Save" Click="SaveLayout_Click"/>
-                <Separator/>
-                <MenuItem Header="Load" Style="{StaticResource layoutsMenu}" Click="LoadNamedLayout_Click"/>
-                <MenuItem Header="Save ..." Click="SaveNamedLayout_Click"/>
-                <MenuItem Header="Remove" Style="{StaticResource layoutsMenu}" Click="RemoveNamedLayout_Click"/>
+            <Separator/>
+            <MenuItem Header="Exit" Command="ApplicationCommands.Close"/>
+        </MenuItem>
+        <MenuItem Header="Viewer" ItemsSource="{Binding ViewParts}">
+            <MenuItem.ItemContainerStyle>
+                <Style TargetType="MenuItem">
+                    <Setter Property="Command" Value="local:ShellWindowMenu.ShowViewPartCommand" />
+                    <Setter Property="Header" Value="{Binding Title}" />
+                    <Setter Property="CommandParameter" Value="{Binding .}" />
+                </Style>
+            </MenuItem.ItemContainerStyle>
+        </MenuItem>
+        <MenuItem Header="Layout">
+            <MenuItem.Resources>
+                <Style TargetType="MenuItem" x:Key="layoutsMenu">
+                    <Setter Property="ItemsSource" Value="{Binding ShellVm.Layouts}"/>
+                    <Setter Property="ItemContainerStyle" >
+                        <Setter.Value>
+                            <Style TargetType="MenuItem">
+                                <!--<EventSetter Event="Click" Handler="LoadNamedLayout_Click"/>-->
+                                <Setter Property="CommandParameter" Value="{Binding .}" />
+                            </Style>
+                        </Setter.Value>
+                    </Setter>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding ShellVm.Layouts.Count}" Value="0">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </MenuItem.Resources>
+            <MenuItem Header="Auto load" IsCheckable="True" IsChecked="{Binding ShellVm.AutoLoadLayout}"/>
+            <MenuItem Header="Load" Click="LoadLayout_Click"/>
+            <MenuItem Header="Save" Click="SaveLayout_Click"/>
+            <Separator/>
+            <MenuItem Header="Load" Style="{StaticResource layoutsMenu}" Click="LoadNamedLayout_Click"/>
+            <MenuItem Header="Save ..." Click="SaveNamedLayout_Click"/>
+            <MenuItem Header="Remove" Style="{StaticResource layoutsMenu}" Click="RemoveNamedLayout_Click"/>
                 
-            </MenuItem>
+        </MenuItem>
 
-            <MenuItem Header="Tools">
-                <MenuItem Header="Test data" Click="OnTestData_Click"/>
-            </MenuItem>
-        </Menu>
-    </Grid>
+        <MenuItem Header="Tools">
+            <MenuItem Header="Test data" Click="OnTestData_Click"/>
+        </MenuItem>
+    </Menu>
 </UserControl>

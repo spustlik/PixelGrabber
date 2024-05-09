@@ -173,7 +173,7 @@ namespace WpfGrabber.ViewParts
                 ColorType = ViewModel.MaskType,
                 Preambule = ViewModel.Preambule
             };
-            while (rd.BitReader.BytePosition < rd.BitReader.DataLength)
+            while (rd.Reader.BytePosition < rd.Reader.DataLength)
             {
                 var img = rd.Read();
                 yield return img;

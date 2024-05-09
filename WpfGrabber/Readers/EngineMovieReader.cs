@@ -8,13 +8,13 @@ namespace WpfGrabber.Readers
 {
     //Movie game engine, but not complete - user must find sprite starts (see Marks)
     //height(16bit), data(h*WIDTH), mask reversed
-    public class MovieReader
+    public class EngineMovieReader
     {
         private DataReader rd;
         public bool FlipVertical { get; set; }
         public int Width { get; set; }
 
-        public MovieReader(DataReader reader)
+        public EngineMovieReader(DataReader reader)
         {
             this.rd = reader;
         }
@@ -83,14 +83,14 @@ namespace WpfGrabber.Readers
                 w = Width;
                 h = rd.ReadByte();
             }
-            var bmp = ReadBitmap(w, h, readmask, flipX:true, flipY:FlipVertical);
+            var bmp = ReadBitmap(w, h, readmask, flipX: true, flipY: FlipVertical);
             var result = new ReaderImageResult(bmp, pos, rd.BytePosition);
             return result;
         }
 
         public ByteBitmap8Bit ReadBitmap(int w, int h, bool readmask, bool flipX, bool flipY)
         {
-            var datar = new DataReader(rd.ReadBytes(w * h), 0, flipX:flipX);
+            var datar = new DataReader(rd.ReadBytes(w * h), 0, flipX: flipX);
             var maskr = readmask ? new DataReader(rd.ReadBytes(w * h), 0, flipX: false) : null;
             var bmp = new ByteBitmap8Bit(w * 8, h);
             for (int y = 0; y < bmp.Height; y++)
@@ -120,16 +120,15 @@ namespace WpfGrabber.Readers
         public int h;
         public bool skip;
         public bool IsImage => w == 0 && h == 0 && !skip;
-        public static MovieMark[] GetMarks()
+        static MovieMark _(int ofs, int w = 0, int h = 0, bool _skip = false)
         {
-            MovieMark _(int ofs, int w = 0, int h = 0, bool _skip = false)
+            return new MovieMark() { offset = ofs, w = w, h = h, skip = _skip };
+        }
+        static MovieMark s(int ofs) => _(ofs, 0, 0, true);
+
+        public static MovieMark[] Marks { get; } = new[]
             {
-                return new MovieMark() { offset = ofs, w = w, h = h, skip = _skip };
-            }
-            MovieMark s(int ofs) => _(ofs, 0, 0, true);
-            var result = new[]
-            {
-                #region offsets
+                #region
                 _(0x3c3b),
                 s(0x3E67), //42 10 63 5C 21
                 _(0x447B, w:-32, h:24),
@@ -327,7 +326,5 @@ namespace WpfGrabber.Readers
                 _(0x9ABE), //BOM, ..etc total 264 items
                 #endregion
             };
-            return result;
-        }
     }
 }

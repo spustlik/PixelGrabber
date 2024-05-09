@@ -60,7 +60,7 @@ namespace WpfGrabber.Shell
         }
         public void SetOptions(ViewPart viewPart, ViewPartOptions options)
         {
-            var (vpc, i) = GetViewPartControl(viewPart);
+            var (vpc, i, w) = GetViewPartControl(viewPart);
             if (i < 0)
                 return;
             vpc.Title = options.Title;
@@ -81,19 +81,28 @@ namespace WpfGrabber.Shell
 
         void IViewPartServiceEx.FixGridLayout() => this.FixGridLayout();
 
-        (ViewPartControl vpc, int index) IViewPartServiceEx.GetViewPartControl(ViewPart viewPart) => this.GetViewPartControl(viewPart);
+        (ViewPartControl vpc, int index, int width) IViewPartServiceEx.GetViewPartControl(ViewPart viewPart) 
+            => this.GetViewPartControl(viewPart);
 
         #endregion
 
-        private (ViewPartControl control, int index) GetViewPartControl(ViewPart viewPart)
+        private (ViewPartControl control, int index, int width) GetViewPartControl(ViewPart viewPart)
         {
             for (int i = 0; i < partsGrid.Children.Count; i++)
             {
                 var vpc = partsGrid.Children[i] as ViewPartControl;
                 if (vpc?.Content == viewPart)
-                    return (control: vpc, index: i);
+                {
+                    var width = (int)vpc.ActualWidth;
+                    //star width is not stored
+                    var col = Grid.GetColumn(vpc);
+                    if (partsGrid.ColumnDefinitions[col].Width.IsStar)
+                        width = 0;
+                    return (control: vpc, index: i, width);
+                }
+                    
             }
-            return (control: null, index: -1);
+            return (control: null, index: -1, width: 0);
         }
 
         private void FixGridLayout()

@@ -18,7 +18,7 @@ namespace WpfGrabber.Shell
 
         void FixGridLayout();
 
-        (ViewPartControl vpc, int index) GetViewPartControl(ViewPart viewPart);
+        (ViewPartControl vpc, int index, int width) GetViewPartControl(ViewPart viewPart);
     }
     public class ViewPartOptions
     {

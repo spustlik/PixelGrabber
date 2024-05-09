@@ -52,11 +52,11 @@ namespace WpfGrabber.Readers
 
     public class MaskReader
     {
-        public DataReader BitReader { get; }
+        public DataReader Reader { get; }
 
-        public MaskReader(DataReader bitReader)
+        public MaskReader(DataReader reader)
         {
-            this.BitReader = bitReader;
+            this.Reader = reader;
         }
 
         public bool FlipX { get; set; }
@@ -106,43 +106,43 @@ namespace WpfGrabber.Readers
                 case MaskReaderPreambule.None:
                     break;
                 case MaskReaderPreambule.Skip8Bits:
-                    BitReader.ReadByte();
+                    Reader.ReadByte();
                     break;
                 case MaskReaderPreambule.Skip16Bits:
-                    BitReader.ReadWord16();
+                    Reader.ReadWord16();
                     break;
                 case MaskReaderPreambule.Skip32Bits:
-                    BitReader.ReadWord16();
-                    BitReader.ReadWord16();
+                    Reader.ReadWord16();
+                    Reader.ReadWord16();
                     break;
                 case MaskReaderPreambule.WidthHeight:
                     {
-                        width = BitReader.ReadByte();
-                        height = BitReader.ReadByte();
+                        width = Reader.ReadByte();
+                        height = Reader.ReadByte();
                         break;
                     }
                 case MaskReaderPreambule.WidthHeight8:
                     {
-                        width = BitReader.ReadByte() / 8;
-                        height = BitReader.ReadByte();
+                        width = Reader.ReadByte() / 8;
+                        height = Reader.ReadByte();
                         break;
                     }
                 case MaskReaderPreambule.WidthHeight16:
                     {
-                        width = BitReader.ReadWord16() / 8;
-                        height = BitReader.ReadWord16();
+                        width = Reader.ReadWord16() / 8;
+                        height = Reader.ReadWord16();
                         break;
                     }
                 case MaskReaderPreambule.HeightWidth8:
                     {
-                        height = BitReader.ReadByte();
-                        width = (BitReader.ReadByte() / 8) / 2;
+                        height = Reader.ReadByte();
+                        width = (Reader.ReadByte() / 8) / 2;
                         break;
                     }
                 case MaskReaderPreambule.HeightWidth16:
                     {
-                        height = BitReader.ReadWord16();
-                        width = BitReader.ReadWord16() / 8;
+                        height = Reader.ReadWord16();
+                        width = Reader.ReadWord16() / 8;
                         break;
                     }
                 default:
@@ -160,11 +160,12 @@ namespace WpfGrabber.Readers
             bool swapMaskData = type == MaskReaderType.ImageMaskData;
             bool skipMask = type == MaskReaderType.ImageData;
 
-            var dataBytes = ReadBytes(width * height);
             if (readPreambule)
             {
                 ReadPreambule(ref width, ref height);
             }
+            var dataBytes = ReadBytes(width * height);
+
             var maskBytes = skipMask ? new byte[width * height] : ReadBytes(width * height);
             if (swapMaskData)
             {
@@ -204,7 +205,7 @@ namespace WpfGrabber.Readers
             var result = new byte[count];
             for (int i = 0; i < result.Length; i++)
             {
-                var b = BitReader.ReadByte();
+                var b = Reader.ReadByte();
                 if (FlipByte)
                     b = DataReader.GetFlippedX(b);
                 result[i] = b;

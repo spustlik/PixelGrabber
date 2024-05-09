@@ -13,12 +13,12 @@ namespace WpfGrabber
     // byte height
     // byte[] data - 2 bytes for mask and data for each 8 pixels
 
-    public class AlienReader
+    public class EngineAlienReader
     {
         private DataReader reader;
 
         public bool FlipY { get; set; }
-        public AlienReader(DataReader reader)
+        public EngineAlienReader(DataReader reader)
         {
             //flipX:false
             this.reader = reader;

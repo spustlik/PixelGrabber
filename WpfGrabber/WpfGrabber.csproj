@@ -74,7 +74,7 @@
     <Compile Include="Data\FontData.cs" />
     <Compile Include="Data\Graphics.cs" />
     <Compile Include="Data\GraphicsWpf.cs" />
-    <Compile Include="Readers\AlienReader.cs" />
+    <Compile Include="Readers\EngineAlienReader.cs" />
     <Compile Include="Readers\BitImageReader.cs" />
     <Compile Include="Readers\DataReader.cs" />
     <Compile Include="Data\ByteBitmapRgba.cs" />
@@ -82,9 +82,10 @@
       <DependentUpon>ExceptionWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Data\Interval.cs" />
+    <Compile Include="Readers\EngineFilmationReader.cs" />
     <Compile Include="Readers\FontReader.cs" />
     <Compile Include="Readers\MaskReader.cs" />
-    <Compile Include="Readers\MovieReader.cs" />
+    <Compile Include="Readers\EngineMovieReader.cs" />
     <Compile Include="Readers\ReaderImageResult.cs" />
     <Compile Include="Readers\Z80\SnaData.cs" />
     <Compile Include="Readers\Z80\Z80Instruction.cs" />
