@@ -59,7 +59,7 @@ namespace WpfGrabber.ViewParts
             var rgba = new ByteBitmapRgba(max_w, max_h);
             var font = AppData.GetFont();
 
-            font.DrawString(rgba, 0, 0, "TEST TEXT",Colorizers.GetColorBlack);
+            rgba.DrawText(font, 0, 0, "TEST TEXT",Colorizers.GetColorBlack);
             var bmp = rgba.ToBitmapSource();
             image.Source = bmp;
             image.RenderTransform = new ScaleTransform(ShellVm.Zoom, ShellVm.Zoom);

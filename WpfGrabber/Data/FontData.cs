@@ -29,34 +29,6 @@ namespace WpfGrabber.Data
             font.TryGetValue(c, out var r);
             return r;
         }
-        public void DrawString(ByteBitmapRgba target, int x, int y, string text, Colorizer colorizer)
-        {
-            for (int i = 0; i < text.Length; i++)
-            {
-                var c = GetCharBmp(text[i]);
-                if (c != null)
-                {
-                    DrawLetter(target, x, y, c, colorizer);
-                    x += c.WidthPixels;
-                }
-                else
-                {
-                    x += 6;
-                }
-                x += SpaceX;
-            }
-        }
-        public void DrawString(ByteBitmap8Bit bmp, int posx, int posy, string text)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void DrawLetter(ByteBitmapRgba target, int posx, int posy, BitBitmap chr, Colorizer colorizer = null)
-        {
-            if (colorizer == null)
-                colorizer = Colorizers.GetColorWhite;
-            target.DrawBitmap(chr, posx, posy, colorizer);
-        }
 
         public void WriteToStream(Stream s)
         {
@@ -68,19 +40,14 @@ namespace WpfGrabber.Data
                 while (letter.Key > last + 1)
                 {
                     //add empty char
-                    byte[] data = GetLetterData(letter.Value);
+                    byte[] data = letter.Value.Data;
                     Array.Clear(data, 0, data.Length);
                     s.WriteBytes(data);
                     last = letter.Key;
                 }
-                s.WriteBytes(GetLetterData(letter.Value));
+                s.WriteBytes(letter.Value.Data);
                 last = letter.Key;
             }
-        }
-
-        private static byte[] GetLetterData(BitBitmap letter)
-        {
-            return letter.Data;
         }
 
     }

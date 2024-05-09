@@ -152,7 +152,7 @@ namespace WpfGrabber.ViewParts
             var font = CreateFont();
             var (max_w, max_h) = GetDataImageSize(imageBorder);
             var rgba = new ByteBitmapRgba(max_w, max_h);
-            font.DrawString(rgba, 10, 10, ViewModel.TestText, Colorizers.GetColorBlack);
+            rgba.DrawText(font, 10, 10, ViewModel.TestText, Colorizers.GetColorBlack);
             var posX = 0;
             var posY = 40;
             var maxX = max_w - 40;
@@ -188,7 +188,7 @@ namespace WpfGrabber.ViewParts
             for (var i = 0; i < font.Letters.Count(); i++)
             {
                 var letter = font.Letters[i];
-                font.DrawLetter(bmp, 0, y, letter, Colorizers.GetColorWhite);
+                bmp.DrawBitmap(letter, 0, y, Colorizers.GetColorWhite);
                 y += letter.Height;
             }
             bmp.ToBitmapSource().SaveToPngFile(dlg.FileName);
@@ -216,7 +216,7 @@ namespace WpfGrabber.ViewParts
                 return;
             var font = CreateFont();
             var bmp = new ByteBitmapRgba(ViewModel.TestText.Length * font.Letters.First().WidthPixels, font.Letters.Max(x => x.Height));
-            font.DrawString(bmp, 0, 0, ViewModel.TestText, Colorizers.GetColorWhite);
+            bmp.DrawText(font, 0, 0, ViewModel.TestText, Colorizers.GetColorWhite);
             bmp.ToBitmapSource().SaveToPngFile(dlg.FileName);
         }
 

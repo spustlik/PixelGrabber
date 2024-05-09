@@ -237,7 +237,7 @@ namespace WpfGrabber.ViewParts
             foreach (var img in ViewModel.Images)
             {
                 var image = img.Image.ToRgba();
-                rgba.DrawBitmap(image, posX, posY);
+                rgba.DrawBitmap(image, posX, posY, Colorizers.GetColorCopy);
                 posX++;
                 if (posX >= ViewModel.Columns)
                 {

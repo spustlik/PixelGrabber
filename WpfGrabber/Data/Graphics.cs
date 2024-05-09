@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -44,6 +45,9 @@ namespace WpfGrabber.Data
         }
 
 
+        #endregion
+
+        #region rect
         public static void Rect(int x0, int y0, int x1, int y1, PlotDelegate plot)
         {
             Line(x0, y0, x1, y0, plot);
@@ -72,6 +76,46 @@ namespace WpfGrabber.Data
         public static void DrawFillRect(this ByteBitmap8Bit bmp, int x0, int y0, int x1, int y1, byte pixel = 2)
         {
             FillRect(x0, y0, x1, y1, (x, y) => Plot8(x, y, bmp, pixel));
+        }
+
+
+        #endregion
+
+        #region font
+
+        public static void PutText(FontData font, 
+            int x, int y, string text,
+            Action<int, int, BitBitmap> drawChar)
+        {
+            for (int i = 0; i < text.Length; i++)
+            {
+                var chr = font.GetCharBmp(text[i]);
+                if (chr != null)
+                {
+                    drawChar(x, y, chr);
+                    x += chr.WidthPixels;
+                }
+                else
+                {
+                    //unknown char
+                    x += 6;
+                }
+                x += font.SpaceX;
+            }
+        }
+        public static void DrawText(this ByteBitmapRgba target, FontData font, int posx, int posy, string text, Colorizer colorizer)
+        {
+            PutText(font, posx, posy, text, (x, y, chr) =>
+            {
+                target.DrawBitmap(chr, x, y, colorizer);
+            });
+        }
+        public static void DrawText(this ByteBitmap8Bit target, FontData font, int posx, int posy, string text, byte pixel)
+        {
+            PutText(font, posx, posy, text, (x, y, chr) =>
+            {
+                target.DrawBitmap(chr, x, y, pixel);
+            });
         }
 
 
@@ -114,7 +158,7 @@ namespace WpfGrabber.Data
         }
 
 
-        public static void DrawBitmap(this ByteBitmapRgba dest, BitBitmap src, int posX, int posY, Colorizer colorizer = null)
+        public static void DrawBitmap(this ByteBitmapRgba dest, BitBitmap src, int posX, int posY, Colorizer colorizer)
         {
             DrawBitmapByFunc(
                 dest,
@@ -127,10 +171,8 @@ namespace WpfGrabber.Data
         }
 
 
-        public static void DrawBitmap(this ByteBitmapRgba dest, ByteBitmap8Bit src, int posX, int posY, Colorizer colorizer = null)
+        public static void DrawBitmap(this ByteBitmapRgba dest, ByteBitmap8Bit src, int posX, int posY, Colorizer colorizer)
         {
-            if (colorizer == null)
-                colorizer = Colorizers.GetColor01Gray;
             DrawBitmapByFunc(
                 dest,
                 src.Width,
@@ -140,11 +182,9 @@ namespace WpfGrabber.Data
                 (x, y) => src.GetPixel(x, y),
                 colorizer);
         }
-        public static void DrawBitmap(this ByteBitmapRgba dest, ByteBitmapRgba src, int posX, int posY, Colorizer colorizer = null)
+        public static void DrawBitmap(this ByteBitmapRgba dest, ByteBitmapRgba src, int posX, int posY, Colorizer colorizer)
         {
-            if (colorizer == null)
-                colorizer = Colorizers.GetColorCopy;
-            Graphics.DrawBitmapFunctioned(src.Width, src.Height,
+            DrawBitmapFunctioned(src.Width, src.Height,
                 (x, y) => src.GetPixel(x, y),
                 (x, y, pixel) =>
                 {
@@ -154,8 +194,21 @@ namespace WpfGrabber.Data
                 });
         }
 
+        public static void DrawBitmap(this ByteBitmap8Bit dest, BitBitmap src, int posX, int posY, 
+            byte pixel)
+        {
+            DrawBitmapFunctioned(src.WidthPixels, src.Height,
+                (x, y) => src.GetPixel(x, y) ? (uint)1 : 2, //1=no font pixel
+                (x, y, px) =>
+                {
+                    if(px==1)
+                        dest.SetPixel(posX + x, posY + y, pixel);
+                });
+        }
         #endregion
-        public static ByteBitmapRgba ToRgba(this ByteBitmap8Bit src, Colorizer colorizer = null)
+
+
+        public static ByteBitmapRgba ToRgba(this ByteBitmap8Bit src, Colorizer colorizer)
         {
             var result = new ByteBitmapRgba(src.Width, src.Height);
             result.DrawBitmap(src, 0, 0, colorizer);

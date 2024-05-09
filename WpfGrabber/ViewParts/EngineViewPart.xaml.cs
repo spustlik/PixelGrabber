@@ -156,7 +156,7 @@ namespace WpfGrabber.ViewParts
             ViewModel.Images.Clear();
             foreach (var a in images)
             {
-                var img = a.Bitmap.ToRgba();
+                var img = a.Bitmap.ToRgba(Colorizers.GetColor01Gray);
                 var s = a.Description + $"\nWidth: {img.Width}, Height: {img.Height}";
                 if (img.Width == 0 || img.Height == 0)
                     img = null;
@@ -256,7 +256,7 @@ namespace WpfGrabber.ViewParts
                 s(0x5619), // 99 81 FF F0 7F E0 3F C0 | 7F 80 3F 80 1F 00 1F 00
                 _(0x561b, w:2,h:23), // h?
                 s(0x5649), // C0 D0 F8 C4 C9 A8 FF FF | FF 
-                _(0x5652),                
+                _(0x5652),
                 s(0x57FA), // 21 28 17 C6 D3 2D DA 08 | 88 D4 5B DA 09 16 A6 F8 
                 _(0x5864),
                 _(0x5B40,w:-2,h:38),
@@ -330,7 +330,8 @@ namespace WpfGrabber.ViewParts
                 s(0x74CA), //F3 F9 51 B9 02 02 CB 40 | 02 EB 40 02 EB 40 02 6B 
                 _(0x74CD,w:-3,h:11),
                 s(0x74EE),// 70 00 00 00 00 07 AE 00 | 1F 27 80 3F DF C0 7F 8F 
-                _(0x74F3,w:-3,h:22),
+                _(0x74F3,w:-3,h:20),
+
                 _(0x752F,w:-3,h:22), //mask for prev?!?
                 _(0x7571,w:-2,h:24),
                 _(0x75A1,w:-2,h:24), //mask for prev?
@@ -440,7 +441,7 @@ namespace WpfGrabber.ViewParts
                         bmp = new ByteBitmap8Bit(30, 10);
                     bmp.DrawLine(0, 0, bmp.Width - 1, bmp.Height - 1);
                     bmp.DrawLine(bmp.Width - 1, 0, 0, bmp.Height - 1);
-                    fnt.DrawString(bmp, 3,3, skipbytes.ToString());
+                    bmp.DrawText(fnt, 0, 0, skipbytes.ToString(), 2);
                     var dummy = new ReaderImageResult(bmp, pos, pos + skipbytes);
                     var data = CreateImageData(dummy);
                     data.Description = $"(skip:0x{skip:X4}) {data.Description}";
@@ -484,12 +485,19 @@ namespace WpfGrabber.ViewParts
         {
             var dlg = new SaveFileDialog();
             dlg.DefaultExt = ".png";
-            dlg.FileName = Path.ChangeExtension(ShellVm.FileName, ".png");
+            dlg.FileName = Path.GetFileName(Path.ChangeExtension(ShellVm.FileName, ".png"));
             if (dlg.ShowDialog() != true)
                 return;
             foreach (var item in ViewModel.Images)
             {
-                var fileName = Path.ChangeExtension(dlg.FileName, $"{item.Name}-{item.ImageData.Addr:X4}-{item.Image.Width}x{item.Image.Height}.png");
+                if (item.Image == null)
+                    continue;
+                var n2 = $"{item.ImageData.Addr:X4}";
+                if (n2 == item.Name)
+                    n2 = "";
+                else 
+                    n2 = "-" + n2;
+                var fileName = Path.ChangeExtension(dlg.FileName, $"{item.Name}{n2}-{item.Image.Width}x{item.Image.Height}.png");
                 item.Image?.SaveToPngFile(fileName);
             }
         }

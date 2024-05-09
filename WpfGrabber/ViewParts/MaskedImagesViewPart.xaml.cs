@@ -191,7 +191,7 @@ namespace WpfGrabber.ViewParts
             {
                 if (img.Width <= 0 || img.Height <= 0 || img.Width >= 256 || img.Height >= 128)
                     continue;
-                var rgba = img.ToRgba();
+                var rgba = img.ToRgba(Colorizers.GetColor01Gray);
                 string fileName = Path.Combine(
                     Path.GetDirectoryName(dlg.FileName),
                     $"{Path.GetFileNameWithoutExtension(ShellVm.FileName)}-{i:00}.png");
