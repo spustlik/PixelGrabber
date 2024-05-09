@@ -12,18 +12,15 @@
         </Style>
     </d:DesignerProperties.DesignStyle>
     <Grid>
-        <Grid.Resources>
-            <Style TargetType="Label">
-                <Setter Property="Padding" Value="0,3,3,3" />
-            </Style>
-
-        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <ItemsControl Style="{StaticResource toolbar}">
             <ItemsControl.Resources>
+                <Style TargetType="Label">
+                    <Setter Property="Padding" Value="0,3,3,3" />
+                </Style>
                 <Style TargetType="StackPanel">
                     <Setter Property="Orientation" Value="Horizontal" />
                 </Style>
