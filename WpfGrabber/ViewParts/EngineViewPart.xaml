@@ -18,10 +18,10 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <ItemsControl Style="{StaticResource toolbar}">
-            <Button Content="®" Click="OnReload_Click" Width="20" Height="20" Padding="0"/>
+            <!--<Button Content="®" Click="OnReload_Click" Width="20" Height="20" Padding="0"/>-->
 
-            <Label Content="Engine"/>
-            <ComboBox Style="{StaticResource enumCombo}" 
+            <!--<Label Content="Engine"/>-->
+            <ComboBox ToolTip="Engine" Style="{StaticResource enumCombo}" 
                     ItemsSource="{Binding EngineType, Converter={StaticResource enumItems}, Mode=OneTime}"
                     SelectedValue="{Binding EngineType, UpdateSourceTrigger=PropertyChanged}" 
                     />
@@ -40,7 +40,7 @@
                             Width="70" SliderWidth="0"/>
             <Separator/>-->
 
-            <Label Content="Max count"/>
+            <Label Content="Max" ToolTip="Maximum images count"/>
             <c:NumberEditor Value="{Binding MaxCount}" 
                             Maximum="256" LargeChange="0"
                             Width="70" SliderWidth="0"/>

@@ -1,4 +1,6 @@
-﻿namespace WpfGrabber.Data
+﻿using System;
+
+namespace WpfGrabber.Data
 {
     public delegate uint Colorizer(uint data, uint orig);
 
@@ -41,6 +43,13 @@
         public static uint GetColorGray(uint d, uint orig)
         {
             return 0xff000000 | d | d >> 8 | d >> 16;
+        }
+
+        public static Colorizer GetColor(uint color)
+        {
+            if ((color & 0xFF000000) == 0)
+                color = color | 0xFF000000;
+            return (d, orig) => d == 0 ? orig : color;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using WpfGrabber.Data;
 
 namespace WpfGrabber
 {
