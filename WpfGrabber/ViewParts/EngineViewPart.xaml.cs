@@ -199,6 +199,8 @@ namespace WpfGrabber.ViewParts
             //    var s = $"o(0x{ShellVm.Offset:X4},w:{(vp.ViewModel.FlipX ? "":"-")}{vp.ViewModel.Width},h:{vp.ViewModel.Height}),";
             //    Clipboard.SetText(s);
             //}
+            //var s = ShellVm.Offset.ToString("X4");
+            //Clipboard.SetText(s);
             ShowData();
         }
 
@@ -326,42 +328,38 @@ namespace WpfGrabber.ViewParts
                 o(0x74CA,skip:-1), //F3 F9 51 B9 02 02 CB 40 | 02 EB 40 02 EB 40 02 6B 
                 o(0x74CD,w:-3,h:11),
                 o(0x74EE,skip:-1),// 70 00 00 00 00 07 AE 00 | 1F 27 80 3F DF C0 7F 8F 
-
-
-
-                o(0x74F3,w:-3,h:20),
+                o(0x74F3,w:-3,h:22),
                 o(0x752F,w:-3,h:22), //mask for prev?!?
                 o(0x7571,w:-2,h:24),
                 o(0x75A1,w:-2,h:24), //mask for prev?
                 o(0x75D1,w:-2,h:16),
                 o(0x75F1,w:-2,h:23),
                 o(0x761F,w:-2,h:18), //mask for prev?
-                o(0x7643,w:-3,h:20),
-                o(0x767F,w:-3,h:25),
-
+                o(0x7643,w:-3,h:22),
+                o(0x7685,w:3,h:22),
                 o(0x76C7,w:-2,h:31),
-                o(0x7705,w:-2,h:31),
+                o(0x7705,w:2,h:31),
                 o(0x7743,w:-2,h:27),
-                o(0x7779,w:-2,h:26),
+                o(0x7779,w:2,h:26),
                 o(0x77AD,w:-2,h:26),
-                o(0x77E1,w:-2,h:25),
+                o(0x77E1,w:2,h:25),
                 o(0x7813,w:2,h:39),
-                //7861: E3 08 0D 08 06 08 20 08 | A0 01 A8 04 46 03 86 01 
+                o(0x7861,skip:-1), //E3 08 0D 08 06 08 20 08 | A0 01 A8 04 46 03 86 01 
                 o(0x787F,w:-3,h:18),
-                o(0x78B5,w:-3,h:18),
+                o(0x78B5,w:3,h:18),
                 o(0x78EB,w:-2,h:15),
-                o(0x7909,w:-3,h:15),
-                o(0x7937,w:-3,h:16),
+                o(0x7909,w:-3,h:15), //40 1F F8 C0 3E F3 80 3D | 8
+                o(0x7936,w:3,h:16), //80 07 00 F8 03 00 F8 01 
                 o(0x7967,w:-2,h:21),
                 o(0x7991,w:-2,h:12),
                 o(0x79A9,w:-2,h:16),
-                //79C9: 11 00 5B 21 E0 5D 01 21 | 27 ED B0 11 00 84 21 00 
-                                o(0x7A07,w:-2,h:20),
+                o(0x79C9, skip:-1), // 11 00 5B 21 E0 5D 01 21 | 27 ED B0 11 00 84 21 00 
+                o(0x7A07,w:-2,h:20),
                 o(0x7A2F,w:-2,h:23),
                 o(0x7A5D,w:-3,h:26),
-                o(0x7AAB,w:-3,h:26),
+                o(0x7AAB,w:3,h:26),
                 o(0x7AF9,w:-3,h:27),
-                o(0x7B4A,w:-3,h:27),
+                o(0x7B4A,w:3,h:27),
                 o(0x7B9B,w:-2,h:24),
                 o(0x7BCB,w:-2,h:13),
                 o(0x7BE5,w:-2,h:23),
@@ -370,34 +368,39 @@ namespace WpfGrabber.ViewParts
                 o(0x7C8D,w:-2,h:30),
                 o(0x7CC9),
                 o(0x7E0D,w:-2,h:26),
-                //7E41: 1E 76 B0 42 C1 0A 4C AE | C4 AE 21 28 0D 56 B5 86
+                o(0x7e41,skip:-1), // 1E 76 B0 42 C1 0A 4C AE | C4 AE 21 28 0D 56 B5 86
                 o(0x8013),
                 o(0x815D,w:-3,h:30),
                 o(0x8631),
-                //864F: 21 28 13 9E D4 60 A7 0C | 5C D5 88 A7 09 4A A8 30 
+                o(0x864F,skip:-1), // 21 28 13 9E D4 60 A7 0C | 5C D5 88 A7 09 4A A8 30 
                 o(0x8661),
                 o(0x8BBB, skip:-1),//8BBB: 00 44 00 44 00 12 03 92 | 07 DA 07 DA 00 92 03 12 
                 o(0x8C19),
                 o(0x8D9D, skip:-1),//8D9D: 11 14 05 8E CD 98 CD 0F | 3C CD 64 CD 00 00 02 20 
                 o(0x8DF5),
+                o(0x8E37), // bad height ?!? 83 18 00 00 0E 00 00 00
+                o(0x8F5D),
+                o(0x8F8F,w:2,h:21), // 0F CA F7 AC BB 54 BD 51 | DD 6B 5D AB
                 o(0x8FB9),
-                //9009: 21 28 17 C8 D3 2F DA 07 | 18 D4 5D DA 0A 4C A5 2E 
+                o(0x9009,skip:-1), // 21 28 17 C8 D3 2F DA 07 | 18 D4 5D DA 0A 4C A5 2E 
                 o(0x921B),
                 o(0x9433,w:-2,h:66), //merged images
                 o(0x94B7,w:-2,h:41),
                 o(0x9509,w:-2,h:92), //merged
-                o(0x95C1,w:-2,h:18),
-
-                //95E2: 28 01 E0 00 07 E0 00 00 | B0 00 01 E0 00 02 18 38
-                o(0x95E3,w:-3,h:40),
+                o(0x95C1,skip:-1), //03 03 16 06 12 15 08 03 | 03 03 03 03 03 03 03 03 
+                o(0x95E1),
                 o(0x965B,w:-3,h:40),
                 o(0x96D3,w:-3,h:25),
                 o(0x971E,w:-2,h:16),
                 o(0x973E,w:-3,h:25),
-                //9789: 1D 8A 3D 96 3A D4 73 54 | 77 4C E3 94 F9 DE FE 5E 
+                o(0x9789,w:-2,h:18), 
+                o(0x97AD, skip:-1), //13 90 10 10 7E 12 | 80 7E CB C0 1E EB C0 03 
+                o(0x97E0,w:-2,h:19),
+                o(0x9806,w:-2,h:20),
+                o(0x982E,w:-2,h:8),
                 o(0x983E,w:-3,h:25),
                 o(0x9889,w:-2,h:17),
-                //98AB: 0B F0 13 90 10 10 7E 12 | 80 7E CB C0 1E EB C0 03 
+                o(0x98AB,skip:-1), //0B F0 13 90 10 10 
                 o(0x98B1,w:-3,h:12),
                 o(0x98D5,w:-2,h:21),
                 o(0x98FF),
@@ -409,6 +412,7 @@ namespace WpfGrabber.ViewParts
                 o(0x9ABE), //BOM
                 #endregion
             };
+            var fnt = AppData.GetFont();
             while (!rd.IsEmpty)
             {
                 var found = offsets.FirstOrDefault(a => a.offset == rd.BytePosition);
@@ -430,8 +434,11 @@ namespace WpfGrabber.ViewParts
                     }
                     rd.ReadBytes(skip);
                     var bmp = new ByteBitmap8Bit(20, 10);
+                    if (skip > 8)
+                        bmp = new ByteBitmap8Bit(30, 10);
                     bmp.DrawLine(0, 0, bmp.Width - 1, bmp.Height - 1);
                     bmp.DrawLine(bmp.Width - 1, 0, 0, bmp.Height - 1);
+                    //fnt.DrawString()
                     var dummy = new ReaderImageResult(bmp, pos, pos + skip);
                     var data = CreateImageData(dummy);
                     data.Description = $"(skip:0x{skip:X4}) {data.Description}";
