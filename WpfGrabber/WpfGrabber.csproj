@@ -64,6 +64,7 @@
       <DependentUpon>InputQueryWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\EnumItemsConverter.cs" />
+    <Compile Include="Converters\Mul100Converter.cs" />
     <Compile Include="Converters\PercentTextConverter.cs" />
     <Compile Include="Converters\CharConverter.cs" />
     <Compile Include="Converters\HexStringConverter.cs" />
@@ -82,6 +83,7 @@
       <DependentUpon>ExceptionWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Data\Interval.cs" />
+    <Compile Include="Readers\EngineGunfrightReader.cs" />
     <Compile Include="Readers\EngineFilmationReader.cs" />
     <Compile Include="Readers\FontReader.cs" />
     <Compile Include="Readers\MaskReader.cs" />

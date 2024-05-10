@@ -100,7 +100,6 @@ namespace WpfGrabber.Shell
                         width = 0;
                     return (control: vpc, index: i, width);
                 }
-                    
             }
             return (control: null, index: -1, width: 0);
         }

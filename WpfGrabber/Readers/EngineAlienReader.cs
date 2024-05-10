@@ -12,33 +12,29 @@ namespace WpfGrabber
     // byte width - pixels 
     // byte height
     // byte[] data - 2 bytes for mask and data for each 8 pixels
-
-    public class EngineAlienReader
+    public class EngineAlienReader : EngineReader
     {
-        private DataReader reader;
-
         public bool FlipY { get; set; }
-        public EngineAlienReader(DataReader reader)
+        public int EndPos { get; private set; }
+        public EngineAlienReader(DataReader reader) : base(reader)
         {
-            //flipX:false
-            this.reader = reader;
         }
 
-        public IEnumerable<ReaderImageResult> ReadImages(int endpos)
+        public override IEnumerable<ReaderImageResult> ReadImages()
         {
-            if (endpos <= 0)
-                endpos = this.reader.DataLength;
-            while (!reader.IsEmpty)
+            if (EndPos <= 0)
+                EndPos = this.Reader.DataLength;
+            while (!Reader.IsEmpty)
             {
-                var start = reader.BytePosition;
-                if (endpos > 0 && reader.BytePosition >= endpos)
+                var start = Reader.BytePosition;
+                if (EndPos > 0 && Reader.BytePosition >= EndPos)
                     break;
                 if (!TryRead(out var w, out var h))
                     break;
-                if (reader.BytePosition >= endpos || w >= 64 || h >= 64)
+                if (Reader.BytePosition >= EndPos || w >= 64 || h >= 64)
                     break;
                 var aimg = ReadMaskedImage();
-                yield return new ReaderImageResult(aimg, start, reader.BytePosition);
+                yield return new ReaderImageResult(aimg, start, Reader.BytePosition);
             }
         }
 
@@ -46,25 +42,25 @@ namespace WpfGrabber
         {
             w = 0;
             h = 0;
-            if (reader.BytePosition > reader.DataLength - 2)
+            if (Reader.BytePosition > Reader.DataLength - 2)
                 return false;
-            w = reader.Data[reader.BytePosition];
-            h = reader.Data[reader.BytePosition + 1];
+            w = Reader.Data[Reader.BytePosition];
+            h = Reader.Data[Reader.BytePosition + 1];
             return w != 0 && h != 0;
         }
         public ByteBitmap8Bit ReadMaskedImage()
         {
-            var w = reader.ReadByte();
-            var h = reader.ReadByte();
+            var w = Reader.ReadByte();
+            var h = Reader.ReadByte();
             var result = new ByteBitmap8Bit(w * 8, h);
             for (int y = 0; y < h; y++)
             {
                 for (int x = 0; x < w; x++)
                 {
-                    if (reader.IsEmpty)
+                    if (Reader.IsEmpty)
                         break;
-                    var d = reader.ReadByte();
-                    var m = reader.ReadByte();
+                    var d = Reader.ReadByte();
+                    var m = Reader.ReadByte();
                     for (int i = 0; i < 8; i++)
                     {
                         int shift = (7 - i);

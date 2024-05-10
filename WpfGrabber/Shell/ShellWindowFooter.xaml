@@ -9,6 +9,8 @@
              FocusManager.IsFocusScope="True">
     <FrameworkElement.Resources>
         <wpfgrabber:PercentTextConverter x:Key="zoomConv"/>
+        <wpfgrabber:Mul100Converter x:Key="mul100Conv"/>
+
         <Style TargetType="Button">
             <Setter Property="Width" Value="22" />
         </Style>
@@ -28,8 +30,9 @@
         <StatusBarItem HorizontalAlignment="Right">
             <StackPanel Orientation="Horizontal" >
                 <Label>UI zoom:</Label>
-                <Slider VerticalAlignment="Center" Width="80" 
-                        Minimum="0.5" Maximum="3" Value="{Binding UiZoom}"/>
+                <Label Padding="0" Margin="5,0" Content="{Binding UiZoom,Converter={StaticResource zoomConv}}"/>
+                <Slider VerticalAlignment="Center" Width="100" 
+                        Minimum="50" Maximum="300" Value="{Binding UiZoom, Converter={StaticResource mul100Conv}}"/>
                 <FrameworkElement Width="10"/>
                 <Label Content="Zoom " />
                 <Button Click="ZoomMinus_Click">

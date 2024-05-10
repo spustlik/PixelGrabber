@@ -4,6 +4,7 @@ using System.CodeDom.Compiler;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -20,7 +21,9 @@ namespace WpfGrabber.ViewParts
     {
         Movie,
         Alien,
-        Filmation
+        Filmation,
+        [Description("Gunfright (Filmation)")]
+        Gunfright
     }
     public class EngineViewPartVM : SimpleDataObject
     {
@@ -138,6 +141,7 @@ namespace WpfGrabber.ViewParts
             base.OnInitialize();
             ViewModel.Columns = 1;
             ViewModel.ShellVm = ShellVm;
+            ViewModel.MaxCount = 1;
         }
         private void BorderSize_Changed(object sender, SizeChangedEventArgs e)
         {
@@ -174,32 +178,21 @@ namespace WpfGrabber.ViewParts
             switch (ViewModel.EngineType)
             {
                 case EngineType.Movie: return ReadMovieImages();
-                case EngineType.Alien: return ReadAlienImages();
-                case EngineType.Filmation: return ReadFilmationImages();
+                case EngineType.Alien: return ReadEngineImages((r) => new EngineAlienReader(r) { FlipY=ViewModel.FlipVertical});
+                case EngineType.Filmation: return ReadEngineImages((r) => new EngineFilmationReader(r));
+                case EngineType.Gunfright: return ReadEngineImages((r) => new EngineGunfrightReader(r));
                 default:
                     throw new NotImplementedException();
             }
         }
 
-        private IEnumerable<ImageData> ReadFilmationImages()
+        private IEnumerable<ImageData> ReadEngineImages<TR>(Func<DataReader, TR> factory) where TR:EngineReader
         {
             var rd = new DataReader(ShellVm.Data, ShellVm.Offset);
-            var fr = new EngineFilmationReader(rd);
-            return fr
-                .ReadImages()
+            var r = factory(rd);
+            return r.ReadImages()
                 .Select(x => CreateImageData(x));
         }
-
-        private IEnumerable<ImageData> ReadAlienImages()
-        {
-            var rd = new DataReader(ShellVm.Data, ShellVm.Offset);
-            var r = new EngineAlienReader(rd) { FlipY = ViewModel.FlipVertical };
-            return r
-                .ReadImages(0)
-                .Select(x => CreateImageData(x));
-        }
-
-
 
         private IEnumerable<ImageData> ReadMovieImages()
         {

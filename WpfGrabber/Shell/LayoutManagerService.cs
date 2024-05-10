@@ -104,7 +104,7 @@ namespace WpfGrabber.Shell
             var viewPart = def.Create();
             viewPartService.Add(viewPart);
             var width = (int?)ele.Attribute(ATTR_WIDTH);
-            viewPartService.SetOptions(viewPart, new ViewPartOptions() { Title = def.Title, Width = width??0 });
+            viewPartService.SetOptions(viewPart, new ViewPartOptions() { Title = def.Title, Width = width });
             var le = ele.Element(ELE_LAYOUT);
             if (le != null)
                 viewPart.OnLoadLayout(le);

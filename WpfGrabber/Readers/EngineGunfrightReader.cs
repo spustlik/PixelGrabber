@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace WpfGrabber.Readers
 {
-    internal class EngineFilmationReader : EngineReader
+    internal class EngineGunfrightReader : EngineReader
     {
-        public EngineFilmationReader(DataReader reader):base(reader)
-        {
-        }
+        public EngineGunfrightReader(DataReader reader):base(reader) { }
 
         public override IEnumerable<ReaderImageResult> ReadImages()
         {
@@ -28,21 +26,35 @@ namespace WpfGrabber.Readers
                 Type = MaskReaderType.ByteDataMask,
                 Preambule = MaskReaderPreambule.None
             };
+            var r3 = new MaskReader(Reader)
+            {
+                FlipY = true,
+                FlipByte = true,
+                Type = MaskReaderType.ImageData,
+                Preambule = MaskReaderPreambule.None
+            };
             while (!Reader.IsEmpty)
             {
                 var pos = Reader.BytePosition;
                 var b = Reader.PeekByte();
                 var r = r1;
-                if ((b & 0xF0) == 0)
+                while (b == 0 && !Reader.IsEmpty)
                 {
-                    //32A7: 03 1F - 3x31, masked
-                    r = r1;
+                    b = Reader.ReadByte();
+                }
+                if ((b & 0x80) == 0)
+                {
+                    //gunfright
+                    r = r3;
+                    //Reader.ReadByte();
+                    r.Height = Reader.ReadByte();
+                    r.Width = 2;
                 }
                 else
                 {
                     //3B75: 84 20 - 4x32, no mask
                     r = r2;
-                    var w = Reader.ReadByte(); 
+                    var w = Reader.ReadByte();
                     var h = Reader.ReadByte();
                     r.Width = w & 0x0F;
                     r.Height = h;
