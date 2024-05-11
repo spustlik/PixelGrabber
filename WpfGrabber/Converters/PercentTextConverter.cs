@@ -31,10 +31,13 @@ namespace WpfGrabber
                 return value;
             if(value is string s)
             {
-                s = s.Trim('%').Trim(' ');
-                if (!double.TryParse(s, out var d))
-                    return value;
-                return d / 100;
+                //strange, but working on footer
+                //s = s.Trim('%').Trim(' ');
+                //if (!double.TryParse(s, out var d))
+                //    return value;
+                //return d / 100;
+                if (double.TryParse(s, out var d))
+                    return d;
             }
             return value;
         }

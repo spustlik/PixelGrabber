@@ -2,18 +2,22 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
+using System.Xml.Linq;
 using System.Xml.Serialization;
 using WpfGrabber.Data;
 using WpfGrabber.Readers;
+using WpfGrabber.Services;
 using WpfGrabber.Shell;
 
 namespace WpfGrabber.ViewParts
@@ -57,6 +61,7 @@ namespace WpfGrabber.ViewParts
         }
         #endregion
 
+        [XmlIgnore]
         public ObservableCollection<ImageVM> Images { get; } = new ObservableCollection<ImageVM>();
 
         #region SelectedImage property
@@ -66,6 +71,16 @@ namespace WpfGrabber.ViewParts
         {
             get => _selectedImage;
             set => Set(ref _selectedImage, value);
+        }
+        #endregion
+
+        #region ShellVm property
+        private ShellVm _shellVm;
+        [XmlIgnore]
+        public ShellVm ShellVm
+        {
+            get => _shellVm;
+            set => Set(ref _shellVm, value);
         }
         #endregion
     }
@@ -107,6 +122,16 @@ namespace WpfGrabber.ViewParts
             set => Set(ref _image, value);
         }
         #endregion
+
+        #region IsSelected property
+        private bool _isSelected;
+        [XmlIgnore]
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set => Set(ref _isSelected, value);
+        }
+        #endregion
     }
 
 
@@ -117,6 +142,10 @@ namespace WpfGrabber.ViewParts
 
     public partial class ImageSpriteViewPart : ImageSpriteViewPartBase
     {
+        public static RoutedUICommand CommandMoveUp = new RoutedUICommand("Up", nameof(CommandMoveUp), typeof(ImageSpriteViewPart), new InputGestureCollection() { new KeyGesture(Key.Left, ModifierKeys.Control) });
+        public static RoutedUICommand CommandMoveDown = new RoutedUICommand("Down", nameof(CommandMoveDown), typeof(ImageSpriteViewPart), new InputGestureCollection() { new KeyGesture(Key.Right, ModifierKeys.Control) });
+        public static RoutedUICommand CommandRemove = new RoutedUICommand("Remove", nameof(CommandRemove), typeof(ImageSpriteViewPart), new InputGestureCollection() { new KeyGesture(Key.Delete) });
+
         public ImageSpriteViewPart()
         {
             InitializeComponent();
@@ -125,8 +154,12 @@ namespace WpfGrabber.ViewParts
         public override void OnInitialize()
         {
             base.OnInitialize();
+            CommandBindings.Add(new CommandBinding(CommandMoveUp, OnCommandMoveUp_Executed));
+            CommandBindings.Add(new CommandBinding(CommandMoveDown, OnCommandMoveDown_Executed));
+            CommandBindings.Add(new CommandBinding(CommandRemove, OnCommandRemove_Executed, (s, e) => e.CanExecute = ViewModel.SelectedImage != null));
             ViewModel.Columns = 1;
             ViewModel.ShowLabels = true;
+            ViewModel.ShellVm = ShellVm;
             //foreach (var file in Directory.GetFiles(@"E:\GameWork\8bitgames\alien8", "alien8.*.png"))
             //foreach (var file in Directory.GetFiles(@"E:\GameWork\_AssetsIso\kenney_isometric-roads\png\roads", "*.png"))
             //{
@@ -134,6 +167,24 @@ namespace WpfGrabber.ViewParts
             //    img.LoadFromFile(file);
             //    CreateImageVMFromFile(img, file);
             //}
+        }
+        public override void OnLoadLayout(XElement ele)
+        {
+            base.OnLoadLayout(ele);
+            ele.LoadCollection(() => ViewModel.Images, (e) => e.LoadProperties(new ImageVM()));
+            foreach (var img in ViewModel.Images)
+            {
+                if (img.Image != null)
+                    continue;
+                if (!File.Exists(img.FileName))
+                    continue;
+                CreateOrUpdateImageVMFromFile(img.FileName);
+            }
+        }
+        public override void OnSaveLayout(XElement ele)
+        {
+            base.OnSaveLayout(ele);
+            ele.SaveCollection(() => ViewModel.Images, (img, e) => e.SaveProperties(img));
         }
         private void BorderSize_Changed(object sender, SizeChangedEventArgs e)
         {
@@ -192,28 +243,29 @@ namespace WpfGrabber.ViewParts
                 return;
             foreach (var file in dlg.FileNames)
             {
-                var img = new BitmapImage();
-                img.LoadFromFile(file);
-                CreateImageVMFromFile(img, file);
+                CreateOrUpdateImageVMFromFile(file);
             }
         }
 
-        private ImageVM CreateImageVMFromFile(BitmapImage img, string file)
+        private ImageVM CreateOrUpdateImageVMFromFile(string file)
         {
-            var image = this.ViewModel.Images
+            var imageVm = this.ViewModel.Images
                 .FirstOrDefault(a => String.Compare(a.FileName, file, StringComparison.InvariantCultureIgnoreCase) == 0);
-            if (image == null)
+            if (imageVm == null)
             {
-                image = new ImageVM()
+                imageVm = new ImageVM()
                 {
                     FileName = file,
                     Name = Path.GetFileNameWithoutExtension(file)
                 };
-                ViewModel.Images.Add(image);
+                ViewModel.Images.Add(imageVm);
             }
-            image.Image = img;
-            image.Description = $"{image.Name}\n{image.FileName}\n{image.Image.Width} x {image.Image.Height}";
-            return image;
+            var bmp = new BitmapImage();
+            bmp.LoadFromFile(file);
+
+            imageVm.Image = bmp;
+            imageVm.Description = $"{imageVm.Name}\n{imageVm.FileName}\n{imageVm.Image.Width} x {imageVm.Image.Height}";
+            return imageVm;
         }
 
         private void OnButtonSave_Click(object sender, RoutedEventArgs e)
@@ -227,17 +279,25 @@ namespace WpfGrabber.ViewParts
             if (dlg.ShowDialog() != true)
                 return;
             //save sheet
-            var width = (ViewModel.Columns * ViewModel.Images.Max(a => a.Image.PixelWidth));
-            var height = ViewModel.Height * ViewModel.Images.Count / ViewModel.Columns;
 
-            var rgba = new ByteBitmapRgba(width, height);
+            var width = ViewModel.Width; //ViewModel.Images.Max(a => a.Image.PixelWidth)
+            var height = ViewModel.Height;
+            var bmpwidth = width;
+            var bmpheight = height * ViewModel.Images.Count;
+            if (ViewModel.Columns != 0)
+            {
+                bmpwidth = ViewModel.Columns * width;
+                bmpheight = height * ViewModel.Images.Count / ViewModel.Columns;
+            }
+
+            var rgba = new ByteBitmapRgba(bmpwidth, bmpheight);
 
             int posX = 0;
             int posY = 0;
             foreach (var img in ViewModel.Images)
             {
                 var image = img.Image.ToRgba();
-                rgba.DrawBitmap(image, posX, posY, Colorizers.GetColorCopy);
+                rgba.DrawBitmap(image, posX * width, posY, Colorizers.GetColorCopy);
                 posX++;
                 if (posX >= ViewModel.Columns)
                 {
@@ -248,37 +308,67 @@ namespace WpfGrabber.ViewParts
 
             var result = rgba.ToBitmapSource();
             result.SaveToPngFile(dlg.FileName);
+            var cols = ViewModel.Columns;
+            if (cols == 0)
+                cols = 1;
+            var opts = $"W={width}, H={height}, Columns={cols}, Rows={ViewModel.Images.Count / cols}, Count={ViewModel.Images.Count}";
+            if (MessageBox.Show(
+                $"\n{opts}\nCopy to clipboard?",
+                "Saved to spritesheet",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Information) != MessageBoxResult.Yes)
+                return;
+            Clipboard.SetText(opts);
         }
 
-        private void OnButtonUp_Click(object sender, RoutedEventArgs e)
+        private void OnCommandMoveUp_Executed(object sender, RoutedEventArgs e)
         {
-            var i = ViewModel.Images.FindIndex(x => x == ViewModel.SelectedImage);
-            if (i <= 0)
-                return;
-            ViewModel.Images.Move(i, i - 1);
+            for (int i = 1; i < ViewModel.Images.Count; i++)
+            {
+                var img = ViewModel.Images[i];
+                if (!img.IsSelected)
+                    continue;
+                ViewModel.Images.Move(i, i - 1);
+            }
         }
 
-        private void OnButtonDown_Click(object sender, RoutedEventArgs e)
+        private void OnCommandMoveDown_Executed(object sender, RoutedEventArgs e)
         {
-            var i = ViewModel.Images.FindIndex(x => x == ViewModel.SelectedImage);
-            if (i < 0 || i + 1 >= ViewModel.Images.Count)
-                return;
-            ViewModel.Images.Move(i, i + 1);
+            for (int i = ViewModel.Images.Count - 2; i >= 0; i--)
+            {
+                var img = ViewModel.Images[i];
+                if (!img.IsSelected)
+                    continue;
+                ViewModel.Images.Move(i, i + 1);
+            }
         }
 
-        private void OnButtonDelete_Click(object sender, RoutedEventArgs e)
+        private void OnCommandRemove_Executed(object sender, RoutedEventArgs e)
         {
-            var i = ViewModel.Images.FindIndex(x => x == ViewModel.SelectedImage);
-            if (i < 0)
-                return;
-            ViewModel.Images.RemoveAt(i);
+            foreach (var img in ViewModel.Images.Where(x => x.IsSelected).ToArray())
+            {
+                ViewModel.Images.Remove(img);
+            }
         }
 
         private void OnButtonClear_Click(object sender, RoutedEventArgs e)
         {
-            if (MessageBox.Show("Do you really remove all images?", "Question", MessageBoxButton.YesNoCancel) != MessageBoxResult.Yes)
+            if (MessageBox.Show("Do you really want to remove all images?", "Question",
+                MessageBoxButton.YesNoCancel,
+                MessageBoxImage.Warning) != MessageBoxResult.Yes)
                 return;
             this.ViewModel.Images.Clear();
+        }
+
+        private void OnSortBySize_Click(object sender, RoutedEventArgs e)
+        {
+            var sorted = ViewModel
+                .Images
+                .OrderBy(a => a.Image.Width)
+                .ThenBy(a => a.Image.Height)
+                .ThenBy(a => a.Name)
+                .ToArray();
+            ViewModel.Images.AddRange(sorted, clear: true);
         }
     }
 }

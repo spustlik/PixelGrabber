@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -72,7 +73,7 @@ namespace WpfGrabber.Services
             throw new NotSupportedException($"Type {t} is not supported");
         }
 
-        public static void LoadProperties(this XElement e, object o, params string[] ignore)
+        public static T LoadProperties<T>(this XElement e, T o, params string[] ignore)
         {
             var props = o.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
             foreach (var p in props)
@@ -83,6 +84,7 @@ namespace WpfGrabber.Services
                 if (v != null)
                     p.SetValue(o, v);
             }
+            return o;
         }
 
         public static void SaveProperties(this XElement e, object o, params string[] ignore)
@@ -96,6 +98,44 @@ namespace WpfGrabber.Services
                 e.SetAttributeValue(p.Name, s);
             }
         }
+
+        public static void SaveCollection<T>(this XElement parent, 
+            Expression<Func<IEnumerable<T>>> collection, 
+            Action<T, XElement> itemSaver)
+        {
+            string name = GetMemberName(collection);
+            var itemsGetter = collection.Compile();
+            foreach (var item in itemsGetter())
+            {
+                var ele = new XElement(name);
+                parent.Add(ele);
+                itemSaver(item, ele);
+            }
+        }
+
+        private static string GetMemberName(LambdaExpression collection)
+        {
+            var member = collection.Body as MemberExpression;
+            if (member == null)
+                throw new InvalidOperationException();
+            return member.Member.Name;
+        }
+
+        public static void LoadCollection<T>(this XElement parent,
+            Expression<Func<ICollection<T>>> collection,
+            Func<XElement, T> itemLoader) where T:class
+        {
+            var name = GetMemberName(collection);
+            var items = collection.Compile()();
+            foreach (var ele in parent.Elements(name))
+            {
+                var item = itemLoader(ele);
+                if (item != default(T))
+                    items.Add(item);
+            }
+        }
+
+
         private static bool IsIgnored(PropertyInfo pi, params string[] ignore)
         {
             if (pi.GetCustomAttribute<XmlIgnoreAttribute>() != null)
