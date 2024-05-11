@@ -2,6 +2,6 @@
 {
     public interface IShellWindow
     {
-        bool CanClose();
+        bool CanCloseProject();
     }
 }

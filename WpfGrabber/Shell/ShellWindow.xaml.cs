@@ -51,15 +51,15 @@ namespace WpfGrabber.Shell
 
         private void OnWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            e.Cancel = !CanClose();
+            e.Cancel = !CanCloseProjectPrompt();
         }
 
-        bool IShellWindow.CanClose()
+        bool IShellWindow.CanCloseProject()
         {
-            return CanClose();
+            return CanCloseProjectPrompt();
         }
 
-        private bool CanClose()
+        private bool CanCloseProjectPrompt()
         {
             if (!ViewModel.IsProjectDirty)
                 return true;
@@ -67,7 +67,8 @@ namespace WpfGrabber.Shell
                 this, 
                 $"Do you want to save layout of {Path.GetFileName( ViewModel.FileName)}?", 
                 "Question", 
-                MessageBoxButton.YesNoCancel);
+                MessageBoxButton.YesNoCancel,
+                MessageBoxImage.Question);
             if (r == MessageBoxResult.Cancel)
             {
                 return false;

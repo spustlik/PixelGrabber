@@ -20,6 +20,7 @@ namespace WpfGrabber.ViewParts
                 new ViewPartDef<EngineViewPart>(){Title = "Engine"},
                 new ViewPartDef<Z80DumpViewPart>(){Title = "Z80 disasm"},
                 new ViewPartDef<ImageSpriteViewPart>(){Title = "Image sprite sheet"},
+                new ViewPartDef<ImageSheetViewPart>(){Title = "Image sheet cutter"},
                 new ViewPartDef<TestViewPart>(){Title = "(Test)"},
             });
         }

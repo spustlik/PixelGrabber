@@ -109,6 +109,9 @@
     <Compile Include="ViewParts\FontBinaryViewPart.xaml.cs">
       <DependentUpon>FontBinaryViewPart.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewParts\ImageSheetViewPart.xaml.cs">
+      <DependentUpon>ImageSheetViewPart.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewParts\WhatsNewViewPart.xaml.cs">
       <DependentUpon>WhatsNewViewPart.xaml</DependentUpon>
     </Compile>
@@ -178,6 +181,10 @@
     <Page Include="ViewParts\FontBinaryViewPart.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ViewParts\ImageSheetViewPart.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="ViewParts\WhatsNewViewPart.xaml">
       <Generator>MSBuild:Compile</Generator>

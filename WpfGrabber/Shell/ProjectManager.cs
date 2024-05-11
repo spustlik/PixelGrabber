@@ -22,7 +22,7 @@ namespace WpfGrabber.Shell
             var shellVm = serviceProvider.GetService<ShellVm>();
             if (shellVm.AutoLoadLayout && !string.IsNullOrEmpty(shellVm.FileName))
             {
-                if (!serviceProvider.GetService<IShellWindow>().CanClose())
+                if (!serviceProvider.GetService<IShellWindow>().CanCloseProject())
                     return;
             }
             shellVm.LoadData(fileName);

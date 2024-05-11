@@ -1,0 +1,69 @@
+﻿<local:ImageSheetViewPartBase x:Class="WpfGrabber.ViewParts.ImageSheetViewPart"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfGrabber.ViewParts" xmlns:c="clr-namespace:WpfGrabber.Controls"
+             mc:Ignorable="d" x:Name="root"
+             d:DesignHeight="205.849" d:DesignWidth="602.528">
+    <d:DesignerProperties.DesignStyle>
+        <Style TargetType="UserControl">
+            <Setter Property="Background" Value="White" />
+        </Style>
+    </d:DesignerProperties.DesignStyle>
+    <Grid>
+        <Grid.Resources>
+            <BooleanToVisibilityConverter x:Key="visiConv"/>
+        </Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <ItemsControl Style="{StaticResource toolbar}" >
+            <ItemsControl.Resources>
+                <Style TargetType="StackPanel">
+                    <Setter Property="Orientation" Value="Horizontal" />
+                </Style>
+            </ItemsControl.Resources>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <StackPanel>
+                <Label Content="Columns"/>
+                <c:NumberEditor Value="{Binding Columns}" Minimum="1" Maximum="16" Width="70" LargeChange="0"/>
+                <Separator/>
+            </StackPanel>
+            <StackPanel>
+                <Label Content="Width"/>
+                <c:NumberEditor Value="{Binding Width}" Minimum="1" Maximum="256" Width="110"/>
+                <Separator/>
+            </StackPanel>
+            <StackPanel>
+                <Label Content="Height"/>
+                <c:NumberEditor Value="{Binding Height}" Minimum="1" Maximum="256" Width="110"/>
+                <Separator/>
+            </StackPanel>
+            <Button Content="Menu" Style="{StaticResource dropDown}">
+                <Button.ContextMenu>
+                    <ContextMenu Placement="Bottom">
+                        <Separator/>
+                        <MenuItem Header="Show labels" IsCheckable="true" IsChecked="{Binding ShowLabels}"/>
+                    </ContextMenu>
+                </Button.ContextMenu>
+            </Button>
+        </ItemsControl>
+        <Border x:Name="imageBorder"
+                SizeChanged="BorderSize_Changed"
+                Style="{StaticResource checkerBorder}" 
+                Grid.Row="1" 
+                >
+            <ListBox Style="{StaticResource listBoxImages}" 
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                     SelectionMode="Extended"  />
+
+        </Border>
+
+    </Grid>
+</local:ImageSheetViewPartBase>
