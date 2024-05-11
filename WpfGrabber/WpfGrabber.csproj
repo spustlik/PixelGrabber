@@ -64,6 +64,7 @@
       <DependentUpon>InputQueryWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\EnumItemsConverter.cs" />
+    <Compile Include="Converters\GestureTextConverter.cs" />
     <Compile Include="Converters\Mul100Converter.cs" />
     <Compile Include="Converters\PercentTextConverter.cs" />
     <Compile Include="Converters\CharConverter.cs" />

@@ -1,5 +1,8 @@
-﻿using System.IO;
+﻿using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media.Imaging;
 
 namespace WpfGrabber
@@ -43,6 +46,20 @@ namespace WpfGrabber
                 return (int)v;
             }
             return 0;
+        }
+
+        public static string GetInputGesturesText(this ICommandSource source)
+        {
+            //copied from MenuItem
+            if (source == null || !(source.Command is RoutedUICommand cmd))
+                return null;
+            var s = string.Join(", ",
+                cmd
+                    .InputGestures
+                    .OfType<KeyGesture>()
+                    .Select(kg => kg.GetDisplayStringForCulture(CultureInfo.CurrentCulture))
+                );
+            return s;
         }
 
         /*

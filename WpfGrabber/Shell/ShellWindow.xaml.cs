@@ -22,12 +22,12 @@ namespace WpfGrabber.Shell
             App.Current.ServiceContainer.AddService(new ViewParts.ViewPartFactory());
             App.Current.ServiceContainer.AddService(ProjectManager = new ProjectManager(App.Current.ServiceProvider));
             InitializeComponent();
-            ExceptionWindow.StartHandlingExceptions();
         }
 
         protected override void OnInitialized(EventArgs e)
         {
             base.OnInitialized(e);
+            ExceptionWindow.StartHandlingExceptions();
             var cfg = AppConfig.Load(this.ViewModel);
             if (cfg != null && !string.IsNullOrEmpty(cfg.LastFile) && cfg.OpenLastFile)
             {

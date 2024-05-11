@@ -12,6 +12,9 @@
     <Window.Resources>
         <Style TargetType="FrameworkElement" x:Key="scaler">
             <Setter Property="LayoutTransform">
+<!-- generated error, but works 
+Cannot find governing FrameworkElement or FrameworkContentElement for target element. BindingExpression:Path=UiZoom; DataItem=null; target element is 'ScaleTransform' (HashCode=52579650); target property is 
+-->
                 <Setter.Value>
                     <ScaleTransform ScaleX="{Binding UiZoom}" ScaleY="{Binding UiZoom}"/>
                 </Setter.Value>

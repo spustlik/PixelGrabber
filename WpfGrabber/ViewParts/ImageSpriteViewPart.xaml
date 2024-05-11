@@ -91,11 +91,11 @@
                     <Label Content="Image properties" Foreground="White"/>
                 </Border>
                 <ItemsControl Grid.Row="1" Style="{StaticResource toolbar}">
-                    <Button Command="{x:Static local:ImageSpriteViewPart.CommandMoveUp}">Up</Button>
+                    <Button Command="{x:Static local:ImageSpriteViewPart.CommandMoveUp}"/>
                     <Separator/>
-                    <Button Click="OnCommandMoveDown_Executed">Down</Button>
+                    <Button Command="{x:Static local:ImageSpriteViewPart.CommandMoveDown}"/>
                     <Separator/>
-                    <Button Click="OnCommandRemove_Executed">Remove</Button>
+                    <Button Command="{x:Static local:ImageSpriteViewPart.CommandRemove}"/>
                 </ItemsControl>
                 <StackPanel Grid.Row="2" Margin="10">
                     <Label Content="{Binding Name}"/>
