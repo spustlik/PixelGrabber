@@ -1,9 +1,14 @@
-﻿using System.Collections.ObjectModel;
+﻿using Microsoft.Win32;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using WpfGrabber.Data;
 using WpfGrabber.Shell;
 
 namespace WpfGrabber.ViewParts
@@ -20,12 +25,12 @@ namespace WpfGrabber.ViewParts
         }
         #endregion
 
-        #region Height property
-        private int _height;
-        public int Height
+        #region Rows property
+        private int _rows;
+        public int Rows
         {
-            get => _height;
-            set => Set(ref _height, value);
+            get => _rows;
+            set => Set(ref _rows, value);
         }
         #endregion
 
@@ -35,6 +40,24 @@ namespace WpfGrabber.ViewParts
         {
             get => _width;
             set => Set(ref _width, value);
+        }
+        #endregion
+
+        #region Height property
+        private int _height;
+        public int Height
+        {
+            get => _height;
+            set => Set(ref _height, value);
+        }
+        #endregion
+
+        #region Count property
+        private int _count;
+        public int Count
+        {
+            get => _count;
+            set => Set(ref _count, value);
         }
         #endregion
 
@@ -72,21 +95,13 @@ namespace WpfGrabber.ViewParts
     }
     public class ImageSheetImageVM : SimpleDataObject
     {
+
         #region Name property
         private string _name;
         public string Name
         {
             get => _name;
             set => Set(ref _name, value);
-        }
-        #endregion
-
-        #region FileName property
-        private string _fileName;
-        public string FileName
-        {
-            get => _fileName;
-            set => Set(ref _fileName, value);
         }
         #endregion
 
@@ -100,9 +115,9 @@ namespace WpfGrabber.ViewParts
         #endregion
 
         #region Image property
-        private BitmapImage _image;
+        private BitmapSource _image;
         [XmlIgnore]
-        public BitmapImage Image
+        public BitmapSource Image
         {
             get => _image;
             set => Set(ref _image, value);
@@ -140,14 +155,7 @@ namespace WpfGrabber.ViewParts
             ViewModel.ShowLabels = true;
             ViewModel.ShellVm = ShellVm;
         }
-        public override void OnLoadLayout(XElement ele)
-        {
-            base.OnLoadLayout(ele);
-        }
-        public override void OnSaveLayout(XElement ele)
-        {
-            base.OnSaveLayout(ele);
-        }
+
         private void BorderSize_Changed(object sender, SizeChangedEventArgs e)
         {
             OnShowData();
@@ -155,25 +163,99 @@ namespace WpfGrabber.ViewParts
 
         protected override void OnShowData()
         {
-            var (max_w, max_h) = GetDataImageSize(imageBorder);
+            //var (max_w, max_h) = GetDataImageSize(imageBorder);
 
-            if (ViewModel.Width == 0 && ViewModel.Images.Count > 0)
+            //if (ViewModel.Width == 0 && ViewModel.Images.Count > 0)
+            //{
+            //    ViewModel.Width = ViewModel.Images.Max(a => a.Image.PixelWidth);
+            //    return;
+            //}
+            //if (ViewModel.Height == 0 && ViewModel.Images.Count > 0)
+            //{
+            //    ViewModel.Height = ViewModel.Images.Max(a => a.Image.PixelHeight);
+            //    return;
+            //}
+
+            var img = new BitmapImage();
+            using (var ms = new MemoryStream(ShellVm.Data.Skip(ShellVm.Offset).ToArray()))
             {
-                ViewModel.Width = ViewModel.Images.Max(a => a.Image.PixelWidth);
-                return;
-            }
-            if (ViewModel.Height == 0 && ViewModel.Images.Count > 0)
-            {
-                ViewModel.Height = ViewModel.Images.Max(a => a.Image.PixelHeight);
-                return;
+                img.LoadFromStream(ms);
             }
 
-            //var bs = new BitmapSource();
-            ////bs.lo
-            //var bmp = new ByteBitmapRgba();
-            //    bmp.lo
+            var rgba = img.ToRgba();
+
+            var vm = ViewModel;
+            //C,R,W,H,#
+            var w = vm.Width;
+            var h = vm.Height;
+            if (vm.Columns != 0)
+                w = rgba.Width / vm.Columns;
+            if (vm.Rows != 0)
+                h = rgba.Height / vm.Rows;
+
+            var maxcount = vm.Count;
+            if (maxcount != 0)
+            {
+                if (w == 0 && h != 0)
+                    w = maxcount / (rgba.Height / h);
+                if (h == 0 && w != 0)
+                    h = maxcount / (rgba.Width / w);
+            }
+            if (w == 0)
+                w = rgba.Width / 8;
+            if (h == 0)
+                h = rgba.Height / 8;
+
+            var result = GetCroppedImages(rgba, w, h);
+            if (maxcount > 0)
+                result = result.Take(maxcount);
+            ViewModel.Images.AddRange(result, clear: true);
             //images are viewed by Binding to Images collection
         }
 
+        private IEnumerable<ImageSheetImageVM> GetCroppedImages(ByteBitmapRgba src, int w, int h)
+        {
+            int counter = 0;
+            for (int y = 0; y < src.Height / h; y++)
+            {
+                for (var x = 0; x < src.Width / w; x++)
+                {
+                    var bmp = new ByteBitmapRgba(w, h);
+
+                    Graphics.DrawBitmapFunctioned(w, h,
+                        (sx, sy) => src.GetPixel(x * w + sx, y * h + sy),
+                        (dx, dy, c) => bmp.SetPixel(dx, dy, c));
+                    var vm = new ImageSheetImageVM()
+                    {
+                        Name = $"{counter} [{x},{y}]",
+                        Image = bmp.ToBitmapSource(),
+                        Description = $"Column={x}, Row={y}, Index={counter}, Width={w}, Height={h}",
+                    };
+                    yield return vm;
+                    counter++;
+                }
+            }
+        }
+
+        private void SaveImages_Click(object sender, RoutedEventArgs e)
+        {
+            if (ViewModel.Images.Count == 0)
+                return;
+            var dlg = new SaveFileDialog();
+            dlg.DefaultExt = ".png";
+            dlg.FileName = "Select folder";
+            dlg.CheckFileExists = false;
+            if (dlg.ShowDialog() != true)
+                return;
+            int i = 0;
+            foreach (var vm in ViewModel.Images)
+            {
+                string fileName = Path.Combine(
+                    Path.GetDirectoryName(dlg.FileName),
+                    $"{Path.GetFileNameWithoutExtension(ShellVm.FileName)}-{i}.png");
+                vm.Image.SaveToPngFile(fileName);
+                i++;
+            }
+        }
     }
 }

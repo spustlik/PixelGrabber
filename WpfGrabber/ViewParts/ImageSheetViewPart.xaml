@@ -24,30 +24,84 @@
                 <Style TargetType="StackPanel">
                     <Setter Property="Orientation" Value="Horizontal" />
                 </Style>
+                <Style TargetType="c:NumberEditor">
+                    <Setter Property="Minimum" Value="0" />
+                    <Setter Property="Width" Value="70" />
+                    <Setter Property="LargeChange" Value="0" />
+                </Style>
             </ItemsControl.Resources>
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
+            <Label ToolTip="Set what you know, other to 0, it will be calculated in this order">
+                <Grid Width="16" Height="16" >
+                    <Viewbox Stretch="Fill">
+                        <Ellipse Width="10" Height="10" Fill="DodgerBlue" Stretch="Fill"/>
+                    </Viewbox>
+                    <TextBlock Text="i" Foreground="White" FontFamily="Times New Roman" FontWeight="Bold"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Grid>
+            </Label>
             <StackPanel>
-                <Label Content="Columns"/>
-                <c:NumberEditor Value="{Binding Columns}" Minimum="1" Maximum="16" Width="70" LargeChange="0"/>
+                <Label Content="C:" ToolTip="Columns"/>
+                <c:NumberEditor Value="{Binding Columns}" Maximum="128"/>
                 <Separator/>
             </StackPanel>
             <StackPanel>
-                <Label Content="Width"/>
-                <c:NumberEditor Value="{Binding Width}" Minimum="1" Maximum="256" Width="110"/>
+                <Label Content="R:" ToolTip="Rows"/>
+                <c:NumberEditor Value="{Binding Rows}" Maximum="128"/>
                 <Separator/>
             </StackPanel>
-            <StackPanel>
-                <Label Content="Height"/>
-                <c:NumberEditor Value="{Binding Height}" Minimum="1" Maximum="256" Width="110"/>
-                <Separator/>
+            <CheckBox x:Name="more" IsChecked="False">
+                <CheckBox.Style>
+                    <Style TargetType="CheckBox">
+                        <Setter Property="Content" Value="»" />
+                        <Setter Property="VerticalContentAlignment" Value="Center" />
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#c0c0ff" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <!--<Setter Property="Background" Value="#9090FF"/>-->
+                                <Setter Property="Content" Value="«" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </CheckBox.Style>
+                <CheckBox.Template>
+                    <ControlTemplate TargetType="CheckBox" >
+                        <Border x:Name="btn" Padding="3,0" VerticalAlignment="Center" 
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="#d0d0d0" BorderThickness="1">
+                            <ContentPresenter/>
+                        </Border>
+                    </ControlTemplate>
+                </CheckBox.Template>
+            </CheckBox>
+            <Separator/>
+            <StackPanel Visibility="{Binding IsChecked, ElementName=more, Converter={StaticResource visiConv}}">
+                <StackPanel>
+                    <Label Content="W:" ToolTip="Width"/>
+                    <c:NumberEditor Value="{Binding Width}" Maximum="256" />
+                    <Separator/>
+                </StackPanel>
+                <StackPanel>
+                    <Label Content="H:" ToolTip="Height"/>
+                    <c:NumberEditor Value="{Binding Height}" Maximum="256"/>
+                    <Separator/>
+                </StackPanel>
+                <StackPanel>
+                    <Label Content="#:" ToolTip="Count"/>
+                    <c:NumberEditor Value="{Binding Count}" />
+                    <Separator/>
+                </StackPanel>
             </StackPanel>
             <Button Content="Menu" Style="{StaticResource dropDown}">
                 <Button.ContextMenu>
                     <ContextMenu Placement="Bottom">
+                        <MenuItem Header="Save images" Click="SaveImages_Click"/>
                         <Separator/>
                         <MenuItem Header="Show labels" IsCheckable="true" IsChecked="{Binding ShowLabels}"/>
                     </ContextMenu>
