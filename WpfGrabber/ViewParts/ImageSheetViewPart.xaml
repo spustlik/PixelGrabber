@@ -101,7 +101,8 @@
             <Button Content="Menu" Style="{StaticResource dropDown}">
                 <Button.ContextMenu>
                     <ContextMenu Placement="Bottom">
-                        <MenuItem Header="Save images" Click="SaveImages_Click"/>
+                        <MenuItem Header="Save images" Click="OnSaveImages_Click"/>
+                        <MenuItem Header="Move to image sprites" Click="OnMoveToSprites_Click"/>
                         <Separator/>
                         <MenuItem Header="Show labels" IsCheckable="true" IsChecked="{Binding ShowLabels}"/>
                     </ContextMenu>

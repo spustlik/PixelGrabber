@@ -114,9 +114,9 @@ namespace WpfGrabber.ViewParts
         #endregion
 
         #region Image property
-        private BitmapImage _image;
+        private BitmapSource _image;
         [XmlIgnore]
-        public BitmapImage Image
+        public BitmapSource Image
         {
             get => _image;
             set => Set(ref _image, value);

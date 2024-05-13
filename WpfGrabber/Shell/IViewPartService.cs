@@ -29,12 +29,12 @@ namespace WpfGrabber.Shell
 
     public static class ViewPartServiceExtensions
     {
-        public static void AddNewPart(this IViewPartService svc, ViewPartDef def)
+        public static ViewPart AddNewPart(this IViewPartService svc, ViewPartDef def)
         {
             var part = def.Create();
             svc.Add(part);
             svc.SetOptions(part, new ViewPartOptions() { Title = def.Title });
-
+            return part;
         }
     }
 }

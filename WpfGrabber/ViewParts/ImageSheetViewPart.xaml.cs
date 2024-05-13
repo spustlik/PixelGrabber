@@ -237,7 +237,7 @@ namespace WpfGrabber.ViewParts
             }
         }
 
-        private void SaveImages_Click(object sender, RoutedEventArgs e)
+        private void OnSaveImages_Click(object sender, RoutedEventArgs e)
         {
             if (ViewModel.Images.Count == 0)
                 return;
@@ -256,6 +256,25 @@ namespace WpfGrabber.ViewParts
                 vm.Image.SaveToPngFile(fileName);
                 i++;
             }
+        }
+
+        private void OnMoveToSprites_Click(object sender, RoutedEventArgs e)
+        {
+            var vps = App.GetService<IViewPartServiceEx>();
+            var vp = vps.ViewParts.OfType<ImageSpriteViewPart>().FirstOrDefault();
+            if (vp == null)
+            {
+                var vpf = App.GetService<ViewPartFactory>();
+                var def = vpf.Definitions.First(d => d.ViewPartType == typeof(ImageSpriteViewPart));
+                vp = (ImageSpriteViewPart)vps.AddNewPart(def);
+            }
+            vp.ViewModel.Images.AddRange(ViewModel.Images
+                .Select(a => new ImageVM() { 
+                    Image = a.Image, 
+                    Name = a.Name, 
+                    Description = a.Description, 
+                    //FileName = 
+                }), clear: true);
         }
     }
 }
