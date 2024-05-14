@@ -25,17 +25,23 @@ namespace WpfGrabber.ViewParts
             });
         }
 
-        public ViewPartDef FindDefinition(ViewPart viewPart)
-        {
-            return FindTypeDefinition(viewPart.GetType().Name);
-        }
-
         public ViewPartDef FindTypeDefinition(string typeId)
         {
             return Definitions.FirstOrDefault(x => x.TypeId == typeId);
         }
     }
+    public static class ViewPartExtensions
+    {
+        public static ViewPartDef FindDefinition(this ViewPartFactory factory, ViewPart viewPart)
+        {
+            return factory.FindTypeDefinition(viewPart.GetType().Name);
+        }
+        public static ViewPartDef FindDefinition<T>(this ViewPartFactory factory) where T : ViewPart
+        {
+            return factory.FindTypeDefinition(typeof(T).Name);
+        }
 
+    }
 
     public abstract class ViewPartDef
     {

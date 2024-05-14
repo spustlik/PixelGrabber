@@ -63,7 +63,8 @@ namespace WpfGrabber.Shell
             var (vpc, i, w) = GetViewPartControl(viewPart);
             if (i < 0)
                 return;
-            vpc.Title = options.Title;
+            if(!string.IsNullOrEmpty(options.Title))
+                vpc.Title = options.Title;
             if (options.Width.HasValue)
             {
                 if (options.Width < 50)
@@ -72,7 +73,7 @@ namespace WpfGrabber.Shell
                 }
                 partsGrid.ColumnDefinitions[i].Width = new GridLength(options.Width.GetValueOrDefault());
             }
-
+            FixGridLayout();
         }
         #endregion
 

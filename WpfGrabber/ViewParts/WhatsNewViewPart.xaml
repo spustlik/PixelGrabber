@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WpfGrabber.ViewParts"
              mc:Ignorable="d" d:DesignWidth="490.477"
-             Background="LightYellow" Height="318"
+             Background="LightYellow" 
              >
     <Grid>
         <ScrollViewer>
@@ -27,7 +27,7 @@
 
                 <Run FontSize="30" FontWeight="Bold" Foreground="DodgerBlue">What to do</Run>
                 <Run xml:space="preserve">
-- multiselect in imagesprite              
+- photoshop layers to image sprites
 - end offset for bit8, masked - count?
 - show whatsnew viewpart...
 - z80 - orgs, sym addr, dumps

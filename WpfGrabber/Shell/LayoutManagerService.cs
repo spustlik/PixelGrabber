@@ -44,15 +44,16 @@ namespace WpfGrabber.Shell
             return Path.Combine(Path.GetDirectoryName(shellVm.FileName), ".pixelgrabber");
         }
 
-        public void LoadLayoutFile(string name)
+        public bool LoadLayoutFile(string name)
         {
             var fileName = GetConfigFileName();
             if (!File.Exists(fileName))
-                return;
+                return false;
             var doc = XDocument.Load(fileName);
             if (doc.Root.Name != ELE_LAYOUTS)
                 throw new FormatException("Invalid xml file");
             LoadLayout(doc.Root, name);
+            return true;
         }
 
         public void SaveLayoutFile(string name)

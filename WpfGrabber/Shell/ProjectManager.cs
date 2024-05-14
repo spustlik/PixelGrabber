@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using WpfGrabber.ViewParts;
 
 namespace WpfGrabber.Shell
 {
@@ -28,7 +30,18 @@ namespace WpfGrabber.Shell
             shellVm.LoadData(fileName);
             if (shellVm.AutoLoadLayout)
             {
-                LoadLayout();
+                if (!LoadLayout())
+                {
+                    //first load of file, no layout found
+                    if (Path.GetExtension(fileName).Equals(".psd", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        var vps = serviceProvider.GetService<IViewPartService>();
+                        var vpf = serviceProvider.GetService<ViewPartFactory>();
+                        //TODO: photoshop viewpart, show layers, layers to image sprites
+                        //<package id="psd-parser" version="1.1.18124.1812" targetFramework="net48" />
+                    }
+
+                }
             }
             SetDirty(false);
         }
@@ -39,11 +52,12 @@ namespace WpfGrabber.Shell
             shellVm.IsProjectDirty = dirty;
         }
 
-        public void LoadLayout()
+        public bool LoadLayout()
         {
             var layoutSvc = serviceProvider.GetService<LayoutManagerService>();
-            layoutSvc.LoadLayoutFile(null);
+            var r = layoutSvc.LoadLayoutFile(null);
             SetDirty(false);
+            return r;
         }
         public void SaveLayout()
         {
