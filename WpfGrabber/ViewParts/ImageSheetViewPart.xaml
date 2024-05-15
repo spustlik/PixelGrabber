@@ -65,7 +65,7 @@
                     <ControlTemplate TargetType="CheckBox" >
                         <Border x:Name="btn" Padding="3,0" VerticalAlignment="Center" 
                                 Background="{TemplateBinding Background}"
-                                BorderBrush="#d0d0d0" BorderThickness="1">
+                                BorderBrush="#606060" BorderThickness="1">
                             <ContentPresenter/>
                         </Border>
                     </ControlTemplate>

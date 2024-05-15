@@ -5,6 +5,7 @@ using System.ComponentModel.Design;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace WpfGrabber
 {
@@ -97,6 +98,20 @@ namespace WpfGrabber
             return String.Join(separator, data.Select(x => x.ToString("X2")));
         }
 
+        public static StringBuilder AppendIndented(this StringBuilder sb, string indent, params string[] lines)
+        {
+            if (lines.Length==1)
+            {
+                lines = lines[0].Split('\n');
+            }
+            foreach (var line in lines)
+            {
+                sb.Append(indent)
+                    .Append(line.TrimEnd())
+                    .AppendLine();
+            }
+            return sb;
+        }
 
     }
 }

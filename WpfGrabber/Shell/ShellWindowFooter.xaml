@@ -32,7 +32,9 @@
                 <Label>UI zoom:</Label>
                 <Label Padding="0" Margin="5,0" Content="{Binding UiZoom, Converter={StaticResource zoomConv}}"/>
                 <Slider VerticalAlignment="Center" Width="100" 
-                        Minimum="50" Maximum="300" Value="{Binding UiZoom, Converter={StaticResource mul100Conv}}"/>
+                        Minimum="50" Maximum="300" 
+                        LargeChange = "10"
+                        Value="{Binding UiZoom, Converter={StaticResource mul100Conv}}"/>
                 <FrameworkElement Width="10"/>
                 <Label Content="Zoom " />
                 <Button Click="ZoomMinus_Click">

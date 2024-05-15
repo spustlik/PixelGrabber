@@ -4,11 +4,14 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 using WpfGrabber.Data;
+using WpfGrabber.Readers;
 using WpfGrabber.Shell;
 
 namespace WpfGrabber.ViewParts
@@ -217,8 +220,26 @@ namespace WpfGrabber.ViewParts
 
         private bool LoadPsd()
         {
-            //<package id="psd-parser" version="1.1.18124.1812" targetFramework="net48" />
-            return false;
+            var data = ShellVm.Offset == 0 ? ShellVm.Data : ShellVm.Data.Skip(ShellVm.Offset).ToArray();
+            byte[] PSD_HEADER = Encoding.ASCII.GetBytes("8BPS");
+            if (!Enumerable.SequenceEqual(data.Take(4), PSD_HEADER))
+                return false;
+            using (var ms = new MemoryStream(data))
+            {
+                var psd = new PsdReader(ms);
+                ViewModel.Images.Clear();
+                foreach (var layer in psd.ReadImages())
+                {
+                    var img = new ImageSheetImageVM()
+                    {
+                        Name = layer.name,
+                        Image = layer.bmp.ToBitmapSource(),
+                        Description = layer.dump,
+                    };
+                    ViewModel.Images.Add(img);
+                }
+            }
+            return true;
         }
 
         private IEnumerable<ImageSheetImageVM> GetCroppedImages(ByteBitmapRgba src, int w, int h)
@@ -296,14 +317,27 @@ namespace WpfGrabber.ViewParts
             ViewModel.CombinatorText = String.Join("\n", ViewModel.Images.Select((img, i) => (i + 1) + ":" + img.Name));
         }
 
-        private void OnPreview_Click(object sender, RoutedEventArgs e)
+        private void OnPreview_Click(object sender, RoutedEventArgs args)
         {
-            //c1:a,b,c
-            //c2:d,e,f
-            //c3:a,e,f
-
-            //--> ada, ade, adf,  aea, aee, aef, ...
-            // no duplicate letter, so ad,ade,adf,ae,aef,...
+            var rd = new CombinationsReader();
+            rd.Read(ViewModel.CombinatorText);
+            var errors = rd.Check(ViewModel.Images.Select(x => x.Name));
+            if (errors.Count > 0)
+            {
+                var dr = MessageBox.Show($"There are {errors.Count} errors.\nDo you want to add them as comments?",
+                    "Question",
+                    MessageBoxButton.YesNoCancel,
+                    MessageBoxImage.Question);
+                if (dr == MessageBoxResult.Cancel)
+                    return;
+                if (dr == MessageBoxResult.Yes)
+                {
+                    ViewModel.CombinatorText += "\n" + String.Join("\n", errors.Select(e => "# " + e));
+                    return;
+                }
+            }
+            var r = rd.Combine();
+            ViewModel.CombinatorText += "\n#-------\n" + String.Join("\n", r);
         }
 
         private void OnGenerate_Click(object sender, RoutedEventArgs e)

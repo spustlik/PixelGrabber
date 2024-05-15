@@ -39,6 +39,9 @@
     <Reference Include="ICSharpCode.AvalonEdit, Version=6.3.0.90, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
       <HintPath>..\packages\AvalonEdit.6.3.0.90\lib\net462\ICSharpCode.AvalonEdit.dll</HintPath>
     </Reference>
+    <Reference Include="Ntreev.Library.Psd, Version=1.1.0.0, Culture=neutral, PublicKeyToken=c38f7f9c4e34740b, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ntreev.Library.Psd.1.1.18134.1310\lib\net45\Ntreev.Library.Psd.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Forms" />
@@ -76,6 +79,7 @@
     <Compile Include="Data\FontData.cs" />
     <Compile Include="Data\Graphics.cs" />
     <Compile Include="Data\GraphicsWpf.cs" />
+    <Compile Include="Readers\CombinationsReader.cs" />
     <Compile Include="Readers\EngineAlienReader.cs" />
     <Compile Include="Readers\BitImageReader.cs" />
     <Compile Include="Readers\DataReader.cs" />
@@ -89,6 +93,7 @@
     <Compile Include="Readers\FontReader.cs" />
     <Compile Include="Readers\MaskReader.cs" />
     <Compile Include="Readers\EngineMovieReader.cs" />
+    <Compile Include="Readers\PsdReader.cs" />
     <Compile Include="Readers\ReaderImageResult.cs" />
     <Compile Include="Readers\Z80\SnaData.cs" />
     <Compile Include="Readers\Z80\Z80Instruction.cs" />
