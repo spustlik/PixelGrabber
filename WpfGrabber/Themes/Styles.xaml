@@ -123,4 +123,21 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <Style TargetType="ContentControl" x:Key="info_icon">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate >
+                    <Grid Width="16" Height="16" >
+                        <Viewbox Stretch="Fill">
+                            <Ellipse Width="10" Height="10" Fill="DodgerBlue" Stretch="Fill"/>
+                        </Viewbox>
+                        <TextBlock Text="i" Foreground="White" FontFamily="Times New Roman" FontWeight="Bold"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>

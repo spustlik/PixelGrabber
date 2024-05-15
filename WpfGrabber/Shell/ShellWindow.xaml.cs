@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using WpfGrabber.Services;
 using WpfGrabber.ViewParts;
@@ -35,10 +36,11 @@ namespace WpfGrabber.Shell
                 ProjectManager.LoadFile(cfg.LastFile);
             }
             var vps = App.Current.ServiceProvider.GetService<IViewPartServiceEx>();
-            var def = new ViewPartDef<WhatsNewViewPart>() { Title = "What is new"};
-            var vp = vps.AddNewPart(def);
-            vps.SetOptions(vp, new ViewPartOptions() { Width = 300 });
-
+            if (vps.ViewParts.Count() == 0)
+            {
+                var vp = vps.AddNewPart(WhatsNewViewPart.Def);
+                vps.SetOptions(vp, new ViewPartOptions() { Width = 300 });
+            }
             _configSaver = Throthler.Create(TimeSpan.FromMilliseconds(50), () =>
             {
                 AppConfig.Save(ViewModel);

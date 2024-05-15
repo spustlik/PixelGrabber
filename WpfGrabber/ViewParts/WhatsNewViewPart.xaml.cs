@@ -33,6 +33,7 @@ namespace WpfGrabber.ViewParts
 
     public partial class WhatsNewViewPart : WhatsNewViewPartBase
     {
+        public static ViewPartDef Def { get; } = new ViewPartDef<WhatsNewViewPart>() { Title = "What is new" };
 
         public WhatsNewViewPart()
         {

@@ -19,30 +19,21 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <ItemsControl Style="{StaticResource toolbar}" >
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="300"/>
+        </Grid.ColumnDefinitions>
+        <ItemsControl Style="{StaticResource toolbar_wrap}" >
             <ItemsControl.Resources>
-                <Style TargetType="StackPanel">
-                    <Setter Property="Orientation" Value="Horizontal" />
-                </Style>
                 <Style TargetType="c:NumberEditor">
                     <Setter Property="Minimum" Value="0" />
                     <Setter Property="Width" Value="70" />
                     <Setter Property="LargeChange" Value="0" />
                 </Style>
             </ItemsControl.Resources>
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel/>
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
             <Label ToolTip="Set what you know, other to 0, it will be calculated in this order">
-                <Grid Width="16" Height="16" >
-                    <Viewbox Stretch="Fill">
-                        <Ellipse Width="10" Height="10" Fill="DodgerBlue" Stretch="Fill"/>
-                    </Viewbox>
-                    <TextBlock Text="i" Foreground="White" FontFamily="Times New Roman" FontWeight="Bold"
-                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                </Grid>
+                <ContentControl Style="{StaticResource info_icon}"/>
             </Label>
             <StackPanel>
                 <Label Content="C:" ToolTip="Columns"/>
@@ -110,14 +101,45 @@
             </Button>
         </ItemsControl>
         <Border x:Name="imageBorder"
-                SizeChanged="BorderSize_Changed"
-                Style="{StaticResource checkerBorder}" 
-                Grid.Row="1" 
-                >
+            SizeChanged="BorderSize_Changed"
+            Style="{StaticResource checkerBorder}" 
+            Grid.Row="1" Grid.RowSpan="99"
+            >
             <ListBox Style="{StaticResource listBoxImages}" 
-                     ScrollViewer.VerticalScrollBarVisibility="Auto"
-                     SelectionMode="Extended"  />
+                    ScrollViewer.VerticalScrollBarVisibility="Auto"
+                    SelectionMode="Extended"  />
 
+        </Border>
+        <GridSplitter Grid.Column="1" Grid.RowSpan="99" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+        <Border x:Name="properties" Grid.Column="2" Grid.RowSpan="99" 
+                BorderBrush="#a0a0a0" BorderThickness="1">
+            <DockPanel>
+                <Border DockPanel.Dock="Top" Background="#606060">
+                    <Label Content="Image combinations" Foreground="White"/>
+                </Border>
+                <ItemsControl DockPanel.Dock="Top" Style="{StaticResource toolbar_wrap}">
+                    <ContentControl Style="{StaticResource info_icon}">
+                        <ContentControl.ToolTip>
+                            <TextBlock FontFamily="Courier new" FontSize="10" Foreground="#606060" TextWrapping="Wrap">
+                            <Run>syntax:</Run><LineBreak/>
+                            <Run>[NewName:]Name1(,Name2...)</Run>
+                            </TextBlock>
+                        </ContentControl.ToolTip>
+                    </ContentControl>
+                    <Separator/>
+                    <Button Content="Tools" Style="{StaticResource dropDown}">
+                        <Button.ContextMenu>
+                            <ContextMenu Placement="Bottom">
+                                <MenuItem Header="Generate all names" Click="OnGenerateNames_Click"/>
+                                <MenuItem Header="Preview" Click="OnPreview_Click"/>
+                                <MenuItem Header="Generate" Click="OnGenerate_Click" IsEnabled="False"/>
+                            </ContextMenu>
+                        </Button.ContextMenu>
+                    </Button>
+                </ItemsControl>
+                <TextBox Text="{Binding CombinatorText,UpdateSourceTrigger=PropertyChanged}" 
+                         AcceptsReturn="True" FontFamily="Courier New" FontSize="11"/>
+            </DockPanel>
         </Border>
 
     </Grid>

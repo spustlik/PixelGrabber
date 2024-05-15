@@ -32,15 +32,7 @@ namespace WpfGrabber.Shell
             {
                 if (!LoadLayout())
                 {
-                    //first load of file, no layout found
-                    if (Path.GetExtension(fileName).Equals(".psd", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        var vps = serviceProvider.GetService<IViewPartService>();
-                        var vpf = serviceProvider.GetService<ViewPartFactory>();
-                        //TODO: photoshop viewpart, show layers, layers to image sprites
-                        //<package id="psd-parser" version="1.1.18124.1812" targetFramework="net48" />
-                    }
-
+                    ///auto layout ???? 
                 }
             }
             SetDirty(false);

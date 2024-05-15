@@ -83,6 +83,15 @@ namespace WpfGrabber.ViewParts
         }
         #endregion
 
+        #region CombinatorText property
+        private string _combinatorText;
+        public string CombinatorText
+        {
+            get => _combinatorText;
+            set => Set(ref _combinatorText, value);
+        }
+        #endregion
+
         #region ShellVm property
         private ShellVm _shellVm;
         [XmlIgnore]
@@ -163,18 +172,11 @@ namespace WpfGrabber.ViewParts
 
         protected override void OnShowData()
         {
-            //var (max_w, max_h) = GetDataImageSize(imageBorder);
-
-            //if (ViewModel.Width == 0 && ViewModel.Images.Count > 0)
-            //{
-            //    ViewModel.Width = ViewModel.Images.Max(a => a.Image.PixelWidth);
-            //    return;
-            //}
-            //if (ViewModel.Height == 0 && ViewModel.Images.Count > 0)
-            //{
-            //    ViewModel.Height = ViewModel.Images.Max(a => a.Image.PixelHeight);
-            //    return;
-            //}
+            if (ShellVm.Offset == 0 && Path.GetExtension(ShellVm.FileName).Equals(".psd", StringComparison.InvariantCultureIgnoreCase))
+            {
+                if (LoadPsd())
+                    return;
+            }
 
             var img = new BitmapImage();
             using (var ms = new MemoryStream(ShellVm.Data.Skip(ShellVm.Offset).ToArray()))
@@ -213,6 +215,12 @@ namespace WpfGrabber.ViewParts
             //images are viewed by Binding to Images collection
         }
 
+        private bool LoadPsd()
+        {
+            //<package id="psd-parser" version="1.1.18124.1812" targetFramework="net48" />
+            return false;
+        }
+
         private IEnumerable<ImageSheetImageVM> GetCroppedImages(ByteBitmapRgba src, int w, int h)
         {
             int counter = 0;
@@ -227,7 +235,7 @@ namespace WpfGrabber.ViewParts
                         (dx, dy, c) => bmp.SetPixel(dx, dy, c));
                     var vm = new ImageSheetImageVM()
                     {
-                        Name = $"{counter} [{x},{y}]",
+                        Name = $"#{counter}", // ! combinator
                         Image = bmp.ToBitmapSource(),
                         Description = $"Column={x}, Row={y}, Index={counter}, Width={w}, Height={h}",
                     };
@@ -269,12 +277,38 @@ namespace WpfGrabber.ViewParts
                 vp = (ImageSpriteViewPart)vps.AddNewPart(def);
             }
             vp.ViewModel.Images.AddRange(ViewModel.Images
-                .Select(a => new ImageVM() { 
-                    Image = a.Image, 
-                    Name = a.Name, 
-                    Description = a.Description, 
+                .Select(a => new ImageVM()
+                {
+                    Image = a.Image,
+                    Name = a.Name,
+                    Description = a.Description,
                     //FileName = 
                 }), clear: true);
+        }
+
+        private void OnGenerateNames_Click(object sender, RoutedEventArgs e)
+        {
+            if (!String.IsNullOrEmpty(ViewModel.CombinatorText?.Trim()))
+            {
+                if (MessageBox.Show("Replace current content ?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                    return;
+            }
+            ViewModel.CombinatorText = String.Join("\n", ViewModel.Images.Select((img, i) => (i + 1) + ":" + img.Name));
+        }
+
+        private void OnPreview_Click(object sender, RoutedEventArgs e)
+        {
+            //c1:a,b,c
+            //c2:d,e,f
+            //c3:a,e,f
+
+            //--> ada, ade, adf,  aea, aee, aef, ...
+            // no duplicate letter, so ad,ade,adf,ae,aef,...
+        }
+
+        private void OnGenerate_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

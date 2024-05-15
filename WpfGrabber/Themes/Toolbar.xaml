@@ -4,6 +4,10 @@
     <Style TargetType="ItemsControl" x:Key="toolbar" >
         <Style.Resources>
             <wpfgrabber:GestureTextConverter x:Key="gestureTextConv"/>
+            <Style TargetType="StackPanel">
+                <Setter Property="Orientation" Value="Horizontal" />
+            </Style>
+
             <Style TargetType="CheckBox">
                 <Setter Property="VerticalAlignment" Value="Center" />
             </Style>
@@ -37,6 +41,16 @@
                         <ItemsPresenter/>
                     </Border>
                 </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="ItemsControl" x:Key="toolbar_wrap" BasedOn="{StaticResource toolbar}" >
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <WrapPanel />
+                </ItemsPanelTemplate>
             </Setter.Value>
         </Setter>
     </Style>
