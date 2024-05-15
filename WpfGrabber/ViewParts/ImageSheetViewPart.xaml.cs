@@ -181,7 +181,7 @@ namespace WpfGrabber.ViewParts
                     return;
             }
 
-            var img = new BitmapImage();
+            var img = new BitmapImage(); //WPF
             using (var ms = new MemoryStream(ShellVm.Data.Skip(ShellVm.Offset).ToArray()))
             {
                 img.LoadFromStream(ms);
@@ -309,12 +309,12 @@ namespace WpfGrabber.ViewParts
 
         private void OnGenerateNames_Click(object sender, RoutedEventArgs e)
         {
-            if (!String.IsNullOrEmpty(ViewModel.CombinatorText?.Trim()))
+            if (!string.IsNullOrEmpty(ViewModel.CombinatorText?.Trim()))
             {
                 if (MessageBox.Show("Replace current content ?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
                     return;
             }
-            ViewModel.CombinatorText = String.Join("\n", ViewModel.Images.Select((img, i) => (i + 1) + ":" + img.Name));
+            ViewModel.CombinatorText = string.Join("\n", ViewModel.Images.Select((img, i) => (i + 1) + ":" + img.Name));
         }
 
         private void OnPreview_Click(object sender, RoutedEventArgs args)
@@ -332,16 +332,19 @@ namespace WpfGrabber.ViewParts
                     return;
                 if (dr == MessageBoxResult.Yes)
                 {
-                    ViewModel.CombinatorText += "\n" + String.Join("\n", errors.Select(e => "# " + e));
+                    ViewModel.CombinatorText += "\n" + string.Join("\n", errors.Select(e => "# " + e));
                     return;
                 }
             }
             var r = rd.Combine();
-            ViewModel.CombinatorText += "\n#-------\n" + String.Join("\n", r);
+            ViewModel.CombinatorText += "\n#-------\n" + string.Join("\n", r);
         }
 
         private void OnGenerate_Click(object sender, RoutedEventArgs e)
         {
+            var rd = new CombinationsReader();
+            rd.Read(ViewModel.CombinatorText);
+            var combinations = rd.Combine();
 
         }
     }

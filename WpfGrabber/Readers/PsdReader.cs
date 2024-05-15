@@ -256,8 +256,6 @@ namespace WpfGrabber.Readers
             {
                 if (resource.Key == "TySh")
                     continue; // hack error in lib
-                if (resource.Key == "luni")
-                    continue; // Name
                 if (resource.Value is IProperties props)
                 {
                     if (new[] { "lyid", "lsct", "fxrp", "iOpa" }.Contains(resource.Key) && props.Count == 1)
