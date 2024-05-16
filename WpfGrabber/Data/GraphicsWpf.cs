@@ -7,16 +7,16 @@ namespace WpfGrabber.Data
 {
     public static class GraphicsWpf
     {
-        public static BitmapSource ToBitmapSource(this ByteBitmapRgba src)
+        public static BitmapSource ToBitmapSource(this ByteBitmapRgba src, PixelFormat? format = null)
         {
             var bmp = BitmapSource.Create(src.Width, src.Height,
-                96, 96, PixelFormats.Pbgra32, null, src.Data, src.Width * sizeof(uint));
+                96, 96, format ?? PixelFormats.Pbgra32, null, src.Data, src.Width * sizeof(uint));
             return bmp;
         }
 
-        public static WriteableBitmap ToWriteableBitmap(this ByteBitmapRgba src)
+        public static WriteableBitmap ToWriteableBitmap(this ByteBitmapRgba src, PixelFormat? format = null)
         {
-            var bmp = new WriteableBitmap(src.Width, src.Height, 96, 96, PixelFormats.Pbgra32, null);
+            var bmp = new WriteableBitmap(src.Width, src.Height, 96, 96, format ?? PixelFormats.Pbgra32, null);
             bmp.WritePixels(new Int32Rect(0, 0, src.Width, src.Height), src.Data, src.Width * 4, 0);
             return bmp;
         }

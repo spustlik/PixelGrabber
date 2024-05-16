@@ -170,7 +170,7 @@ namespace WpfGrabber.ViewParts
 
         private void BorderSize_Changed(object sender, SizeChangedEventArgs e)
         {
-            OnShowData();
+            //OnShowData();
         }
 
         protected override void OnShowData()
@@ -233,7 +233,7 @@ namespace WpfGrabber.ViewParts
                     var img = new ImageSheetImageVM()
                     {
                         Name = layer.name,
-                        Image = layer.bmp.ToWriteableBitmap(),//ToBitmapSource(),
+                        Image = layer.bmp.ToBitmapSource(PixelFormats.Bgra32),
                         Description = layer.dump,
                     };
                     ViewModel.Images.Add(img);
@@ -290,13 +290,7 @@ namespace WpfGrabber.ViewParts
         private void OnMoveToSprites_Click(object sender, RoutedEventArgs e)
         {
             var vps = App.GetService<IViewPartServiceEx>();
-            var vp = vps.ViewParts.OfType<ImageSpriteViewPart>().FirstOrDefault();
-            if (vp == null)
-            {
-                var vpf = App.GetService<ViewPartFactory>();
-                var def = vpf.Definitions.First(d => d.ViewPartType == typeof(ImageSpriteViewPart));
-                vp = (ImageSpriteViewPart)vps.AddNewPart(def);
-            }
+            var vp = vps.GetOrCreate(ImageSpriteViewPart.Def);
             vp.ViewModel.Images.AddRange(ViewModel.Images
                 .Select(a => new ImageVM()
                 {
@@ -324,21 +318,28 @@ namespace WpfGrabber.ViewParts
             var errors = rd.Check(ViewModel.Images.Select(x => x.Name));
             if (errors.Count > 0)
             {
-                var dr = MessageBox.Show($"There are {errors.Count} errors.\nDo you want to add them as comments?",
-                    "Question",
-                    MessageBoxButton.YesNoCancel,
-                    MessageBoxImage.Question);
-                if (dr == MessageBoxResult.Cancel)
-                    return;
-                if (dr == MessageBoxResult.Yes)
-                {
-                    ViewModel.CombinatorText += "\n" + string.Join("\n", errors.Select(e => "# " + e));
-                    return;
-                }
+                var err = TextViewPart.ShowPart("Errors", errors.ToArray());
+                return;
             }
             var r = rd.Combine();
             ViewModel.CombinatorText += "\n#-------\n" + string.Join("\n", r);
         }
+
+        private void OnCopyDescr_Click(object sender, RoutedEventArgs e)
+        {
+            var selected = ViewModel.Images.Where(x => x.IsSelected).ToArray();
+            if (selected.Length == 0)
+                return;
+            var sb = new StringBuilder();
+            foreach (var item in selected)
+            {
+                if (selected.Length > 1)
+                    sb.AppendLine("----- " + item.Name);
+                sb.AppendLine(item.Description);
+            }
+            var part = TextViewPart.ShowPart("Description", sb.ToString());
+        }
+
 
         private void OnGenerate_Click(object sender, RoutedEventArgs e)
         {
@@ -346,21 +347,6 @@ namespace WpfGrabber.ViewParts
             rd.Read(ViewModel.CombinatorText);
             var combinations = rd.Combine();
             MessageBox.Show("Not implemented");
-        }
-
-        private void OnCopyDescr_Click(object sender, RoutedEventArgs e)
-        {
-            var selected = ViewModel.Images.Where(x => x.IsSelected).ToArray();
-            if (selected.Length==0)
-                return;
-            var sb = new StringBuilder();
-            foreach (var item in selected)
-            {
-                if(selected.Length>1)
-                    sb.AppendLine("----- " + item.Name);
-                sb.AppendLine(item.Description);
-            }
-            Clipboard.SetText(sb.ToString());
         }
     }
 }

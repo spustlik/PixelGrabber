@@ -142,6 +142,8 @@ namespace WpfGrabber.ViewParts
 
     public partial class ImageSpriteViewPart : ImageSpriteViewPartBase
     {
+        public static ViewPartDef<ImageSpriteViewPart> Def { get; } = new ViewPartDef<ImageSpriteViewPart>() { Title = "Image sprite sheet" };
+
         public static RoutedUICommand CommandMoveUp = new RoutedUICommand("Up", nameof(CommandMoveUp), typeof(ImageSpriteViewPart), new InputGestureCollection() { new KeyGesture(Key.Left, ModifierKeys.Control) });
         public static RoutedUICommand CommandMoveDown = new RoutedUICommand("Down", nameof(CommandMoveDown), typeof(ImageSpriteViewPart), new InputGestureCollection() { new KeyGesture(Key.Right, ModifierKeys.Control) });
         public static RoutedUICommand CommandRemove = new RoutedUICommand("Remove", nameof(CommandRemove), typeof(ImageSpriteViewPart), new InputGestureCollection() { new KeyGesture(Key.Delete) });

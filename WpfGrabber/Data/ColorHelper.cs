@@ -9,31 +9,25 @@ namespace WpfGrabber.Data
 {
     public struct ByteColor
     {
-        public byte A { get; set; }
-        public byte R { get; set; }
-        public byte G { get; set; }
-        public byte B { get; set; }
+        public uint Value { get; private set; }
+        public byte A => (byte)(Value >> 24);
+        public byte R => (byte)(Value >> 16);
+        public byte G => (byte)(Value >> 8);
+        public byte B => (byte)(Value);
 
         public static ByteColor FromRgba(byte r, byte g, byte b, byte a = 0xFF)
         {
-            return new ByteColor() { A = a, R = r, G = g, B = b };
+            var v = RgbaToUint(r, g, b, a);
+            return new ByteColor() { Value = v };
         }
-        public uint ToUInt()
+
+        public static uint RgbaToUint(byte r, byte g, byte b, byte a)
         {
-            return (uint)((A << 24) | (R << 16) | (G << 8) | B);
+            return (uint)((a << 24) | (r << 16) | (g << 8) | b);
         }
-        public static ByteColor FromUint(uint x)
-        {
-            byte a, r, g, b;
-            b = (byte)(x & 0xFF);
-            x >>= 8;
-            g = (byte)(x & 0xFF);
-            x >>= 8;
-            r = (byte)(x & 0xFF);
-            x >>= 8;
-            a = (byte)(x & 0xFF);
-            return FromRgba(r, g, b, a);
-        }
+
+        public uint ToUInt() => Value;
+        public static ByteColor FromUint(uint v) => new ByteColor() { Value = v };
 
         public static implicit operator ByteColor(uint c) => FromUint(c);
         public static implicit operator uint(ByteColor c) => c.ToUInt();

@@ -59,27 +59,27 @@ namespace WpfGrabber.Readers
             var sw = src.Width;
             var sh = src.Height;
             var bmp = new ByteBitmapRgba(dw, dh);
+            
+            byte opa = (byte)Math.Round(src.Opacity * 255f);
+
             Func<int, int, uint> getPixel = (int x, int y) =>
             {
                 byte r = ch_R.Data[y * sw + x];
                 byte g = ch_G.Data[y * sw + x];
                 byte b = ch_B.Data[y * sw + x];
-                byte a = 0xFF;
+                byte a = opa;
                 if (ch_A != null)
+                {
                     a = ch_A.Data[y * sw + x];
+                    a = (byte)Math.Round(a * src.Opacity);
+                }
                 return ByteColor.FromRgba(r, g, b, a);
             };
             Action<int, int, uint> setPixel = bmp.SetPixel;
             if (RespectBounds)
             {
-                setPixel = (int x, int y, uint color) =>
-                {
-                    var c = ByteColor.FromUint(color);
-                    c.R = 0;
-                    c.G = 0;
-                    c.B = 0x40;
-                    bmp.SetPixel(x + src.Left, y + src.Top, c);
-                };
+                setPixel = (int x, int y, uint color) =>                
+                    bmp.SetPixel(x + src.Left, y + src.Top, color);
             }
             for (var y = sh - 1; y >= 0; --y)
             {
@@ -241,14 +241,14 @@ namespace WpfGrabber.Readers
                         c.B = data[n++];
                         c.G = data[n++];
                         c.R = data[n++];
-                        c.A = (byte)System.Math.Round(data[n++] / 255f * imageSource.Opacity * 255f);
+                        c.A = (byte)Math.Round(data[n++] / 255f * imageSource.Opacity * 255f);
                     }
                     else
                     {
                         c.B = data[n++];
                         c.G = data[n++];
                         c.R = data[n++];
-                        c.A = (byte)System.Math.Round(imageSource.Opacity * 255f);
+                        c.A = (byte)Math.Round(imageSource.Opacity * 255f);
                     }
                     colors[k++] = c;
                 }
