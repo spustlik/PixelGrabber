@@ -7,8 +7,10 @@
     <DrawingBrush x:Key="checkerBrush" TileMode="Tile" Viewport="0,0,32,32" ViewportUnits="Absolute">
         <DrawingBrush.Drawing>
             <DrawingGroup>
-                <GeometryDrawing Geometry="M1,0 H2 V1 H0 V2 H1 V1 H0Z" Brush="#c0c0ff"/>
-                <GeometryDrawing Geometry="M0,0 H1 V1 H2 V2 H1 V1 H0Z" Brush="#e0e0ff"/>
+                <!--<GeometryDrawing Geometry="M1,0 H2 V1 H0 V2 H1 V1 H0Z" Brush="#c0c0ff"/>
+                <GeometryDrawing Geometry="M0,0 H1 V1 H2 V2 H1 V1 H0Z" Brush="#e0e0ff"/>-->
+                <GeometryDrawing Geometry="M1,0 H2 V1 H0 V2 H1 V1 H0Z" Brush="#0080c0"/>
+                <GeometryDrawing Geometry="M0,0 H1 V1 H2 V2 H1 V1 H0Z" Brush="#00e080"/>
             </DrawingGroup>
         </DrawingBrush.Drawing>
     </DrawingBrush>
@@ -51,11 +53,11 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Height" Value="22" />
     </Style>
-    
+
     <converters:EnumItemsConverter x:Key="enumItems"/>
-    
+
     <BooleanToVisibilityConverter x:Key="visiConv"/>
-    
+
     <Style TargetType="ListBox" x:Key="listBoxImages">
         <!-- bind to (Images, SelectedImage, Columns, ShowLabels) -->
         <Setter Property="Background" Value="Transparent" />
@@ -70,7 +72,8 @@
         </Setter>
         <Setter Property="ItemTemplate">
             <Setter.Value>
-                <DataTemplate> <!--(ImageVM) Name,Description,Image -->
+                <DataTemplate>
+                    <!--(ImageVM) Name,Description,Image -->
                     <Border BorderBrush="DodgerBlue" BorderThickness="1" Margin="0"
                             Name="itemborder" 
                             Background="#8080ff80">
@@ -81,7 +84,7 @@
                             <Border Visibility="{Binding DataContext.ShowLabels, RelativeSource={RelativeSource AncestorType=ListBox}, Converter={StaticResource visiConv}}"
                                     HorizontalAlignment="Stretch" VerticalAlignment="Top"
                                     Background="DodgerBlue" Opacity="0.8">
-                                    <TextBlock Text="{Binding Name}" Margin="4,0" Foreground="White" FontSize="10"/>
+                                <TextBlock Text="{Binding Name}" Margin="4,0" Foreground="White" FontSize="10"/>
                             </Border>
                         </Grid>
                     </Border>

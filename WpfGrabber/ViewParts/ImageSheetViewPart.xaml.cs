@@ -226,14 +226,14 @@ namespace WpfGrabber.ViewParts
                 return false;
             using (var ms = new MemoryStream(data))
             {
-                var psd = new PsdReader(ms);
+                var psd = new PsdReader(ms) { RespectBounds = true };
                 ViewModel.Images.Clear();
                 foreach (var layer in psd.ReadImages())
                 {
                     var img = new ImageSheetImageVM()
                     {
                         Name = layer.name,
-                        Image = layer.bmp.ToBitmapSource(),
+                        Image = layer.bmp.ToWriteableBitmap(),//ToBitmapSource(),
                         Description = layer.dump,
                     };
                     ViewModel.Images.Add(img);
@@ -345,7 +345,22 @@ namespace WpfGrabber.ViewParts
             var rd = new CombinationsReader();
             rd.Read(ViewModel.CombinatorText);
             var combinations = rd.Combine();
+            MessageBox.Show("Not implemented");
+        }
 
+        private void OnCopyDescr_Click(object sender, RoutedEventArgs e)
+        {
+            var selected = ViewModel.Images.Where(x => x.IsSelected).ToArray();
+            if (selected.Length==0)
+                return;
+            var sb = new StringBuilder();
+            foreach (var item in selected)
+            {
+                if(selected.Length>1)
+                    sb.AppendLine("----- " + item.Name);
+                sb.AppendLine(item.Description);
+            }
+            Clipboard.SetText(sb.ToString());
         }
     }
 }

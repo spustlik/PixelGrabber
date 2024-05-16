@@ -94,6 +94,7 @@
     <Compile Include="Readers\MaskReader.cs" />
     <Compile Include="Readers\EngineMovieReader.cs" />
     <Compile Include="Readers\PsdReader.cs" />
+    <Compile Include="Readers\PsdReader_Ravu.cs" />
     <Compile Include="Readers\ReaderImageResult.cs" />
     <Compile Include="Readers\Z80\SnaData.cs" />
     <Compile Include="Readers\Z80\Z80Instruction.cs" />

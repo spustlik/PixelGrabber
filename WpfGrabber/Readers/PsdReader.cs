@@ -4,199 +4,22 @@ using System.Linq;
 using System.Text;
 using WpfGrabber.Data;
 using System.IO;
+using Ntreev.Library.Psd;
+using System.Collections;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
 
 namespace WpfGrabber.Readers
 {
     /*
-    <package id="RavuAlHemio.PSD" version="0.0.5" targetFramework="net48" />
-    using RavuAlHemio.PSD;
-    public class PsdReader
-    {
-        private readonly Stream source;
-        private readonly PSDFile psd;
-
-        public PsdReader(Stream source)
-        {
-            this.source = source;
-            psd = new PSDFile();
-            psd.Read(source);
-            if (psd.Depth != 8)
-                throw new NotImplementedException($"Depth {psd.Depth} is not implemented");
-        }
-
-        public IEnumerable<(ByteBitmapRgba bmp, string name, string dump)> ReadImages()
-        {
-            foreach (var layer in psd.Layers.Reverse())
-            {
-                var bmp = ToByteBitmap(layer);
-                var dump = GetDump(layer);
-                yield return (bmp, name: layer.Name, dump);
-            }
-        }
-
-        private string GetDump(PSDLayer layer)
-        {
-            var sb = new StringBuilder();
-            sb.AppendLine($"{layer.Name} ({layer.Left},{layer.Top}) [{layer.Right - layer.Left} x {layer.Bottom - layer.Top}]");
-            var vals = new List<string>();
-            if (layer.Opacity != 255)
-                vals.Add($"Opacity: {layer.Opacity}");
-            if (layer.BlendMode != BlendMode.Normal)
-                vals.Add($"Blend mode: {layer.BlendMode}");
-            if (layer.Obsolete)
-                vals.Add("OBSOLETE");
-            if (!layer.Visible)
-                vals.Add("HIDDEN");
-            if (layer.NonBaseClipping)
-                vals.Add("NonBaseClipping");
-            if (layer.PixelDataIrrelevantToDocumentAppearance)
-                vals.Add("PixelDataIrrelevantToDocumentAppearance");
-            if (vals.Count > 0)
-                sb.AppendLine(string.Join(", ", vals));
-            if (layer.AdditionalInformation.Count > 0)
-            {
-                sb.AppendLine("AdditionalInformation:");
-                foreach (var item in layer.AdditionalInformation)
-                {
-                    sb.AppendLine($"  {item.Key}: {item.Data.Length}");
-                }
-            }
-            if (layer.BlendingRanges?.Length > 0)
-            {
-                sb.AppendLine("BlendingRanges:");
-                foreach (var item in layer.BlendingRanges)
-                {
-                    sb.AppendLine($"  {item}"); //8 bytes 
-                }
-            }
-            sb.AppendLine("Channels:");
-            foreach (var ch in layer.Channels)
-            {
-                sb.AppendLine($"  {ch.ID} {ch.Data.DataLength}");
-            }
-            if (layer.LayerMask != null)
-            {
-                sb.AppendLine("LayerMask:");
-                var m = layer.LayerMask;
-                sb.AppendLine("  ... todo");
-            }
-            return sb.ToString();
-        }
-
-        public enum ChannelType
-        {
-            Alpha = -1,
-            Red = 0,
-            Green = 1,
-            Blue = 2,
-            Mask = -2
-        }
-
-        public ByteBitmapRgba ToByteBitmap(PSDLayer src)
-        {
-            var bmp = new ByteBitmapRgba(src.Width(), src.Height());
-            var ch_R = GetChannel(src, ChannelType.Red);
-            var ch_G = GetChannel(src, ChannelType.Green);
-            var ch_B = GetChannel(src, ChannelType.Blue);
-            var ch_A = GetChannel(src, ChannelType.Alpha);
-            var ch_M = GetChannel(src, ChannelType.Mask);
-            if (src.LayerMask != null)
-                throw new NotImplementedException("Mask not implemented");
-            if (ch_R == null || ch_G == null || ch_B == null)
-                throw new NotImplementedException("Missing RGB channels");
-            var w = bmp.Width;
-            var h = bmp.Height;
-            Func<int, int, uint> getPixel = (int x, int y) =>
-            {
-                byte r = ch_R.Data[y * w + x];
-                byte g = ch_G.Data[y * w + x];
-                byte b = ch_B.Data[y * w + x];
-                byte a = 0xFF;
-                if (ch_A != null)
-                    a = ch_A.Data[y * w + x];
-                return ColorHelper.ColorFromRGBA(r, g, b, a);
-            };
-            for (var y = h - 1; y >= 0; --y)
-            {
-                for (var x = 0; x < w; x++)
-                {
-                    bmp.SetPixel(x, y, getPixel(x, y));
-                }
-            }
-            return bmp;
-        }
-
-        public class ChannelData
-        {
-            public PSDLayerChannel Channel { get; set; }
-            public byte[] Data { get; set; }
-        }
-        private ChannelData GetChannel(PSDLayer src, ChannelType type)
-        {
-            var ch = src.Channels.FirstOrDefault(c => c.ID == (short)type);
-            if (ch == null)
-                return null;
-            return ToReadChannel(ch, src);
-        }
-
-        public ChannelData ToReadChannel(PSDLayerChannel ch, PSDLayer layer)
-        {
-            source.Seek(ch.Data.Offset, SeekOrigin.Begin);
-            using (var ms = new MemoryStream())
-            {
-                Decode(ch.Data.Compression, source, ms, layer.Width(), layer.Height(), layer.Channels.Length);
-                return new ChannelData() { Channel = ch, Data = ms.ToArray() };
-            }
-        }
-
-        public void Decode(CompressionType compression, Stream src, Stream dst, int width, int height, int channelCount)
-        {
-            switch (compression)
-            {
-                case CompressionType.RawData:
-                    PixelDataDecoding.DecodeRawData(src, dst, null);
-                    break;
-                case CompressionType.PackBits:
-                    int scanlineCount = height;// * channelCount;
-                    PixelDataDecoding.DecodePackBits(src, dst, scanlineCount, psd.Version == 2);
-                    break;
-                case CompressionType.ZipWithoutPrediction:
-                    PixelDataDecoding.DecodeZip(src, dst, null);
-                    break;
-                case CompressionType.ZipWithPrediction:
-                    PixelDataDecoding.DecodeZipPredicted(src, dst, null, psd.Depth, width);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(compression));
-            }
-        }
-    }
-
-    public static class PSDExtensions
-    {
-        public static int Width(this PSDLayer layer)
-        {
-            return layer.Right - layer.Left;
-        }
-        public static int Height(this PSDLayer layer)
-        {
-            return layer.Bottom - layer.Top;
-        }
-    }
-    */
-
-    /*
     <package id="Ntreev.Library.Psd" version="1.1.18134.1310" targetFramework="net48" />
     */
-    using Ntreev.Library.Psd;
-    using System.Collections;
 
     public class PsdReader
     {
         private readonly PsdDocument doc;
-
+        public bool RespectBounds { get; set; } = true;
+        public bool ReverseLayerOrder { get; set; } = true;
         public PsdReader(Stream source)
         {
             doc = PsdDocument.Create(source);
@@ -204,11 +27,71 @@ namespace WpfGrabber.Readers
 
         public IEnumerable<(ByteBitmapRgba bmp, string name, string dump)> ReadImages()
         {
-            return doc.Childs
-                .Select(layer => (bmp: layer.ToByteBitmap(), name: layer.Name, dump: layer.GetDump()))
-                .Reverse();
+            var items = doc.Childs
+                .Where(l => l.HasImage)
+                .Select(layer => (
+                    bmp: ToByteBitmap(layer),
+                    name: layer.Name,
+                    dump: layer.GetDump()
+                    ));
+            if (ReverseLayerOrder)
+                items = items.Reverse();
+            return items;
+        }
+        public ByteBitmapRgba ToByteBitmap(IPsdLayer src)
+        {
+            var data = src.MergeChannels(); // Channels Data for each pixel in reversed order
+            var ch_R = src.Channels.FirstOrDefault(c => c.Type == ChannelType.Red);
+            var ch_G = src.Channels.FirstOrDefault(c => c.Type == ChannelType.Green);
+            var ch_B = src.Channels.FirstOrDefault(c => c.Type == ChannelType.Blue);
+            var ch_A = src.Channels.FirstOrDefault(c => c.Type == ChannelType.Alpha);
+            var ch_M = src.Channels.FirstOrDefault(c => c.Type == ChannelType.Mask);
+            if (src.Depth != 8)
+                throw new NotImplementedException($"Image depth {src.Depth} not implemented");
+            if (src.HasMask || ch_M != null)
+                throw new NotImplementedException("Mask not implemented");
+            if (ch_R == null || ch_G == null || ch_B == null)
+                throw new NotImplementedException("Missing RGB channells");
+            var dw = src.Width;
+            if (RespectBounds) dw = src.Width + src.Left;
+            var dh = src.Height;
+            if (RespectBounds) dh = src.Height + src.Top;
+            var sw = src.Width;
+            var sh = src.Height;
+            var bmp = new ByteBitmapRgba(dw, dh);
+            Func<int, int, uint> getPixel = (int x, int y) =>
+            {
+                byte r = ch_R.Data[y * sw + x];
+                byte g = ch_G.Data[y * sw + x];
+                byte b = ch_B.Data[y * sw + x];
+                byte a = 0xFF;
+                if (ch_A != null)
+                    a = ch_A.Data[y * sw + x];
+                return ByteColor.FromRgba(r, g, b, a);
+            };
+            Action<int, int, uint> setPixel = bmp.SetPixel;
+            if (RespectBounds)
+            {
+                setPixel = (int x, int y, uint color) =>
+                {
+                    var c = ByteColor.FromUint(color);
+                    c.R = 0;
+                    c.G = 0;
+                    c.B = 0x40;
+                    bmp.SetPixel(x + src.Left, y + src.Top, c);
+                };
+            }
+            for (var y = sh - 1; y >= 0; --y)
+            {
+                for (var x = 0; x < sw; x++)
+                {
+                    setPixel(x, y, getPixel(x, y));
+                }
+            }
+            return bmp;
         }
     }
+
     public static class NtreevPsdExtensions
     {
         public static string GetDump(this IPsdLayer layer)
@@ -229,9 +112,13 @@ namespace WpfGrabber.Readers
                 info.Add("MASK");
             if (layer.IsClipping)
                 info.Add("Clipping");
-            if (layer.LinkedLayer != null)
-                info.Add($"Linked layer: {layer.LinkedLayer.Name}");
             dump.AppendLine(string.Join(", ", info));
+            if (layer.LinkedLayer != null)
+            {
+                dump.Append($"Linked layer: {layer.LinkedLayer.Name}");
+                //dump.AppendIndented("  ", GetDump(layer.LinkedLayer));
+            }
+
             dump.Append("Channels: ")
                 .Append(string.Join(",", layer.Channels.Select(c => c.Type)))
                 .Append(string.Join(", ", layer.Channels.Select(c => $"({c.Data.Length})")))
@@ -252,13 +139,44 @@ namespace WpfGrabber.Readers
         public static string GetPropertiesDump(this IProperties properties)
         {
             var dump = new StringBuilder();
+            foreach (var item in properties)
+            {
+                if (item.Value is IProperties p)
+                {
+                    dump.AppendLine($"({item.Key})");
+                    if (IsEmpty(item))
+                        continue;
+                    dump.AppendIndented("  ", GetPropertiesDump(p));
+                    continue;
+                }
+                if (item.Value is IEnumerable enumerable && !(item.Value is string))
+                {
+                    int index = 0;
+                    foreach (var i in enumerable)
+                    {
+                        dump.AppendLine($"{item.Key}[{index}]");
+                        if (i is IProperties p2)
+                            dump.AppendIndented("  ", GetPropertiesDump(p2));
+                        else
+                            dump.AppendIndented("  ", $"{i} ({i.GetType().Name})");
+                        index++;
+                    }
+                    continue;
+                }
+                dump.AppendLine($"({item.Key}) {item.Value} ({item.Value.GetType().Name})");
+            }
+            return dump.ToString().Trim();
+        }
+        public static string GetPropertiesDump2(this IProperties properties)
+        {
+            var dump = new StringBuilder();
             foreach (var resource in properties)
             {
                 if (resource.Key == "TySh")
                     continue; // hack error in lib
                 if (resource.Value is IProperties props)
                 {
-                    if (new[] { "lyid", "lsct", "fxrp", "iOpa" }.Contains(resource.Key) && props.Count == 1)
+                    if (props.Count == 1 && new[] { "lyid", "lsct", "fxrp", "iOpa" }.Contains(resource.Key))
                     {
                         dump.AppendLine($"({resource.Key}){props.ElementAt(0).Key}:{props.ElementAt(0).Value}");
                         continue;
@@ -267,14 +185,12 @@ namespace WpfGrabber.Readers
                     if (!string.IsNullOrEmpty(s))
                         dump.AppendIndented("  ", s);
                 }
-                var ns = typeof(Ntreev.Library.Psd.PsdDocument).Namespace;
-                var emptyTypeName = ns + ".Readers.EmptyResourceReader";
-                if (resource.Value.GetType().FullName == emptyTypeName)
+                if (IsEmpty(resource))
                     continue;
                 dump.AppendLine($"  {resource.Key}={resource.Value}");
-                if (!new[] { typeof(string) }.Contains(resource.Value.GetType()) 
+                if (!new[] { typeof(string) }.Contains(resource.Value.GetType())
                     && resource.Value is IEnumerable collection
-                    &&!(resource.Value is IProperties))
+                    && !(resource.Value is IProperties))
                 {
                     foreach (var item in collection)
                     {
@@ -289,52 +205,14 @@ namespace WpfGrabber.Readers
             return dump.ToString().TrimEnd();
         }
 
-        public static BitmapSource GetBitmap(this IImageSource src)
+        private static bool IsEmpty(KeyValuePair<string, object> resource)
         {
-            if (!src.HasImage)
-                return null;
-            var bmp = src.ToByteBitmap();
-            return bmp.ToBitmapSource();
+            var ns = typeof(Ntreev.Library.Psd.PsdDocument).Namespace;
+            var emptyTypeName = ns + ".Readers.EmptyResourceReader";
+            return resource.Value.GetType().FullName == emptyTypeName;
         }
 
-        public static ByteBitmapRgba ToByteBitmap(this IImageSource src)
-        {
-            var bmp = new ByteBitmapRgba(src.Width, src.Height);
-            var data = src.MergeChannels(); // Channels Data for each pixel in reversed order
-            var ch_R = src.Channels.FirstOrDefault(c => c.Type == ChannelType.Red);
-            var ch_G = src.Channels.FirstOrDefault(c => c.Type == ChannelType.Green);
-            var ch_B = src.Channels.FirstOrDefault(c => c.Type == ChannelType.Blue);
-            var ch_A = src.Channels.FirstOrDefault(c => c.Type == ChannelType.Alpha);
-            var ch_M = src.Channels.FirstOrDefault(c => c.Type == ChannelType.Mask);
-            if (src.Depth != 8)
-                throw new NotImplementedException($"Image depth {src.Depth} not implemented");
-            if (src.HasMask)
-                throw new NotImplementedException("Mask not implemented");
-            if (ch_R == null || ch_G == null || ch_B == null)
-                throw new NotImplementedException("Missing RGB channells");
-            var w = src.Width;
-            var h = src.Height;
-            Func<int, int, uint> getPixel = (int x, int y) =>
-            {
-                byte r = ch_R.Data[y * w + x];
-                byte g = ch_G.Data[y * w + x];
-                byte b = ch_B.Data[y * w + x];
-                byte a = 0xFF;
-                if (ch_A != null)
-                    a = ch_A.Data[y * w + x];
-                return ColorHelper.ColorFromRGBA(r, g, b, a);
-            };
-            for (var y = h - 1; y >= 0; --y)
-            {
-                for (var x = 0; x < w; x++)
-                {
-                    bmp.SetPixel(x, y, getPixel(x, y));
-                }
-            }
-            return bmp;
-        }
-
-        public static BitmapSource GetBitmap2(this IImageSource imageSource)
+        public static BitmapSource GetBitmap(this IImageSource imageSource)
         {
             if (imageSource.HasImage == false)
                 return null;
@@ -345,7 +223,10 @@ namespace WpfGrabber.Readers
             var w = imageSource.Width;
             var h = imageSource.Height;
 
+            //var format = channelCount == 3 ? TextureFormat.RGB24 : TextureFormat.ARGB32;
+            //var tex = new Texture2D(w, h, format, false);
             var colors = new Color[data.Length / channelCount];
+
 
             var k = 0;
             for (var y = h - 1; y >= 0; --y)
@@ -376,5 +257,6 @@ namespace WpfGrabber.Readers
                 return BitmapSource.Create(imageSource.Width, imageSource.Height, 96, 96, PixelFormats.Bgra32, null, data, pitch);
             return BitmapSource.Create(imageSource.Width, imageSource.Height, 96, 96, PixelFormats.Bgr24, null, data, pitch);
         }
+
     }
 }
