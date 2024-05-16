@@ -318,7 +318,7 @@ namespace WpfGrabber.ViewParts
             var errors = rd.Check(ViewModel.Images.Select(x => x.Name));
             if (errors.Count > 0)
             {
-                var err = TextViewPart.ShowPart("Errors", errors.ToArray());
+                TextViewPart.ShowPart("Errors", errors.ToArray());
                 return;
             }
             var r = rd.Combine();
@@ -337,7 +337,7 @@ namespace WpfGrabber.ViewParts
                     sb.AppendLine("----- " + item.Name);
                 sb.AppendLine(item.Description);
             }
-            var part = TextViewPart.ShowPart("Description", sb.ToString());
+            TextViewPart.ShowPart("Description", sb.ToString());
         }
 
 

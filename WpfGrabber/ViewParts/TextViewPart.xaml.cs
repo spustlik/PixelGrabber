@@ -55,6 +55,17 @@ namespace WpfGrabber.ViewParts
         {
             var vps = App.Current.ServiceProvider.GetService<IViewPartServiceEx>();
             var part = vps.GetOrCreate(TextViewPart.GetDef(title));
+            if (part.ViewModel.Lines.Count > 0)
+            {
+                if (MessageBox.Show(
+                    $"There is already some text ${part.ViewModel.Lines} lines).\n" +
+                    $"Do you want to replace it?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                {
+                    return null;
+                }
+            }
+            if (lines.Length==1)
+                lines = lines[0].Split('\n');
             vps.SetOptions(part, new ViewPartOptions() { Title = title, Width = 0 });
             part.ViewModel.Lines.AddRange(lines, clear: true);
             return part;

@@ -71,7 +71,23 @@ namespace WpfGrabber.Shell
                 {
                     options.Width = DEFAULT_WIDTH;
                 }
-                partsGrid.ColumnDefinitions[i].Width = new GridLength(options.Width.GetValueOrDefault());
+                if (i == partsGrid.ColumnDefinitions.Count - 1)
+                {
+                    //this width will be replaced with Star
+                    var max = ViewParts
+                        .Select(vp => GetViewPartControl(vp))
+                        .OrderByDescending(a => a.width)
+                        .FirstOrDefault();
+
+                    if(max.control!=null)
+                    {
+                        partsGrid.ColumnDefinitions[max.index].Width = new GridLength(max.width - options.Width.Value);
+                    }
+                }
+                else
+                {
+                    partsGrid.ColumnDefinitions[i].Width = new GridLength(options.Width.GetValueOrDefault());
+                }
             }
             FixGridLayout();
         }
