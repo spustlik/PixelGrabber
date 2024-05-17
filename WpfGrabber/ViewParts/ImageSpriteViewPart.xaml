@@ -53,8 +53,9 @@
             <Button Content="Menu" Style="{StaticResource dropDown}">
                 <Button.ContextMenu>
                     <ContextMenu Placement="Bottom">
-                        <MenuItem Header="Add image files..." Click="OnButtonAddImages_Click"/>
-                        <MenuItem Header="Save image sheet..." Click="OnButtonSave_Click"/>
+                        <MenuItem Header="Add image files..." Click="OnAddImages_Click"/>
+                        <MenuItem Header="Save image sheet..." Click="OnSave_Click"/>
+                        
                         <Separator/>
                         <MenuItem Header="Clear" Click="OnButtonClear_Click"/>
                         <MenuItem Header="Set Width and Height to max" Click="OnSetMax_Click"/>

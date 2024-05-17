@@ -235,12 +235,14 @@ namespace WpfGrabber.ViewParts
             ViewModel.Width = ViewModel.Images.Max(a => a.Image.PixelWidth);
             ViewModel.Height = ViewModel.Images.Max(a => a.Image.PixelHeight);
         }
-        private void OnButtonAddImages_Click(object sender, RoutedEventArgs e)
+        private void OnAddImages_Click(object sender, RoutedEventArgs e)
         {
-            var dlg = new OpenFileDialog();
-            dlg.Multiselect = true;
-            dlg.DefaultExt = ".png";
-            dlg.Filter = "*.png|*.png|*.jpg|*.jpg|*.*|*.*";
+            var dlg = new OpenFileDialog
+            {
+                Multiselect = true,
+                DefaultExt = ".png",
+                Filter = "*.png|*.png|*.jpg|*.jpg|*.*|*.*"
+            };
             if (dlg.ShowDialog() != true)
                 return;
             foreach (var file in dlg.FileNames)
@@ -270,7 +272,7 @@ namespace WpfGrabber.ViewParts
             return imageVm;
         }
 
-        private void OnButtonSave_Click(object sender, RoutedEventArgs e)
+        private void OnSave_Click(object sender, RoutedEventArgs e)
         {
             if (ViewModel.Images.Count == 0)
                 return;
@@ -372,5 +374,7 @@ namespace WpfGrabber.ViewParts
                 .ToArray();
             ViewModel.Images.AddRange(sorted, clear: true);
         }
+
+        
     }
 }

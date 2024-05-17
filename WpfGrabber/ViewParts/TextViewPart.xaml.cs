@@ -58,7 +58,7 @@ namespace WpfGrabber.ViewParts
             if (part.ViewModel.Lines.Count > 0)
             {
                 if (MessageBox.Show(
-                    $"There is already some text ${part.ViewModel.Lines} lines).\n" +
+                    $"There is already some text with {part.ViewModel.Lines.Count} lines).\n" +
                     $"Do you want to replace it?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
                 {
                     return null;
