@@ -59,7 +59,7 @@ namespace WpfGrabber.Readers
             return result;
         }
 
-        public IEnumerable<string> Combine()
+        public IEnumerable<string[]> Combine()
         {
             //c1:a,b,c
             //c2:d,e,f
@@ -91,7 +91,7 @@ namespace WpfGrabber.Readers
             }
 
             var combs = IterateC(0);
-            var result = combs.Select(x => String.Join(",", x.Distinct())).Distinct();
+            var result = combs.Select(x => x.Distinct().ToArray());
             return result;
         }
     }

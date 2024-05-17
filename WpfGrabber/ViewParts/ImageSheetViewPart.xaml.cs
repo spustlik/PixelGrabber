@@ -321,8 +321,8 @@ namespace WpfGrabber.ViewParts
                 TextViewPart.ShowPart("Errors", errors.ToArray());
                 return;
             }
-            var r = rd.Combine();
-            ViewModel.CombinatorText += "\n#-------\n" + string.Join("\n", r);
+            var combinations = rd.Combine();
+            ViewModel.CombinatorText += "\n#-------\n" + string.Join("\n", combinations.Select(c => string.Join(",", c)));
         }
 
         private void OnCopyDescr_Click(object sender, RoutedEventArgs e)
@@ -346,6 +346,10 @@ namespace WpfGrabber.ViewParts
             var rd = new CombinationsReader();
             rd.Read(ViewModel.CombinatorText);
             var combinations = rd.Combine();
+            foreach (var item in combinations)
+            {
+
+            }
             MessageBox.Show("Not implemented");
         }
     }

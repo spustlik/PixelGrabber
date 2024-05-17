@@ -79,7 +79,7 @@ namespace WpfGrabber.Shell
                         .OrderByDescending(a => a.width)
                         .FirstOrDefault();
 
-                    if(max.control!=null)
+                    if(max.control!=null && max.width>0)
                     {
                         partsGrid.ColumnDefinitions[max.index].Width = new GridLength(max.width - options.Width.Value);
                     }

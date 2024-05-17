@@ -8,6 +8,7 @@ using Ntreev.Library.Psd;
 using System.Collections;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
+using System.Xml.Linq;
 
 namespace WpfGrabber.Readers
 {
@@ -25,19 +26,40 @@ namespace WpfGrabber.Readers
             doc = PsdDocument.Create(source);
         }
 
-        public IEnumerable<(ByteBitmapRgba bmp, string name, string dump)> ReadImages()
+        public class PsdLayerData
         {
-            var items = doc.Childs
-                .Where(l => l.HasImage)
-                .Select(layer => (
-                    bmp: ToByteBitmap(layer),
-                    name: layer.Name,
-                    dump: layer.GetDump()
-                    ));
+            public ByteBitmapRgba bmp;
+            public string name;
+            public string dump;
+        }
+        public IEnumerable<PsdLayerData> ReadImages()
+        {
+            var items = GetLayersRec(doc, "");
             if (ReverseLayerOrder)
                 items = items.Reverse();
             return items;
         }
+
+        private IEnumerable<PsdLayerData> GetLayersRec(IPsdLayer parent, string namePrefix)
+        {
+            foreach (var layer in parent.Childs)
+            {
+                if (layer.HasImage)
+                {
+                    yield return new PsdLayerData()
+                    {
+                        bmp = ToByteBitmap(layer),
+                        name = namePrefix + layer.Name,
+                        dump = layer.GetDump()
+                    };
+                }
+                foreach (var item in GetLayersRec(layer, namePrefix + layer.Name + "/"))
+                {
+                    yield return item;
+                }
+            }
+        }
+
         public ByteBitmapRgba ToByteBitmap(IPsdLayer src)
         {
             var data = src.MergeChannels(); // Channels Data for each pixel in reversed order
@@ -59,7 +81,7 @@ namespace WpfGrabber.Readers
             var sw = src.Width;
             var sh = src.Height;
             var bmp = new ByteBitmapRgba(dw, dh);
-            
+
             byte opa = (byte)Math.Round(src.Opacity * 255f);
 
             Func<int, int, uint> getPixel = (int x, int y) =>
@@ -78,7 +100,7 @@ namespace WpfGrabber.Readers
             Action<int, int, uint> setPixel = bmp.SetPixel;
             if (RespectBounds)
             {
-                setPixel = (int x, int y, uint color) =>                
+                setPixel = (int x, int y, uint color) =>
                     bmp.SetPixel(x + src.Left, y + src.Top, color);
             }
             for (var y = sh - 1; y >= 0; --y)
