@@ -7,8 +7,10 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 using System.Xml.Linq;
 using WpfGrabber.Controls;
+using WpfGrabber.Data;
 using WpfGrabber.ViewParts;
 
 namespace WpfGrabber.Shell
@@ -126,6 +128,84 @@ namespace WpfGrabber.Shell
             if (InputQueryWindow.ShowModal("Enter layout name", out var name, ViewModel.ShellVm.Offset.ToString("X4")) != true)
                 return;
             App.GetService<ProjectManager>().SaveNamedLayout(name);
+        }
+
+        private void OnFolderRGBA_Click(object sender, RoutedEventArgs e)
+        {
+            var dlg = new OpenFileDialog
+            {
+                DefaultExt = ".png",
+                Title = "Select images to convert",
+                CheckFileExists = false,
+                Multiselect = true
+            };
+            if (dlg.ShowDialog() != true)
+                return;
+            if (dlg.FileNames.Length == 0)
+                return;
+            var files = dlg.FileNames;
+            files = files.OrderBy(x => x).ToArray();
+            var log = new List<string>();
+            foreach (var _filePath in files)
+            {
+                var file = new FilePath(_filePath);
+                var name = Path.GetFileNameWithoutExtension(file.Name);
+                if (name.EndsWith("_a", StringComparison.OrdinalIgnoreCase))
+                    continue;
+                var maskFile = FilePath.FromPath(file.Directory, name + "_a" + file.Extension);
+                var newFile = file.ChangeExtension(".png");
+                if (!File.Exists(maskFile.FullPath))
+                {
+                    if (file.Extension.Equals(".png", StringComparison.OrdinalIgnoreCase))
+                    {
+                        log.Add($"SKIPPED:{file.Name}");
+                        continue;
+                    }
+                    log.Add($"CONVERTED:{file.Name} => {newFile.Name}");
+                    var bmp = new BitmapImage();
+                    bmp.LoadFromFile(file.FullPath);
+                    bmp.SaveToPngFile(newFile.FullPath);
+                    continue;
+                }
+                var c_img = new BitmapImage();
+                c_img.LoadFromFile(file.FullPath);
+                var colors = c_img.ToRgba();
+
+                var a_img = new BitmapImage();
+                a_img.LoadFromFile(maskFile.FullPath);
+                var alpha = a_img.ToRgba();
+                //alpha.ToBitmapSource().SaveToPngFile(Path.ChangeExtension(newName, "mask.png"));
+
+                if (!ApplyAlpha(colors, alpha))
+                {
+                    log.Add($"!Error applying mask: {file.Name}+{maskFile.Name} to {newFile.Name}");
+                    alpha.ToBitmapSource().SaveToPngFile(newFile.ChangeExtension("mask-error.png").FullPath);
+                    continue;
+                }
+                var r_img = colors.ToBitmapSource();
+                r_img.SaveToPngFile(newFile.FullPath);
+                log.Add($"MASKED: {file.Name}+{maskFile.Name} to {newFile.Name}");
+            }
+
+            TextViewPart.ShowPart("Convert BMP+A images", log.ToArray());
+
+        }
+
+        private static bool ApplyAlpha(ByteBitmapRgba colors, ByteBitmapRgba alpha)
+        {
+            for (int y = 0; y < colors.Height; y++)
+            {
+                for (int x = 0; x < colors.Width; x++)
+                {
+                    ByteColor m = alpha.GetPixel(x, y);
+                    if (m.R != m.G && m.R != m.B && m.A != 0xFF)
+                        return false;
+                    ByteColor c = colors.GetPixel(x, y);
+                    var r = ByteColor.FromRgba(c.R, c.G, c.B, m.R);
+                    colors.SetPixel(x, y, r);
+                }
+            }
+            return true;
         }
     }
 }

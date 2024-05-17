@@ -65,6 +65,8 @@
         </MenuItem>
 
         <MenuItem Header="Tools">
+            <MenuItem Header="Convert BMP+A images from folder" Click="OnFolderRGBA_Click"/>
+            <Separator/>
             <MenuItem Header="Test data" Click="OnTestData_Click"/>
         </MenuItem>
     </Menu>
