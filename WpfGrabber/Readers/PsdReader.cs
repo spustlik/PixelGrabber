@@ -163,7 +163,7 @@ namespace WpfGrabber.Readers
             var dump = new StringBuilder();
             foreach (var item in properties)
             {
-                if (item.Value is IProperties p)
+                if (item.Key != "TySh" && item.Value is IProperties p)
                 {
                     dump.AppendLine($"({item.Key})");
                     if (IsEmpty(item))
@@ -171,7 +171,7 @@ namespace WpfGrabber.Readers
                     dump.AppendIndented("  ", GetPropertiesDump(p));
                     continue;
                 }
-                if (item.Value is IEnumerable enumerable && !(item.Value is string))
+                if (item.Key != "TySh" && item.Value is IEnumerable enumerable && !(item.Value is string))
                 {
                     int index = 0;
                     foreach (var i in enumerable)
