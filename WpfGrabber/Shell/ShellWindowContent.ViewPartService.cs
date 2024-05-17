@@ -63,7 +63,7 @@ namespace WpfGrabber.Shell
             var (vpc, i, w) = GetViewPartControl(viewPart);
             if (i < 0)
                 return;
-            if(!string.IsNullOrEmpty(options.Title))
+            if (!string.IsNullOrEmpty(options.Title))
                 vpc.Title = options.Title;
             if (options.Width.HasValue)
             {
@@ -79,7 +79,7 @@ namespace WpfGrabber.Shell
                         .OrderByDescending(a => a.width)
                         .FirstOrDefault();
 
-                    if(max.control!=null && max.width>0)
+                    if (max.control != null && max.width > DEFAULT_WIDTH)
                     {
                         partsGrid.ColumnDefinitions[max.index].Width = new GridLength(max.width - options.Width.Value);
                     }
@@ -98,7 +98,7 @@ namespace WpfGrabber.Shell
 
         void IViewPartServiceEx.FixGridLayout() => this.FixGridLayout();
 
-        (ViewPartControl vpc, int index, int width) IViewPartServiceEx.GetViewPartControl(ViewPart viewPart) 
+        (ViewPartControl vpc, int index, int width) IViewPartServiceEx.GetViewPartControl(ViewPart viewPart)
             => this.GetViewPartControl(viewPart);
 
         #endregion
