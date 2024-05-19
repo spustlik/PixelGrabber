@@ -25,7 +25,7 @@ namespace WpfGrabber.Data
         {
             if (src.Format == PixelFormats.Indexed8)
                 return FromIndexed(src);
-            if (src.Format == PixelFormats.Bgr32)
+            if (src.Format == PixelFormats.Bgr32 || src.Format == PixelFormats.Bgra32)
                 return FromBGRA(src);
             throw new NotImplementedException($"Bitmap format {src.Format} not implemented");
         }

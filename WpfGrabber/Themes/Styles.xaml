@@ -63,6 +63,7 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="ItemsSource" Value="{Binding Images}" />
         <Setter Property="SelectedValue" Value="{Binding SelectedImage}" />
+        <Setter Property="RenderOptions.BitmapScalingMode" Value="NearestNeighbor" />
         <Setter Property="ItemsPanel">
             <Setter.Value>
                 <ItemsPanelTemplate>
@@ -78,7 +79,7 @@
                             Name="itemborder" 
                             Background="#8080ff80">
                         <Grid>
-                            <Image Source="{Binding Image}" Stretch="None" x:Name="image" RenderOptions.BitmapScalingMode="NearestNeighbor">
+                            <Image Source="{Binding Image}" Stretch="None" x:Name="image">
                             </Image>
 
                             <Border Visibility="{Binding DataContext.ShowLabels, RelativeSource={RelativeSource AncestorType=ListBox}, Converter={StaticResource visiConv}}"
