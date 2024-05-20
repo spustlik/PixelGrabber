@@ -250,6 +250,13 @@ namespace WpfGrabber.ViewParts
                 CreateOrUpdateImageVMFromFile(file);
             }
         }
+        private void OnReloadImages_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var file in ViewModel.Images.Select(a=>a.FileName))
+            {
+                CreateOrUpdateImageVMFromFile(file);
+            }
+        }
 
         private ImageVM CreateOrUpdateImageVMFromFile(string file)
         {
@@ -298,8 +305,11 @@ namespace WpfGrabber.ViewParts
 
             int posX = 0;
             int posY = 0;
+            var sources = new List<string>();
             foreach (var img in ViewModel.Images)
             {
+                if (File.Exists(img.FileName))
+                    sources.Add(img.FileName);
                 var image = img.Image.ToRgba();
                 rgba.DrawBitmap(image, posX * width, posY, Colorizers.GetColorCopy);
                 posX++;
@@ -320,9 +330,21 @@ namespace WpfGrabber.ViewParts
                 $"\n{opts}\nCopy to clipboard?",
                 "Saved to spritesheet",
                 MessageBoxButton.YesNo,
-                MessageBoxImage.Information) != MessageBoxResult.Yes)
-                return;
-            Clipboard.SetText(opts);
+                MessageBoxImage.Information) == MessageBoxResult.Yes)
+                {
+                Clipboard.SetText(opts);
+            }
+            if (MessageBox.Show(
+                $"Do you want to delete source images?",
+                "Confirmation",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning) == MessageBoxResult.Yes)
+            {
+                foreach (var file in sources)
+                {
+                    File.Delete(file);
+                }
+            }
         }
 
         private void OnCommandMoveUp_Executed(object sender, RoutedEventArgs e)
@@ -375,6 +397,5 @@ namespace WpfGrabber.ViewParts
             ViewModel.Images.AddRange(sorted, clear: true);
         }
 
-        
     }
 }
