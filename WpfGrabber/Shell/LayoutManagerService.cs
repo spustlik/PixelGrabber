@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
@@ -180,6 +181,11 @@ namespace WpfGrabber.Shell
         private void SaveViewPart(XElement parent, ViewPart viewPart)
         {
             var def = viewPartFactory.FindDefinition(viewPart);
+            if (def == null)
+            {
+                Debug.Write($"Cannot find view definition for {viewPart.GetType().Name}");
+                return;
+            }
             var ele = parent.Elements(ELE_VIEWPART)
                 .FirstOrDefault(e => e.Attribute(ATTR_TYPE)?.Value == def.TypeId);
             if (ele != null)
