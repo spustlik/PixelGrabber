@@ -2,21 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Media.Media3D;
+using System.Windows.Threading;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 using WpfGrabber.Data;
-using WpfGrabber.Readers;
 using WpfGrabber.Services;
 using WpfGrabber.Shell;
 
@@ -60,6 +54,34 @@ namespace WpfGrabber.ViewParts
             set => Set(ref _showLabels, value);
         }
         #endregion
+
+        #region Animate property
+        private bool _animate;
+        public bool Animate
+        {
+            get => _animate;
+            set => Set(ref _animate, value);
+        }
+        #endregion
+
+        #region AnimationSpeed property
+        private int _animationSpeed;
+        public int AnimationSpeed
+        {
+            get => _animationSpeed;
+            set => Set(ref _animationSpeed, value);
+        }
+        #endregion
+
+        #region Stretch property
+        private bool _stretch;
+        public bool Stretch
+        {
+            get => _stretch;
+            set => Set(ref _stretch, value);
+        }
+        #endregion
+
 
         [XmlIgnore]
         public ObservableCollection<ImageVM> Images { get; } = new ObservableCollection<ImageVM>();
@@ -143,6 +165,7 @@ namespace WpfGrabber.ViewParts
     public partial class ImageSpriteViewPart : ImageSpriteViewPartBase
     {
         public static ViewPartDef<ImageSpriteViewPart> Def { get; } = new ViewPartDef<ImageSpriteViewPart>() { Title = "Image sprite sheet" };
+        public DispatcherTimer AnimationTimer { get; private set; }
 
         public static RoutedUICommand CommandMoveUp = new RoutedUICommand("Up", nameof(CommandMoveUp), typeof(ImageSpriteViewPart), new InputGestureCollection() { new KeyGesture(Key.Left, ModifierKeys.Control) });
         public static RoutedUICommand CommandMoveDown = new RoutedUICommand("Down", nameof(CommandMoveDown), typeof(ImageSpriteViewPart), new InputGestureCollection() { new KeyGesture(Key.Right, ModifierKeys.Control) });
@@ -162,6 +185,10 @@ namespace WpfGrabber.ViewParts
             ViewModel.Columns = 1;
             ViewModel.ShowLabels = true;
             ViewModel.ShellVm = ShellVm;
+            ViewModel.Stretch = true;
+            ViewModel.AnimationSpeed = 25;
+            AnimationTimer = new DispatcherTimer(DispatcherPriority.Normal, Dispatcher);
+            AnimationTimer.Tick += AnimationTimer_Tick;
             //foreach (var file in Directory.GetFiles(@"E:\GameWork\8bitgames\alien8", "alien8.*.png"))
             //foreach (var file in Directory.GetFiles(@"E:\GameWork\_AssetsIso\kenney_isometric-roads\png\roads", "*.png"))
             //{
@@ -170,6 +197,7 @@ namespace WpfGrabber.ViewParts
             //    CreateImageVMFromFile(img, file);
             //}
         }
+
         public override void OnLoadLayout(XElement ele)
         {
             base.OnLoadLayout(ele);
@@ -209,7 +237,30 @@ namespace WpfGrabber.ViewParts
             }
 
             //images are viewed by Binding to Images collection
+
+            if (ViewModel.Animate)
+            {
+                var secs = 1.0 / ViewModel.AnimationSpeed;
+                AnimationTimer.Interval = TimeSpan.FromSeconds(secs);
+                AnimationTimer.Start();
+            }
+            else
+            {
+                AnimationTimer.Stop();
+            }
         }
+        private int animFrame = 0;
+        private void AnimationTimer_Tick(object sender, EventArgs e)
+        {
+            var imgs = ViewModel.Images.Where(a => a.IsSelected).ToArray();
+            if (imgs.Length <= 1)
+                imgs = ViewModel.Images.ToArray();
+            if (animFrame >= imgs.Length)
+                animFrame = 0;
+            ViewModel.SelectedImage = imgs[animFrame];
+            animFrame++;
+        }
+
 
         private BitmapImage TryGetBitmapFromData()
         {
@@ -252,7 +303,7 @@ namespace WpfGrabber.ViewParts
         }
         private void OnReloadImages_Click(object sender, RoutedEventArgs e)
         {
-            foreach (var file in ViewModel.Images.Select(a=>a.FileName))
+            foreach (var file in ViewModel.Images.Select(a => a.FileName))
             {
                 CreateOrUpdateImageVMFromFile(file);
             }
@@ -331,18 +382,21 @@ namespace WpfGrabber.ViewParts
                 "Saved to spritesheet",
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Information) == MessageBoxResult.Yes)
-                {
+            {
                 Clipboard.SetText(opts);
             }
-            if (MessageBox.Show(
-                $"Do you want to delete source images?",
-                "Confirmation",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Warning) == MessageBoxResult.Yes)
+            if (sources.Count > 0)
             {
-                foreach (var file in sources)
+                if (MessageBox.Show(
+                    $"Do you want to delete source images?",
+                    "Confirmation",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning) == MessageBoxResult.Yes)
                 {
-                    File.Delete(file);
+                    foreach (var file in sources)
+                    {
+                        File.Delete(file);
+                    }
                 }
             }
         }

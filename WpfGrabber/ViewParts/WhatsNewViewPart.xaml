@@ -22,12 +22,16 @@
 - named layouts
 - z80 editor   
 - dealien moved to engine
+- photoshop layers to image sprites
+- spritesheet reload images, animate, stretch 
+- image sheet cutter - combinations
+- XCF layers to image sprites
 </Run>
                 <LineBreak/>
 
                 <Run FontSize="30" FontWeight="Bold" Foreground="DodgerBlue">What to do</Run>
                 <Run xml:space="preserve">
-- photoshop layers to image sprites
+- imagesheet cutter - BAD alpha loading - see d12.png
 - end offset for bit8, masked - count?
 - show whatsnew viewpart...
 - z80 - orgs, sym addr, dumps

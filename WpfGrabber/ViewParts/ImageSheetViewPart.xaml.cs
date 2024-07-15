@@ -180,6 +180,11 @@ namespace WpfGrabber.ViewParts
                 if (LoadPsd())
                     return;
             }
+            if (ShellVm.Offset == 0 && Path.GetExtension(ShellVm.FileName).Equals(".xcf", StringComparison.InvariantCultureIgnoreCase))
+            {
+                if (LoadXcf())
+                    return;
+            }
 
             var img = new BitmapImage(); //WPF
             using (var ms = new MemoryStream(ShellVm.Data.Skip(ShellVm.Offset).ToArray()))
@@ -218,17 +223,42 @@ namespace WpfGrabber.ViewParts
             //images are viewed by Binding to Images collection
         }
 
+        private bool LoadXcf()
+        {
+            var data = ShellVm.Offset == 0 ? ShellVm.Data : ShellVm.Data.Skip(ShellVm.Offset).ToArray();
+            byte[] XCF_HEADER = Encoding.ASCII.GetBytes("gimp xcf");
+            if (!Enumerable.SequenceEqual(data.Take(XCF_HEADER.Length), XCF_HEADER))
+                return false;
+            ViewModel.Images.Clear();
+            using (var ms = new MemoryStream(data))
+            {
+                var rd = new XcfReader(ms);
+                foreach (var layer in rd.ReadImages())
+                {
+                    var img = new ImageSheetImageVM()
+                    {
+                        Name = layer.Name,
+                        Image = layer.Data.ToBitmapSource(PixelFormats.Bgra32),
+                        Description = layer.Dump,
+                    };
+                    ViewModel.Images.Add(img);
+                }
+            }
+            return true;
+
+        }
+
         private bool LoadPsd()
         {
             var data = ShellVm.Offset == 0 ? ShellVm.Data : ShellVm.Data.Skip(ShellVm.Offset).ToArray();
             byte[] PSD_HEADER = Encoding.ASCII.GetBytes("8BPS");
             if (!Enumerable.SequenceEqual(data.Take(4), PSD_HEADER))
                 return false;
+            ViewModel.Images.Clear();
             using (var ms = new MemoryStream(data))
             {
-                var psd = new PsdReader(ms) { RespectBounds = true };
-                ViewModel.Images.Clear();
-                foreach (var layer in psd.ReadImages())
+                var rd = new PsdReader(ms) { RespectBounds = true };
+                foreach (var layer in rd.ReadImages())
                 {
                     var img = new ImageSheetImageVM()
                     {

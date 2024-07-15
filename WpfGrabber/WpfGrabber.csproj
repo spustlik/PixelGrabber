@@ -15,6 +15,8 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -38,6 +40,12 @@
   <ItemGroup>
     <Reference Include="ICSharpCode.AvalonEdit, Version=6.3.0.90, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
       <HintPath>..\packages\AvalonEdit.6.3.0.90\lib\net462\ICSharpCode.AvalonEdit.dll</HintPath>
+    </Reference>
+    <Reference Include="Magick.NET-Q8-AnyCPU, Version=13.9.0.0, Culture=neutral, PublicKeyToken=2004825badfa91ec, processorArchitecture=MSIL">
+      <HintPath>..\packages\Magick.NET-Q8-AnyCPU.13.9.1\lib\netstandard20\Magick.NET-Q8-AnyCPU.dll</HintPath>
+    </Reference>
+    <Reference Include="Magick.NET.Core, Version=13.9.0.0, Culture=neutral, PublicKeyToken=2004825badfa91ec, processorArchitecture=MSIL">
+      <HintPath>..\packages\Magick.NET.Core.13.9.1\lib\netstandard20\Magick.NET.Core.dll</HintPath>
     </Reference>
     <Reference Include="Ntreev.Library.Psd, Version=1.1.0.0, Culture=neutral, PublicKeyToken=c38f7f9c4e34740b, processorArchitecture=MSIL">
       <HintPath>..\packages\Ntreev.Library.Psd.1.1.18134.1310\lib\net45\Ntreev.Library.Psd.dll</HintPath>
@@ -97,6 +105,7 @@
     <Compile Include="Readers\PsdReader.cs" />
     <Compile Include="Readers\PsdReader_Ravu.cs" />
     <Compile Include="Readers\ReaderImageResult.cs" />
+    <Compile Include="Readers\XcfReader.cs" />
     <Compile Include="Readers\Z80\SnaData.cs" />
     <Compile Include="Readers\Z80\Z80Instruction.cs" />
     <Compile Include="Readers\Z80\Z80Op.cs" />
@@ -313,4 +322,11 @@
     <Resource Include="icon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\Magick.NET-Q8-AnyCPU.13.9.1\build\netstandard20\Magick.NET-Q8-AnyCPU.targets" Condition="Exists('..\packages\Magick.NET-Q8-AnyCPU.13.9.1\build\netstandard20\Magick.NET-Q8-AnyCPU.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Magick.NET-Q8-AnyCPU.13.9.1\build\netstandard20\Magick.NET-Q8-AnyCPU.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Magick.NET-Q8-AnyCPU.13.9.1\build\netstandard20\Magick.NET-Q8-AnyCPU.targets'))" />
+  </Target>
 </Project>

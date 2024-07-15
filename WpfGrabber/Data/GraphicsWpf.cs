@@ -2,6 +2,7 @@
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Windows;
+using System.Linq;
 
 namespace WpfGrabber.Data
 {
@@ -25,7 +26,10 @@ namespace WpfGrabber.Data
         {
             if (src.Format == PixelFormats.Indexed8)
                 return FromIndexed(src);
-            if (src.Format == PixelFormats.Bgr32 || src.Format == PixelFormats.Bgra32)
+            if (src.Format == PixelFormats.Bgr32 
+                || src.Format == PixelFormats.Bgra32
+                // ??? || src.Format == PixelFormats.Pbgra32
+                )
                 return FromBGRA(src);
             throw new NotImplementedException($"Bitmap format {src.Format} not implemented");
         }
@@ -39,7 +43,23 @@ namespace WpfGrabber.Data
             src.CopyPixels(pixels, stride: width * bytesPerPx, 0);
             var r = new ByteBitmapRgba(width, height);
             Array.Copy(pixels, r.Data, pixels.Length);
+            if (src.Format == PixelFormats.Bgra32)
+            {
+                // ??? premultiplied alpha... it seems good
+                PremultiplyAlpha(r);
+            }
             return r;
+        }
+
+        public static void PremultiplyAlpha(this ByteBitmapRgba bmp)
+        {
+            for (int i = 0; i < bmp.Data.Length; i++)
+            {
+                var c = ByteColor.FromUint(bmp.Data[i]);
+                var a = c.A / 255;
+                c = ByteColor.FromRgba((byte)(a * c.R), (byte)(c.G * a), (byte)(c.B * a), c.A);
+                bmp.Data[i] = c;
+            }
         }
 
         private static ByteBitmapRgba FromIndexed(BitmapSource src)

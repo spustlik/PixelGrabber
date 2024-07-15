@@ -98,6 +98,10 @@
                     <Button Command="{x:Static local:ImageSpriteViewPart.CommandMoveDown}"/>
                     <Separator/>
                     <Button Command="{x:Static local:ImageSpriteViewPart.CommandRemove}"/>
+                    <Separator/>
+                    <CheckBox Content="Animate" IsChecked="{Binding DataContext.Animate, ElementName=root}"/>
+                    <Label Content="FPS"/>
+                    <c:NumberEditor Value="{Binding DataContext.AnimationSpeed, ElementName=root}" Minimum="0" Maximum="100" LargeChange="10"/>
                 </ItemsControl>
                 <StackPanel Grid.Row="2" Margin="10">
                     <Label Content="{Binding Name}"/>
@@ -112,9 +116,20 @@
                         <Label>Height:</Label>
                         <Label Content="{Binding Image.PixelHeight}"/>
                     </StackPanel>
+                    <CheckBox Content="Stretch" IsChecked="{Binding DataContext.Stretch, ElementName=root}" Margin="0,3,0,0"/>
                 </StackPanel>
                 <Border Grid.Row="3" Padding="10" Style="{StaticResource checkerBorder}">
-                    <Image Source="{Binding Image}" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+                    <Image Source="{Binding Image}" RenderOptions.BitmapScalingMode="NearestNeighbor" >
+                        <Image.Style>
+                            <Style TargetType="Image">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DataContext.Stretch, ElementName=root}" Value="False">
+                                        <Setter Property="Stretch" Value="None" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Image.Style>
+                    </Image>
                 </Border>
             </Grid>
 
