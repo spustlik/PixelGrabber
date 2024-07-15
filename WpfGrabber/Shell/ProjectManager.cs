@@ -28,7 +28,7 @@ namespace WpfGrabber.Shell
                     return;
             }
             shellVm.LoadData(fileName);
-            if (shellVm.AutoLoadLayout)
+            if (shellVm.AutoLoadLayout && !String.IsNullOrEmpty(shellVm.FileName))
             {
                 if (!LoadLayout())
                 {
