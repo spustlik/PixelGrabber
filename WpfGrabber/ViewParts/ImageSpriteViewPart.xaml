@@ -62,6 +62,7 @@
                         <MenuItem Header="Set Width and Height to max" Click="OnSetMax_Click"/>
                         <MenuItem Header="Sort by size" Click="OnSortBySize_Click"/>
                         <MenuItem Command="{x:Static local:ImageSpriteViewPart.CommandRemove}"/>
+                        <MenuItem Header="Set color ..." Click="OnSetColor_Click"/>
                         <Separator/>
                         <MenuItem Header="Show labels" IsCheckable="true" IsChecked="{Binding ShowLabels}"/>
                     </ContextMenu>

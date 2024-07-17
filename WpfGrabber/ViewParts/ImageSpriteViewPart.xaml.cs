@@ -10,6 +10,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using WpfGrabber.Controls;
 using WpfGrabber.Data;
 using WpfGrabber.Services;
 using WpfGrabber.Shell;
@@ -334,7 +335,7 @@ namespace WpfGrabber.ViewParts
         {
             if (ViewModel.Images.Count == 0)
                 return;
-            var dlg = new SaveFileDialog();
+            var dlg = new Microsoft.Win32.SaveFileDialog();
             dlg.DefaultExt = ".png";
             //dlg.InitialDirectory = Path.GetDirectoryName(ViewModel.FileName);
             //dlg.FileName = $"{Path.GetFileName(ShellVm.FileName)}-data-{ShellVm.Offset:X4}.{dlg.DefaultExt}";
@@ -451,5 +452,33 @@ namespace WpfGrabber.ViewParts
             ViewModel.Images.AddRange(sorted, clear: true);
         }
 
+        private void OnSetColor_Click(object sender, RoutedEventArgs e)
+        {
+            if (!InputQueryWindow.ShowModal("Enter code of color", out var color, null, "Set color to non-transparent pixels"))
+                return;
+            var c = ByteColor.FromString(color);
+            Colorizer colorizer = (data, orig) => Colorize(data, c);
+            foreach (var img in ViewModel.Images)
+            {
+                var bmp = img.Image.ToRgba();
+                var dst = new ByteBitmapRgba(bmp.Width, bmp.Height);
+                dst.DrawBitmap(bmp, 0, 0, colorizer);
+                img.Image = dst.ToBitmapSource();
+            }
+        }
+
+        private ByteColor Colorize(ByteColor orig, ByteColor c)
+        {
+            byte colorize(byte o, byte d)
+            {
+                return orig.A == 0 ? o : d;
+            }
+            return ByteColor.FromRgba(
+                colorize(orig.R, c.R),
+                colorize(orig.G, c.G),
+                colorize(orig.B, c.B),
+                orig.A
+                );
+        }
     }
 }

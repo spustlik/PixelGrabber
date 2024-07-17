@@ -26,6 +26,7 @@
 - spritesheet reload images, animate, stretch 
 - image sheet cutter - combinations
 - XCF layers to image sprites
+- Image sprites colorizing                    
 </Run>
                 <LineBreak/>
 
@@ -33,7 +34,8 @@
                 <Run xml:space="preserve">
 - imagesheet cutter - BAD alpha loading - see d12.png
 - end offset for bit8, masked - count?
-- show whatsnew viewpart...
+- imagesheet description save ?
+- viewparts loading width when window is another size - save window size and use proportional width                    
 - z80 - orgs, sym addr, dumps
                 </Run>
             </TextBlock>

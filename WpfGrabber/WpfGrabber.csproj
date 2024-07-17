@@ -82,6 +82,7 @@
     <Compile Include="Converters\HexStringConverter.cs" />
     <Compile Include="Data\BitBitmap.cs" />
     <Compile Include="Data\ByteBitmap8Bit.cs" />
+    <Compile Include="Data\ByteColor.cs" />
     <Compile Include="Data\ColorHelper.cs" />
     <Compile Include="Data\Colorizers.cs" />
     <Compile Include="Data\FilePath.cs" />
