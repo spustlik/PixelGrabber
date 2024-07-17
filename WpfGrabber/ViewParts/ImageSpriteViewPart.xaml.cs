@@ -349,8 +349,9 @@ namespace WpfGrabber.ViewParts
             var bmpheight = height * ViewModel.Images.Count;
             if (ViewModel.Columns != 0)
             {
-                bmpwidth = ViewModel.Columns * width;
-                bmpheight = height * ViewModel.Images.Count / ViewModel.Columns;
+                var columns = Math.Min(ViewModel.Columns, ViewModel.Images.Count);
+                bmpwidth = columns * width;
+                bmpheight = height * ViewModel.Images.Count / columns;
             }
 
             var rgba = new ByteBitmapRgba(bmpwidth, bmpheight);
