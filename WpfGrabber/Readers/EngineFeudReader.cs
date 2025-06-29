@@ -28,27 +28,31 @@ namespace WpfGrabber.ViewParts
         private ByteBitmap8Bit ReadImage()
         {
             //4x4 x (8x8) pixels
+            //4x4 x (8) bytes + 4*4 colors
             var result = new ByteBitmap8Bit(32, 32);
+            var tileData = Reader.ReadBytes(4 * 4 * 8);
+            var colorsFG = Reader.ReadBytes(16);
             for (int u = 0; u < 4; u++)
             {
                 for (int v = 0; v < 4; v++)
                 {
-                    ReadTile(result, v * 8, u * 8);
+                    var o = v + u * 4;
+                    var data = tileData.GetRange(o * 8, 8);
+                    ReadSprite(data, result, v * 8, u * 8, colorsFG[v + (3-u) * 4]);
                 }
             }
-            var colorsFG = Reader.ReadBytes(16);
             return result;
         }
 
-        private void ReadTile(ByteBitmap8Bit result, int dx, int dy)
+        private static void ReadSprite(byte[] data, ByteBitmap8Bit result, int dx, int dy, byte colorFG)
         {
             for (var y = 0; y < 8; y++)
             {
-                var b = Reader.ReadByte();
+                var b = data[y];
                 for (var x = 0; x < 8; x++)
                 {
                     var bit = (byte)((b >> (7 - x)) & 1);
-                    var c = (bit == 0) ? 1 : 0;
+                    var c = (bit == 1) ? colorFG >> 4 : colorFG & 0xF;
                     result.SetPixel(dx + x, dy + y, (byte)c);
                 }
             }

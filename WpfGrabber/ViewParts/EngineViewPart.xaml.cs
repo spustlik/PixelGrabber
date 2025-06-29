@@ -100,7 +100,6 @@ namespace WpfGrabber.ViewParts
         }
         #endregion
 
-
         #region IsWidthVisible property
         private bool _isWidthVisible;
         public bool IsWidthVisible
@@ -183,11 +182,16 @@ namespace WpfGrabber.ViewParts
                 images = images.Take(ViewModel.MaxCount);
             var fnt = AppData.GetFont();
             ViewModel.Images.Clear();
+            Colorizer colorizer = Colorizers.GetColor01Gray;
+            if (ViewModel.EngineType == EngineType.Feud)
+            {
+                colorizer= Colorizers.GetColorZx;
+            }
             foreach (var img in images)
             {
-                var bmp = img.Bitmap.ToRgba(Colorizers.GetColor01Gray);
+                var bmp = img.Bitmap.ToRgba(colorizer);
                 if (img.Overlay != null)
-                    bmp.DrawText(fnt, 1, 1, img.Overlay, Colorizers.GetColor(0x4040FF));
+                    bmp.DrawText(fnt, 1, 1, img.Overlay, Colorizers.CreateColor(0x4040FF));
                 var s = img.Description + $"\nWidth: {bmp.Width}, Height: {bmp.Height}";
                 if (bmp.Width == 0 || bmp.Height == 0)
                     bmp = null;

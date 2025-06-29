@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace WpfGrabber.Data
 {
@@ -45,11 +46,35 @@ namespace WpfGrabber.Data
             return 0xff000000 | d | d >> 8 | d >> 16;
         }
 
-        public static Colorizer GetColor(uint color)
+        public static Colorizer CreateColor(uint color)
         {
             if ((color & 0xFF000000) == 0)
                 color = color | 0xFF000000;
             return (d, orig) => d == 0 ? orig : color;
         }
+
+        public static uint GetColorZx(uint b, uint orig)
+        {
+            if (b <= 1) return 0; //dve cerne jako pruhledna
+            return zxpalette[b & 0xF] | 0xFF000000;
+        }
+
+        private static uint zxToRgba(uint c)
+        {
+            //0x38->0xFF, ...
+            var (r, g, b) = ((c & 0xFF0000) >> 16, (c & 0x00FF00) >> 8, c & 0x0000FF);
+            r = (r * 0xFF) / 0x38;
+            g = (g * 0xFF) / 0x38;
+            b = (b * 0xFF) / 0x38;
+            return (uint)((0xFF << 24) | (r << 16) | (g << 8) | b);
+        }
+
+        private static uint[] zxpalette = new uint[] {
+                0x000000,0x000000,0x083008,0x183818,
+                0x080838,0x101838,0x280808,0x103038,
+                0x380808,0x381818,0x303008,0x303020,
+                0x082008,0x301028,0x282828,0x383838,
+            }.Select(x => zxToRgba(x)).ToArray();
+
     }
 }
