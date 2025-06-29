@@ -32,7 +32,7 @@
                     </TextBlock>
                 </Label>
                 <c:NumberEditor 
-                        ToolTip="Use 0x or x prefix for hex numbers"
+                        ToolTip="Use 0x or x prefix for hex numbers, context menu for changing page size"
                         SliderWidth="130" Width="260"
                         Value="{Binding Offset}" Minimum="0" Maximum="{Binding DataLength}" />
                 <Separator/>

@@ -55,9 +55,9 @@
     </Style>
 
     <converters:EnumItemsConverter x:Key="enumItems"/>
-
+    <converters:EqualsConverter x:Key="equals"/>
     <BooleanToVisibilityConverter x:Key="visiConv"/>
-
+    <converters:EqualsConverter x:Key="equalsVisi" Inner="{StaticResource visiConv}"/>
     <Style TargetType="ListBox" x:Key="listBoxImages">
         <!-- bind to (Images, SelectedImage, Columns, ShowLabels) -->
         <Setter Property="Background" Value="Transparent" />

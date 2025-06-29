@@ -22,6 +22,8 @@ namespace WpfGrabber.Services
         public double Zoom { get; set; } = 1;
         public double UiZoom { get; set; } = 1.0;
         public bool AutoLoadLayout { get; set; } = true;
+        public int WindowWidth { get; set; }
+        public int WindowHeight { get; set; }
 
         public static void Save(ShellVm vm)
         {
@@ -31,6 +33,8 @@ namespace WpfGrabber.Services
             data.UiZoom = vm.UiZoom;
             data.LastFile = vm.FileName;
             data.AutoLoadLayout = vm.AutoLoadLayout;
+            data.WindowWidth = vm.WindowWidth;
+            data.WindowHeight = vm.WindowHeight;
             XmlHelper.SerializeToFile(AppConfigFileName, data);
             //string[] is not supported
             //XmlHelper.SaveToFile(Path.ChangeExtension(AppConfigFileName,".config"), data);
@@ -45,6 +49,8 @@ namespace WpfGrabber.Services
             vm.UiZoom = data.UiZoom;
             vm.AutoLoadLayout = data.AutoLoadLayout;
             vm.RecentFiles.AddRange(data.RecentFiles, clear: true);
+            vm.WindowWidth = data.WindowWidth;
+            vm.WindowHeight = data.WindowHeight;
             return data;
         }
     }

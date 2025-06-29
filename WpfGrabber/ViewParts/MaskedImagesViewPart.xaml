@@ -30,6 +30,9 @@
                     <WrapPanel/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
+            <Label ToolTip="Check filpping, T is type of data reading, P is Preambule for each image, Mask - type of Data-Mask decoding, Colorize - type of colorizer">
+                <ContentControl Style="{StaticResource info_icon}"/>
+            </Label>
             <CheckBox Content="Flip bytes" ToolTip="Flip image bytes" IsChecked="{Binding FlipBytes}"/>
             <Separator/>
             <CheckBox Content="Flip X" IsChecked="{Binding FlipX}"/>

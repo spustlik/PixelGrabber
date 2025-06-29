@@ -1,41 +1,78 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using WpfGrabber.Data;
+using WpfGrabber.Shell;
 
 namespace WpfGrabber.Readers
 {
     //Movie game engine, but not complete - user must find sprite starts (see Marks)
     //height(16bit), data(h*WIDTH), mask reversed
-    public class EngineMovieReader
+    public class EngineMovieReader : EngineReader
     {
-        private DataReader rd;
         public bool FlipVertical { get; set; }
         public int Width { get; set; }
 
-        public EngineMovieReader(DataReader reader)
+        public EngineMovieReader(DataReader reader):base(reader)
         {
-            this.rd = reader;
         }
 
-        public IEnumerable<ReaderImageResult> ReadImages()
+        public override IEnumerable<ReaderImageResult> ReadImages()
         {
-            while (!rd.IsEmpty)
+            var marks = MovieMark.Marks;
+            var fnt = AppData.GetFont();
+            while (!Reader.IsEmpty)
             {
-                yield return ReadImage();
+                var found = marks.FirstOrDefault(a => a.offset == Reader.BytePosition);
+                if (found == null || found.IsImage)
+                {
+                    var img = ReadImage();
+                    yield return img;
+                }
+                else if (found.skip)
+                {
+                    var pos = Reader.BytePosition;
+                    var skip = found.skip;
+                    var next = marks.NextItem(a => a.offset == found.offset);
+                    var skipbytes = next.offset - pos;
+                    Reader.ReadBytes(skipbytes);
+                    var bmp = new ByteBitmap8Bit(20, 10);
+                    if (skipbytes > 8)
+                        bmp = new ByteBitmap8Bit(30, 10);
+                    bmp.DrawLine(0, 0, bmp.Width - 1, bmp.Height - 1);
+                    bmp.DrawLine(bmp.Width - 1, 0, 0, bmp.Height - 1);
+                    //bmp.DrawText(fnt, 0, 0, skipbytes.ToString(), 2);
+                    var result = new ReaderImageResult(bmp, pos, pos + skipbytes);
+                    result.Overlay = skipbytes.ToString();
+                    result.Description = $"(skip:0x{skip:X4})";
+                    yield return result;
+                }
+                else if (found.w != 0 && found.h != 0)
+                {
+                    var pos = Reader.BytePosition;
+                    var bmp = ReadBitmap(Math.Abs(found.w), found.h, readmask: false, flipX: found.w < 0, flipY: false);
+                    var dummy = new ReaderImageResult(bmp, pos, Reader.BytePosition);
+                    dummy.Description = $"(no header)";
+                    yield return dummy;
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
+
             }
+
         }
 
         public ReaderImageResult ReadImage()
         {
-            var pos = rd.BytePosition;
-            int w = rd.ReadByte();
+            var pos = Reader.BytePosition;
+            int w = Reader.ReadByte();
             if (w == 0xc0)
             {
-                var unknown = rd.ReadByte(); //skip,  next is 0x8? or 0xC1
+                var unknown = Reader.ReadByte(); //skip,  next is 0x8? or 0xC1
                                              //6B3D: C0 00 C1 39 
-                w = rd.ReadByte();
+                w = Reader.ReadByte();
             }
 
             int h = 0;
@@ -52,7 +89,7 @@ namespace WpfGrabber.Readers
                 //highest bit(s?) can mean that there is mask & data, data otherwise
                 //0x81(w=2), 0x83 BOM (w=4), 0x82(0x98FF-man)
                 w = 1 + (byte)(w & 0b0111111);
-                h = rd.ReadByte();
+                h = Reader.ReadByte();
             }
             else if ((w & 0b11110000) == 0xc0)
             {
@@ -60,7 +97,7 @@ namespace WpfGrabber.Readers
                 if (w == 0xC1)
                 {
                     w = 1 + (byte)(w & 0b0011111);
-                    h = rd.ReadByte();
+                    h = Reader.ReadByte();
                 }
                 else
                 {
@@ -73,25 +110,25 @@ namespace WpfGrabber.Readers
                 //41, 42
                 //TODO: another colors?!?
                 w = 1 + (w & 0b1111);
-                h = rd.ReadByte();
-                rd.ReadByte(); // ignore C9 8C, 9E 8A
-                rd.ReadByte();
+                h = Reader.ReadByte();
+                Reader.ReadByte(); // ignore C9 8C, 9E 8A
+                Reader.ReadByte();
                 readmask = false;
             }
             else
             {
                 w = Width;
-                h = rd.ReadByte();
+                h = Reader.ReadByte();
             }
             var bmp = ReadBitmap(w, h, readmask, flipX: true, flipY: FlipVertical);
-            var result = new ReaderImageResult(bmp, pos, rd.BytePosition);
+            var result = new ReaderImageResult(bmp, pos, Reader.BytePosition);
             return result;
         }
 
         public ByteBitmap8Bit ReadBitmap(int w, int h, bool readmask, bool flipX, bool flipY)
         {
-            var datar = new DataReader(rd.ReadBytes(w * h), 0, flipX: flipX);
-            var maskr = readmask ? new DataReader(rd.ReadBytes(w * h), 0, flipX: false) : null;
+            var datar = new DataReader(Reader.ReadBytes(w * h), 0, flipX: flipX);
+            var maskr = readmask ? new DataReader(Reader.ReadBytes(w * h), 0, flipX: false) : null;
             var bmp = new ByteBitmap8Bit(w * 8, h);
             for (int y = 0; y < bmp.Height; y++)
             {
@@ -111,6 +148,7 @@ namespace WpfGrabber.Readers
             }
             return bmp;
         }
+
     }
 
     public class MovieMark

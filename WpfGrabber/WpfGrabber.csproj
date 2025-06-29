@@ -75,6 +75,7 @@
       <DependentUpon>InputQueryWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\EnumItemsConverter.cs" />
+    <Compile Include="Converters\EqualsConverter.cs" />
     <Compile Include="Converters\GestureTextConverter.cs" />
     <Compile Include="Converters\Mul100Converter.cs" />
     <Compile Include="Converters\PercentTextConverter.cs" />
@@ -120,6 +121,7 @@
     <Compile Include="Shell\ProjectManager.cs" />
     <Compile Include="Shell\LayoutManagerService.cs" />
     <Compile Include="Themes\ResourceEvents.cs" />
+    <Compile Include="Readers\EngineFeudReader.cs" />
     <Compile Include="ViewParts\EngineViewPart.xaml.cs">
       <DependentUpon>EngineViewPart.xaml</DependentUpon>
     </Compile>

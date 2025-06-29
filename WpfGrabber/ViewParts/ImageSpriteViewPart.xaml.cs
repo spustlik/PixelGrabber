@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
@@ -97,6 +98,16 @@ namespace WpfGrabber.ViewParts
         }
         #endregion
 
+        #region SelectedIndex property
+        private string _selectedIndex;
+        [XmlIgnore]
+        public string SelectedIndex
+        {
+            get => _selectedIndex;
+            private set => Set(ref _selectedIndex, value);
+        }
+        #endregion
+
         #region ShellVm property
         private ShellVm _shellVm;
         [XmlIgnore]
@@ -106,6 +117,23 @@ namespace WpfGrabber.ViewParts
             set => Set(ref _shellVm, value);
         }
         #endregion
+
+        protected override void DoPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            base.DoPropertyChanged(propertyName);
+            if (propertyName == nameof(SelectedImage))
+            {
+                if (SelectedImage == null)
+                {
+                    SelectedIndex = null;
+                    return;
+                }
+                var i = this.Images.IndexOf(SelectedImage);
+                var row = 1 + Math.Truncate(1.0 * i / Columns);
+                var col = 1 + i % Columns;
+                SelectedIndex = $"{i} (column: {col}, row: {row})";
+            }
+        }
     }
     public class ImageVM : SimpleDataObject
     {
@@ -354,26 +382,8 @@ namespace WpfGrabber.ViewParts
                 bmpheight = height * ViewModel.Images.Count / columns;
             }
 
-            var rgba = new ByteBitmapRgba(bmpwidth, bmpheight);
+            BitmapSource result = CreateResultImage(bmpwidth, bmpheight, out var sources);
 
-            int posX = 0;
-            int posY = 0;
-            var sources = new List<string>();
-            foreach (var img in ViewModel.Images)
-            {
-                if (File.Exists(img.FileName))
-                    sources.Add(img.FileName);
-                var image = img.Image.ToRgba();
-                rgba.DrawBitmap(image, posX * width, posY, Colorizers.GetColorCopy);
-                posX++;
-                if (posX >= ViewModel.Columns)
-                {
-                    posX = 0;
-                    posY += ViewModel.Height;
-                }
-            }
-
-            var result = rgba.ToBitmapSource();
             result.SaveToPngFile(dlg.FileName);
             var cols = ViewModel.Columns;
             if (cols == 0)
@@ -401,6 +411,30 @@ namespace WpfGrabber.ViewParts
                     }
                 }
             }
+        }
+
+        private BitmapSource CreateResultImage(int bmpwidth, int bmpheight, out List<string> sources)
+        {
+            var rgba = new ByteBitmapRgba(bmpwidth, bmpheight);
+            int posX = 0;
+            int posY = 0;
+            sources = new List<string>();
+            foreach (var img in ViewModel.Images)
+            {
+                if (File.Exists(img.FileName))
+                    sources.Add(img.FileName);
+                //var image = converted.ToRgba(); 
+                var image = img.Image.ToRgba();
+
+                rgba.DrawBitmap(image, posX * ViewModel.Width, posY, Colorizers.GetColorCopy);
+                posX++;
+                if (posX >= ViewModel.Columns)
+                {
+                    posX = 0;
+                    posY += ViewModel.Height;
+                }
+            }
+            return rgba.ToBitmapSource();
         }
 
         private void OnCommandMoveUp_Executed(object sender, RoutedEventArgs e)

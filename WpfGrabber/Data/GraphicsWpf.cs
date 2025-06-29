@@ -2,7 +2,6 @@
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Windows;
-using System.Linq;
 
 namespace WpfGrabber.Data
 {
@@ -26,7 +25,7 @@ namespace WpfGrabber.Data
         {
             if (src.Format == PixelFormats.Indexed8)
                 return FromIndexed(src);
-            if (src.Format == PixelFormats.Bgr32 
+            if (src.Format == PixelFormats.Bgr32
                 || src.Format == PixelFormats.Bgra32
                 || src.Format == PixelFormats.Pbgra32
                 )
@@ -36,22 +35,29 @@ namespace WpfGrabber.Data
 
         private static ByteBitmapRgba FromBGRA(BitmapSource src)
         {
+            if (src.Format == PixelFormats.Bgra32)
+            {
+                src = new FormatConvertedBitmap(src, PixelFormats.Pbgra32, src.Palette, 0);
+            }
             int width = src.PixelWidth;
             int height = src.PixelHeight;
             var bytesPerPx = src.Format.BitsPerPixel / 8;
             var pixels = new uint[width * height];
             src.CopyPixels(pixels, stride: width * bytesPerPx, 0);
-            var r = new ByteBitmapRgba(width, height);
-            Array.Copy(pixels, r.Data, pixels.Length);
+            var r = new ByteBitmapRgba(width, height, pixels);
+
+            /*
+             * probably not properly working -- see below
             if (src.Format == PixelFormats.Bgra32)
             {
                 // ??? premultiplied alpha... it seems good
                 PremultiplyAlpha(r);
-            }
+            }*/
+
             return r;
         }
 
-        public static void PremultiplyAlpha(this ByteBitmapRgba bmp)
+        private static void PremultiplyAlpha(this ByteBitmapRgba bmp)
         {
             for (int i = 0; i < bmp.Data.Length; i++)
             {
@@ -84,6 +90,25 @@ namespace WpfGrabber.Data
                 }
             }
             return r;
+        }
+
+        public static void __DrawBitmap(this WriteableBitmap dest, BitmapSource src, int x, int y)
+        {
+            if (src.Format != dest.Format)
+                throw new ArgumentException($"Formats of src and dest must be same. {src.Format}!={dest.Format}");
+            var bytesPerPx = dest.Format.BitsPerPixel / 8;
+            var stride = dest.PixelWidth * bytesPerPx;
+            var pixels = GetSrcPixels(src);
+            dest.WritePixels(new Int32Rect(x, y, src.PixelWidth, src.PixelHeight), pixels, stride, 0);
+        }
+
+        private static uint[] GetSrcPixels(BitmapSource src)
+        {
+            var bytesPerPx = src.Format.BitsPerPixel / 8;
+            var pixels = new uint[src.PixelWidth * src.PixelHeight];
+            var stride = src.PixelWidth * bytesPerPx;
+            src.CopyPixels(pixels, stride, 0);
+            return pixels;
         }
     }
 }

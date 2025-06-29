@@ -45,7 +45,19 @@ namespace WpfGrabber.Shell
             {
                 AppConfig.Save(ViewModel);
             });
+            if (ViewModel.WindowWidth > 100 && ViewModel.WindowHeight > 50)
+            {
+                this.Width = ViewModel.WindowWidth;
+                this.Height = ViewModel.WindowHeight;
+            }
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
+            this.SizeChanged += WindowSize_Changed;
+        }
+
+        private void WindowSize_Changed(object sender, SizeChangedEventArgs e)
+        {
+            ViewModel.WindowWidth = (int)e.NewSize.Width;
+            ViewModel.WindowHeight = (int)e.NewSize.Height;
         }
 
         private Throthler _configSaver;
@@ -71,9 +83,9 @@ namespace WpfGrabber.Shell
             if (!ViewModel.IsProjectDirty)
                 return true;
             var r = MessageBox.Show(
-                this, 
-                $"Do you want to save layout of {Path.GetFileName( ViewModel.FileName)}?", 
-                "Question", 
+                this,
+                $"Do you want to save layout of {Path.GetFileName(ViewModel.FileName)}?",
+                "Question",
                 MessageBoxButton.YesNoCancel,
                 MessageBoxImage.Question);
             if (r == MessageBoxResult.Cancel)

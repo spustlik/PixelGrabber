@@ -18,37 +18,38 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <ItemsControl Style="{StaticResource toolbar}">
+            <Label ToolTip="Some engines are very proprietal and using concrete data offsets">
+                <ContentControl Style="{StaticResource info_icon}"/>
+            </Label>
             <!--<Button Content="®" Click="OnReload_Click" Width="20" Height="20" Padding="0"/>-->
 
-            <!--<Label Content="Engine"/>-->
             <ComboBox ToolTip="Engine" Style="{StaticResource enumCombo}" 
                     ItemsSource="{Binding EngineType, Converter={StaticResource enumItems}, Mode=OneTime}"
                     SelectedValue="{Binding EngineType, UpdateSourceTrigger=PropertyChanged}" 
                     />
             <Separator/>
             
-            <Label Content="Width"/>
-            <c:NumberEditor Value="{Binding Width}" 
-                            Maximum="256" Minimum="0"
-                            Width="70" SliderWidth="0" LargeChange="0"/>
-            <Separator/>
-
-            <!--<Label Content="Columns"/>
-            <c:NumberEditor Value="{Binding Columns}" 
-                            Maximum="32"
-                            LargeChange="0"
-                            Width="70" SliderWidth="0"/>
-            <Separator/>-->
-
             <Label Content="Max" ToolTip="Maximum images count"/>
             <c:NumberEditor Value="{Binding MaxCount}" 
                             Maximum="256" LargeChange="0"
                             Width="70" SliderWidth="0"/>
             <Separator/>
-            
-            
-            <CheckBox Content="Flip V" IsChecked="{Binding FlipVertical}"/>
-            <Separator/>
+
+            <StackPanel Orientation="Horizontal" Visibility="{Binding IsWidthVisible, Converter={StaticResource visiConv}}">
+                <Label Content="Width"/>
+                <c:NumberEditor Value="{Binding Width}" 
+                            Maximum="256" Minimum="0"
+                            Width="70" SliderWidth="0" LargeChange="0"/>
+                <Separator/>
+            </StackPanel>
+
+
+            <StackPanel Orientation="Horizontal" Visibility="{Binding IsFlipVVisible, Converter={StaticResource visiConv}}">
+                <CheckBox Content="Flip V" IsChecked="{Binding FlipVertical}"/>
+                <Separator/>
+
+            </StackPanel>
+
             <Button Content="Menu" Style="{StaticResource dropDown}">
                 <Button.ContextMenu>
                     <ContextMenu Placement="Bottom">

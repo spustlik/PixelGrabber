@@ -7,7 +7,8 @@ namespace WpfGrabber.Readers
         public ByteBitmap8Bit Bitmap { get; }
         public int Position { get; }
         public int End { get; }
-
+        public string Description { get; set; }
+        public string Overlay { get; set; }
         public ReaderImageResult(ByteBitmap8Bit bitmap, int position, int end)
         {
             this.Bitmap = bitmap;
@@ -20,7 +21,7 @@ namespace WpfGrabber.Readers
     {
         protected DataReader Reader { get; }
 
-        protected EngineReader(DataReader reader) 
+        protected EngineReader(DataReader reader)
         {
             this.Reader = reader;
         }

@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
@@ -23,7 +24,8 @@ namespace WpfGrabber.ViewParts
         Alien,
         Filmation,
         [Description("Gunfright (Filmation)")]
-        Gunfright
+        Gunfright,
+        Feud
     }
     public class EngineViewPartVM : SimpleDataObject
     {
@@ -39,6 +41,7 @@ namespace WpfGrabber.ViewParts
 
         #region Width property
         private int _width = 1;
+        //only Movie
         public int Width
         {
             get => _width;
@@ -57,6 +60,7 @@ namespace WpfGrabber.ViewParts
 
         #region FlipVertical property
         private bool _flipVertical;
+        //olny Movie and Alien
         public bool FlipVertical
         {
             get => _flipVertical;
@@ -87,15 +91,6 @@ namespace WpfGrabber.ViewParts
         }
         #endregion
 
-        #region Columns property
-        private int _columns;
-        public int Columns
-        {
-            get => _columns;
-            set => Set(ref _columns, value);
-        }
-        #endregion
-
         #region ShowLabels property
         private bool _showLabels;
         public bool ShowLabels
@@ -105,6 +100,34 @@ namespace WpfGrabber.ViewParts
         }
         #endregion
 
+
+        #region IsWidthVisible property
+        private bool _isWidthVisible;
+        public bool IsWidthVisible
+        {
+            get => _isWidthVisible;
+            private set => Set(ref _isWidthVisible, value);
+        }
+        #endregion
+
+        #region IsFlipVVisible property
+        private bool _isFlipVVisible;
+        public bool IsFlipVVisible
+        {
+            get => _isFlipVVisible;
+            private set => Set(ref _isFlipVVisible, value);
+        }
+        #endregion
+
+        protected override void DoPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            base.DoPropertyChanged(propertyName);
+            if (propertyName == nameof(EngineType))
+            {
+                IsWidthVisible = EngineType == EngineType.Movie;
+                IsFlipVVisible = EngineType == EngineType.Movie || EngineType == EngineType.Alien;
+            }
+        }
     }
 
     public class EngineImageVM
@@ -113,6 +136,7 @@ namespace WpfGrabber.ViewParts
         public string Description { get; set; }
         public BitmapSource Image { get; set; }
         public ImageData ImageData { get; set; }
+        public bool IsSelected { get; set; }
     }
     public class EngineViewPartBase : ViewPartDataViewer<EngineViewPartVM>
     {
@@ -139,7 +163,6 @@ namespace WpfGrabber.ViewParts
         public override void OnInitialize()
         {
             base.OnInitialize();
-            ViewModel.Columns = 1;
             ViewModel.ShellVm = ShellVm;
             ViewModel.MaxCount = 1;
         }
@@ -177,75 +200,22 @@ namespace WpfGrabber.ViewParts
         {
             switch (ViewModel.EngineType)
             {
-                case EngineType.Movie: return ReadMovieImages();
-                case EngineType.Alien: return ReadEngineImages((r) => new EngineAlienReader(r) { FlipY=ViewModel.FlipVertical});
+                case EngineType.Movie: return ReadEngineImages(r => new EngineMovieReader(r) { FlipVertical = ViewModel.FlipVertical, Width = ViewModel.Width });
+                case EngineType.Alien: return ReadEngineImages((r) => new EngineAlienReader(r) { FlipY = ViewModel.FlipVertical });
                 case EngineType.Filmation: return ReadEngineImages((r) => new EngineFilmationReader(r));
                 case EngineType.Gunfright: return ReadEngineImages((r) => new EngineGunfrightReader(r));
+                case EngineType.Feud: return ReadEngineImages((r) => new EngineFeudReader(r) { });
                 default:
                     throw new NotImplementedException();
             }
         }
 
-        private IEnumerable<ImageData> ReadEngineImages<TR>(Func<DataReader, TR> factory) where TR:EngineReader
+        private IEnumerable<ImageData> ReadEngineImages<TR>(Func<DataReader, TR> factory) where TR : EngineReader
         {
             var rd = new DataReader(ShellVm.Data, ShellVm.Offset);
             var r = factory(rd);
             return r.ReadImages()
                 .Select(x => CreateImageData(x));
-        }
-
-        private IEnumerable<ImageData> ReadMovieImages()
-        {
-            var marks = MovieMark.Marks;
-            var rd = new DataReader(ShellVm.Data, ShellVm.Offset);
-            var r = new EngineMovieReader(rd) { FlipVertical = ViewModel.FlipVertical, Width = ViewModel.Width };
-
-            var fnt = AppData.GetFont();
-            while (!rd.IsEmpty)
-            {
-                var found = marks.FirstOrDefault(a => a.offset == rd.BytePosition);
-                if (found == null || found.IsImage)
-                {
-                    var img = r.ReadImage();
-                    yield return CreateImageData(img);
-                }
-                else if (found.skip)
-                {
-                    var pos = rd.BytePosition;
-                    var skip = found.skip;
-                    var next = marks.NextItem(a => a.offset == found.offset);
-                    var skipbytes = next.offset - pos;
-                    rd.ReadBytes(skipbytes);
-                    var bmp = new ByteBitmap8Bit(20, 10);
-                    if (skipbytes > 8)
-                        bmp = new ByteBitmap8Bit(30, 10);
-                    bmp.DrawLine(0, 0, bmp.Width - 1, bmp.Height - 1);
-                    bmp.DrawLine(bmp.Width - 1, 0, 0, bmp.Height - 1);
-                    //bmp.DrawText(fnt, 0, 0, skipbytes.ToString(), 2);
-                    var dummy = new ReaderImageResult(bmp, pos, pos + skipbytes);
-                    var data = CreateImageData(dummy);
-                    data.Overlay = skipbytes.ToString();
-                    data.Description = $"(skip:0x{skip:X4}) {data.Description}";
-                    yield return data;
-                }
-                else if (found.w != 0 && found.h != 0)
-                {
-                    var pos = rd.BytePosition;
-                    var bmp = r.ReadBitmap(Math.Abs(found.w), found.h, readmask: false, flipX: found.w < 0, flipY: false);
-                    var dummy = new ReaderImageResult(bmp, pos, rd.BytePosition);
-                    var data = CreateImageData(dummy);
-                    data.Description = $"(no header) {data.Description}";
-                    yield return data;
-                }
-                else
-                {
-                    throw new NotImplementedException();
-                }
-
-            }
-            //return r
-            //    .ReadImages()
-            //    .Select(x => CreateImageData(x));
         }
 
         private ImageData CreateImageData(ReaderImageResult r)
@@ -258,7 +228,8 @@ namespace WpfGrabber.ViewParts
                 Addr = r.Position,
                 AddrEnd = r.End,
                 Title = r.Position.ToString("X4"),
-                Description = $"Pos={r.Position:X4}, End={r.End:X4}, {dump}"
+                Overlay = r.Overlay,
+                Description = (r.Description == null ? "" : r.Description + " ") + $"Pos={r.Position:X4}, End={r.End:X4}, {dump}"
             };
         }
 

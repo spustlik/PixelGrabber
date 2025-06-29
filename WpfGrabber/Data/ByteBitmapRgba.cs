@@ -8,11 +8,11 @@ namespace WpfGrabber
         public int Width { get; private set; }
         public int Height { get; private set; }
         public uint[] Data { get; private set; }
-        public ByteBitmapRgba(int width, int height)
+        public ByteBitmapRgba(int width, int height, uint[] data = null)
         {
             this.Width = width;
             this.Height = height;
-            Data = new uint[width * height];
+            Data = data ?? new uint[width * height];
         }
 
 

@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace WpfGrabber.Shell
@@ -74,6 +69,23 @@ namespace WpfGrabber.Shell
         }
         #endregion
 
+        #region WindowWidth property
+        private int _windowWidth;
+        public int WindowWidth
+        {
+            get => _windowWidth;
+            set => Set(ref _windowWidth, value);
+        }
+        #endregion
+
+        #region WindowHeight property
+        private int _windowHeight;
+        public int WindowHeight
+        {
+            get => _windowHeight;
+            set => Set(ref _windowHeight, value);
+        }
+        #endregion
 
         #region AutoLoadLayout property
         private bool _autoLoadLayout;
@@ -81,6 +93,15 @@ namespace WpfGrabber.Shell
         {
             get => _autoLoadLayout;
             set => Set(ref _autoLoadLayout, value);
+        }
+        #endregion
+
+        #region StatusBarMessage property
+        private string _statusBarMessage;
+        public string StatusBarMessage
+        {
+            get => _statusBarMessage;
+            set => Set(ref _statusBarMessage, value);
         }
         #endregion
 
@@ -113,7 +134,7 @@ namespace WpfGrabber.Shell
         private void AddRecentFile(string fileName)
         {
             var i = RecentFiles.FindIndex(x => String.Compare(x, fileName, StringComparison.OrdinalIgnoreCase) == 0);
-            if (i >= 0) 
+            if (i >= 0)
             {
                 RecentFiles.RemoveAt(i); // move to end
             }

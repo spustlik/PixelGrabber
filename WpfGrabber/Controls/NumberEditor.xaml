@@ -70,6 +70,8 @@
             <MenuItem Header="32" Click="ButtonPageSize_Click"/>
             <MenuItem Header="64" Click="ButtonPageSize_Click"/>
             <MenuItem Header="128" Click="ButtonPageSize_Click"/>
+            <MenuItem Header="256" Click="ButtonPageSize_Click"/>
+            <MenuItem Header="1024" Click="ButtonPageSize_Click"/>
             <Separator/>
         </ContextMenu>
     </UserControl.Resources>
