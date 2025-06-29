@@ -36,7 +36,7 @@ namespace WpfGrabber.ViewParts
                     ReadTile(result, v * 8, u * 8);
                 }
             }
-            var wtf = Reader.ReadBytes(16);
+            var colorsFG = Reader.ReadBytes(16);
             return result;
         }
 
