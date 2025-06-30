@@ -61,6 +61,7 @@
                         <MenuItem Header="Clear" Click="OnButtonClear_Click"/>
                         <MenuItem Header="Set Width and Height to max" Click="OnSetMax_Click"/>
                         <MenuItem Header="Sort by size" Click="OnSortBySize_Click"/>
+                        <MenuItem Header="Sort by file name" Click="OnSortByFileName_Click"/>
                         <MenuItem Command="{x:Static local:ImageSpriteViewPart.CommandRemove}"/>
                         <MenuItem Header="Set color ..." Click="OnSetColor_Click"/>
                         <Separator/>

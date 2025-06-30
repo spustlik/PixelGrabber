@@ -379,7 +379,10 @@ namespace WpfGrabber.ViewParts
             {
                 var columns = Math.Min(ViewModel.Columns, ViewModel.Images.Count);
                 bmpwidth = columns * width;
-                bmpheight = height * ViewModel.Images.Count / columns;
+                var rows = ViewModel.Images.Count / columns;
+                if (rows * columns < ViewModel.Images.Count)
+                    rows++;
+                bmpheight = height * rows;
             }
 
             BitmapSource result = CreateResultImage(bmpwidth, bmpheight, out var sources);
@@ -397,6 +400,7 @@ namespace WpfGrabber.ViewParts
             {
                 Clipboard.SetText(opts);
             }
+            /*
             if (sources.Count > 0)
             {
                 if (MessageBox.Show(
@@ -410,7 +414,7 @@ namespace WpfGrabber.ViewParts
                         File.Delete(file);
                     }
                 }
-            }
+            }*/
         }
 
         private BitmapSource CreateResultImage(int bmpwidth, int bmpheight, out List<string> sources)
@@ -486,6 +490,14 @@ namespace WpfGrabber.ViewParts
                 .ToArray();
             ViewModel.Images.AddRange(sorted, clear: true);
         }
+        private void OnSortByFileName_Click(object sender, RoutedEventArgs e)
+        {
+            var sorted = ViewModel
+                .Images
+                .OrderBy(a => a.Name)
+                .ToArray();
+            ViewModel.Images.AddRange(sorted, clear: true);
+        }
 
         private void OnSetColor_Click(object sender, RoutedEventArgs e)
         {
@@ -515,5 +527,6 @@ namespace WpfGrabber.ViewParts
                 orig.A
                 );
         }
+
     }
 }

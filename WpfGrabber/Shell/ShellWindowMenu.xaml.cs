@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -206,6 +208,50 @@ namespace WpfGrabber.Shell
                 }
             }
             return true;
+        }
+
+        private void OnExtractTexts_Click(object sender, RoutedEventArgs e)
+        {
+            var result = new List<string>();
+            var i = 0;
+            var last = "";
+            var s = Encoding.GetEncoding("iso-8859-1").GetString(ViewModel.ShellVm.Data);
+            // pascal strings - [len]...bytes
+            // c strings - ...bytes\0
+            // spec. strings - ends with high bit set to 1
+            //max length
+            //allowed chars (a-z,A-Z,space,apostrophe) ? digits, brackets? chars 32-127?
+            //distinct
+            var chars = new Regex(@"[A-Za-z _']");
+            while (i < s.Length)
+            {
+                char c = s[i++];
+                if (chars.IsMatch(c + ""))
+                {
+                    last += c;
+                    continue;
+                }
+                //if(c=='\0')//std c end
+                if (c > 'z')
+                {
+
+                }
+                if (c > 127 && last.Length > 2)
+                {
+                    c = (char)(c - 128); //(char)(b & 0x7F); // remove high bit
+                    if (chars.IsMatch(c + ""))
+                    {
+                        last += c; //end of string
+                    }
+                }
+                if (!String.IsNullOrEmpty(last))
+                    result.Add(last);
+                last = "";
+            }
+            if (!String.IsNullOrEmpty(last))
+                result.Add(last);
+            result = result.Where(x => x.Length > 2).Distinct().ToList();
+            TextViewPart.ShowPart("Extracted texts", result.ToArray());
         }
     }
 }

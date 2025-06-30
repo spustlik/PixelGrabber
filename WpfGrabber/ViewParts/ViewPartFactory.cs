@@ -13,6 +13,7 @@ namespace WpfGrabber.ViewParts
         public ViewPartFactory()
         {
             _definitions.AddRange(new ViewPartDef[] {
+                new ViewPartDef<FileMapViewPart>(){Title = "File map"},
                 new ViewPartDef<Binary8BitViewPart>(){Title = "Binary 8bit" },
                 new ViewPartDef<HexDumpViewPart>(){Title = "Hex dump" },
                 new ViewPartDef<MaskedImagesViewPart>(){Title = "Binary masked images"},
