@@ -115,7 +115,7 @@
                     SelectionMode="Extended" />
 
         </Border>
-        <GridSplitter Grid.Column="1" Grid.RowSpan="99" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+        <GridSplitter Grid.Column="1" Grid.RowSpan="99" Width="5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
         <Border x:Name="properties" Grid.Column="2" Grid.RowSpan="99" 
                 BorderBrush="#a0a0a0" BorderThickness="1">
             <DockPanel>

@@ -11,7 +11,7 @@
             <Style TargetType="Border">
                 <Setter Property="Background" Value="White"/>
             </Style>
-            <Style TargetType="GridSplitter">
+            <Style TargetType="GridSplitter" x:Key="gridSplitter">
                 <Setter Property="VerticalAlignment" Value="Stretch"/>
                 <Setter Property="HorizontalAlignment" Value="Center"/>
                 <Setter Property="Width" Value="5" />
@@ -27,10 +27,10 @@
         <controls:ViewPartControl Grid.Column="0" Title="Bit8">
             <Border CornerRadius="10" Background="Pink" Width="50" Height="50"/>
         </controls:ViewPartControl>
-        <GridSplitter Grid.Column="1"/>
+        <GridSplitter Grid.Column="1" Style="{StaticResource gridSplitter}"/>
         <controls:ViewPartControl Grid.Column="2" Title="Hex dump" >
             <ListBox/>
         </controls:ViewPartControl>
-        <GridSplitter Grid.Column="3"/>
+        <GridSplitter Grid.Column="3" Style="{StaticResource gridSplitter}"/>
     </Grid>
 </UserControl>

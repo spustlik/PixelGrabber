@@ -23,11 +23,16 @@ namespace WpfGrabber.Shell
 
             //add ([splitter] if not first)[viewpart]
             if (partsGrid.Children.Count > 0)
-                partsGrid.Children.Add(new GridSplitter());
+                partsGrid.Children.Add(CreateGridSplitter());
             partsGrid.Children.Add(new ViewPartControl() { Content = viewPart });
             FixGridLayout();
             viewPart.OnInitialize();
             projectManager.SetDirty(true);
+        }
+
+        private GridSplitter CreateGridSplitter()
+        {
+            return new GridSplitter() { Style = partsGrid.Resources["gridSplitter"] as Style };
         }
 
         public void Remove(ViewPart viewPart)
@@ -142,7 +147,7 @@ namespace WpfGrabber.Shell
                 {
                     if (!(con is GridSplitter))
                     {
-                        con = new GridSplitter();
+                        con = CreateGridSplitter();
                         partsGrid.Children.Insert(i, con);
                     }
                     col.Width = GridLength.Auto;

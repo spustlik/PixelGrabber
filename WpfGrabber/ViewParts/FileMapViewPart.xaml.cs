@@ -24,12 +24,17 @@ namespace WpfGrabber.ViewParts
     {
         [XmlIgnore]
         public ObservableCollection<FileMapItem> Items { get; } = new ObservableCollection<FileMapItem>();
+
+        #region SelectedItem property
+        private FileMapItem _selectedItem;
         [XmlIgnore]
-        public ICollectionView ItemsView => CollectionViewSource.GetDefaultView(Items);
-        public FileMapVM()
+        public FileMapItem SelectedItem
         {
-            ItemsView.SortDescriptions.Add(new SortDescription(nameof(FileMapItem.Address), ListSortDirection.Ascending));
+            get => _selectedItem;
+            set => Set(ref _selectedItem, value);
         }
+        #endregion
+
     }
     public class FileMapItem : SimpleDataObject
     {
@@ -40,6 +45,15 @@ namespace WpfGrabber.ViewParts
         {
             get => _address;
             set => Set(ref _address, value);
+        }
+        #endregion
+
+        #region Size property
+        private int _size;
+        public int Size
+        {
+            get => _size;
+            set => Set(ref _size, value);
         }
         #endregion
 
@@ -73,12 +87,60 @@ namespace WpfGrabber.ViewParts
     {
         public FileMapViewPart()
         {
+            this.ViewModel.Items.Add(new FileMapItem() { Address = 0, Title = "Start", Comment = "Start of file" });
+            this.ViewModel.Items.Add(new FileMapItem() { Address = 1234, Title = "Some stuff", Comment = "There is something strange" });
+            this.ViewModel.Items.Add(new FileMapItem() { Address = 2234, Title = "Main prog" });
             InitializeComponent();
+        }
+        public override void OnLoadLayout(XElement ele)
+        {
+            base.OnLoadLayout(ele);
         }
         public override void OnSaveLayout(XElement ele)
         {
             base.OnSaveLayout(ele);
             ele.SaveCollection(() => ViewModel.Items, (item, e) => e.SaveProperties(item));
+        }
+
+        private void Add_Click(object sender, RoutedEventArgs e)
+        {
+            this.ViewModel.Items.Add(new FileMapItem() { Address = ShellVm.Offset, Title = "at " + ShellVm.Offset });
+            this.SortItems();
+        }
+
+        private void AddrFromOffset_Click(object sender, RoutedEventArgs e)
+        {
+            this.ViewModel.SelectedItem.Address = ShellVm.Offset;
+            this.SortItems();
+        }
+
+        private void SizeFromNext_Click(object sender, RoutedEventArgs e)
+        {
+            var next = ViewModel.Items.OrderBy(x => x.Address).FirstOrDefault(x => x.Address > this.ViewModel.SelectedItem.Address);
+            if (next != null)
+                this.ViewModel.SelectedItem.Size = next.Address - ViewModel.SelectedItem.Address;
+            else
+                this.ViewModel.SelectedItem.Size = ShellVm.DataLength - ViewModel.SelectedItem.Address;
+        }
+
+        private void Sort_Click(object sender, RoutedEventArgs e)
+        {
+            SortItems();
+        }
+
+        private void SortItems()
+        {
+            this.ViewModel.Items.AddRange(ViewModel.Items.OrderBy(x => x.Address).ToArray(), clear: true);
+        }
+
+        private void ViewItem_Click(object sender, RoutedEventArgs e)
+        {
+            var btn = sender as Button;
+            if (btn == null) return;
+            var item = btn.DataContext as FileMapItem;
+            if (item == null) return;
+            ShellVm.Offset = item.Address;
+            //TODO: update viewparts?
         }
     }
 }

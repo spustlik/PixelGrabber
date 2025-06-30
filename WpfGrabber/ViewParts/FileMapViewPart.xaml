@@ -4,9 +4,122 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WpfGrabber.ViewParts"
+             xmlns:converters="clr-namespace:WpfGrabber"   
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="454" d:DesignWidth="319">
+    <d:DesignerProperties.DesignStyle>
+        <Style TargetType="UserControl">
+            <Setter Property="Background" Value="White" />
+        </Style>
+    </d:DesignerProperties.DesignStyle>
     <Grid>
-            
+        <Grid.Resources>
+            <converters:HexStringConverter x:Key="hexConv" HexNums="0"/>
+        </Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <ItemsControl Style="{StaticResource toolbar}" >
+            <Button Content="+ Add..." Click="Add_Click"></Button>
+            <Separator/>
+            <Button Content="❌ Delete" Click="Add_Click"/>
+            <Separator/>
+            <Button Content="Sort" Click="Sort_Click"/>
+        </ItemsControl>
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <ListBox Grid.Row="0" ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem}" Grid.IsSharedSizeScope="True">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type local:FileMapItem}">
+                        <Grid >
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="g1"/>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="g2"/>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="g3"/>
+                                <ColumnDefinition Width="*" SharedSizeGroup="g4"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding Address,StringFormat=X4}" 
+                                   ToolTip="{Binding Address}"
+                                   Margin="5,0" 
+                                   VerticalAlignment="Center"
+                                   FontFamily="Courier New"/>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <StackPanel.Resources>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Padding" Value="3,2"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                    <Style TargetType="Separator">
+                                        <Setter Property="Width" Value="3"/>
+                                    </Style>
+                                </StackPanel.Resources>
+                                <Button Content="View" Click="ViewItem_Click"/>
+                            </StackPanel>
+                            <TextBlock Grid.Column="2" Margin="5" Text="{Binding Title}"/>
+                            <TextBlock Grid.Column="3" Margin="5" Foreground="Green" Text="{Binding Comment}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch"/>
+            <Grid Grid.Row="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Border Background="#606060">
+                    <Label Content="Properties" Foreground="White"/>
+                </Border>
+                <StackPanel Grid.Row="1" Margin="10" DataContext="{Binding SelectedItem}">
+                    <StackPanel.Resources>
+                        <Style TargetType="Label">
+                            <Setter Property="MinWidth" Value="70"/>
+                        </Style>
+                        <Style TargetType="Separator">
+                            <Setter Property="Width" Value="5"/>
+                            <Setter Property="Height" Value="0"/>
+                        </Style>
+                        <Style TargetType="TextBox">
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="Padding" Value="2,2" />
+                        </Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Padding" Value="3,1"/>
+                            <Setter Property="Margin" Value="0"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                        </Style>
+                    </StackPanel.Resources>
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="Address"/>
+                        <TextBox Text="{Binding Address,StringFormat={}x{0:X4},Converter={StaticResource hexConv}}" FontFamily="Courier New" Width="50"/>
+                        <Separator />
+                        <Button Content="&lt;ofs" Click="AddrFromOffset_Click"/>
+                        <Separator />
+                        <Label Content="Size" MinWidth="0"/>
+                        <TextBox Text="{Binding Size,StringFormat={}x{0:X4},Converter={StaticResource hexConv}}" FontFamily="Courier New" Width="50"/>
+                        <Separator />
+                        <Button Content="&lt;next" Click="SizeFromNext_Click"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="Title"/>
+                        <TextBox Text="{Binding Title}" HorizontalAlignment="Stretch" MinWidth="160"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical">
+                        <Label Content="Comment"/>
+                        <TextBox Text="{Binding Comment}" MinLines="3" MaxLines="5"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Grid>
     </Grid>
 </local:FileMapViewPartBase>
