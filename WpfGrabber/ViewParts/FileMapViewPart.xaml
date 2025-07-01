@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WpfGrabber.ViewParts"
              xmlns:converters="clr-namespace:WpfGrabber"   
+             x:Name="root"
              mc:Ignorable="d" 
              d:DesignHeight="454" d:DesignWidth="319">
     <d:DesignerProperties.DesignStyle>
@@ -23,9 +24,17 @@
         <ItemsControl Style="{StaticResource toolbar}" >
             <Button Content="+ Add..." Click="Add_Click"></Button>
             <Separator/>
-            <Button Content="❌ Delete" Click="Add_Click"/>
-            <Separator/>
-            <Button Content="Sort" Click="Sort_Click"/>
+            <Button Style="{StaticResource dropDown}" Content="Menu...">
+                <Button.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem  Header="❌ Delete" Click="Delete_Click"/>
+                        <MenuItem  Header="Sort" Click="Sort_Click"/>
+                        <MenuItem  Header="Add spaces" Click="AddSpaces_Click"/>
+                        <Separator/>
+                        <MenuItem  Header="Sync Part" IsChecked="{Binding SyncViewPart}"/>
+                    </ContextMenu>
+                </Button.ContextMenu>
+            </Button>
         </ItemsControl>
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
@@ -48,23 +57,14 @@
                                 <ColumnDefinition Width="Auto" SharedSizeGroup="g3"/>
                                 <ColumnDefinition Width="*" SharedSizeGroup="g4"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding Address,StringFormat=X4}" 
-                                   ToolTip="{Binding Address}"
+
+                            <TextBlock ToolTip="{Binding Address}"
                                    Margin="5,0" 
                                    VerticalAlignment="Center"
-                                   FontFamily="Courier New"/>
-                            <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                <StackPanel.Resources>
-                                    <Style TargetType="Button">
-                                        <Setter Property="Padding" Value="3,2"/>
-                                        <Setter Property="VerticalAlignment" Value="Center"/>
-                                    </Style>
-                                    <Style TargetType="Separator">
-                                        <Setter Property="Width" Value="3"/>
-                                    </Style>
-                                </StackPanel.Resources>
-                                <Button Content="View" Click="ViewItem_Click"/>
-                            </StackPanel>
+                                   FontFamily="Courier New"
+                                   Text="{Binding Address,StringFormat={}0x{0:X4}}"/>
+                            <TextBlock Grid.Column="1" Margin="5" Visibility="{Binding Size, Converter={StaticResource notEqualsVisi},ConverterParameter={StaticResource zero}}"
+                                       Text="{Binding Size,StringFormat={}+0x{0:X4}}"/>
                             <TextBlock Grid.Column="2" Margin="5" Text="{Binding Title}"/>
                             <TextBlock Grid.Column="3" Margin="5" Foreground="Green" Text="{Binding Comment}"/>
                         </Grid>
@@ -117,6 +117,23 @@
                     <StackPanel Orientation="Vertical">
                         <Label Content="Comment"/>
                         <TextBox Text="{Binding Comment}" MinLines="3" MaxLines="5"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="Uses part"/>
+                        <ComboBox ItemsSource="{Binding ViewParts, ElementName=root}" 
+                                  SelectedValue="{Binding ViewPartId}" SelectedValuePath="TypeId"
+                                  SelectionChanged="ViewPartId_SelectionChanged"
+                                  VerticalAlignment="Center" MinWidth="60">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate DataType="{x:Type local:ViewPartDef}">
+                                    <TextBlock Text="{Binding Title}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <Separator/>
+                        <Button Content="&lt; Save" Click="SaveViewPart_Click"/>
+                        <Separator/>
+                        <Button Content="&gt; Load" Click="LoadViewPart_Click"/>
                     </StackPanel>
                 </StackPanel>
             </Grid>

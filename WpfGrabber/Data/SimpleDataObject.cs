@@ -2,15 +2,21 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Xml.Serialization;
 
 namespace WpfGrabber
 {
     public abstract class SimpleDataObject : INotifyPropertyChanged
     {
+        public void RaisePropertyChange(string propertyName)
+        {
+            DoPropertyChanged(propertyName);
+        }
         protected virtual void DoPropertyChanged([CallerMemberName] string propertyName = null)
         {
             if (propertyName != nameof(IsChanged))
@@ -39,7 +45,6 @@ namespace WpfGrabber
         }
 
         #endregion
-
 
         public event PropertyChangedEventHandler PropertyChanged;
     }

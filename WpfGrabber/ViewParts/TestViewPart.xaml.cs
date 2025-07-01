@@ -7,7 +7,7 @@ using WpfGrabber.Shell;
 
 namespace WpfGrabber.ViewParts
 {
-    public class TestViewPartVM : SimpleDataObject
+    public class TestViewPartVM : SimpleDataObjectEx
     {
 
         #region TestEnum property
@@ -43,7 +43,7 @@ namespace WpfGrabber.ViewParts
     }
     public partial class TestViewPart : TestViewPartBase
     {
-        public TestViewPart():base()
+        public TestViewPart() : base()
         {
             InitializeComponent();
         }
@@ -59,7 +59,7 @@ namespace WpfGrabber.ViewParts
             var rgba = new ByteBitmapRgba(max_w, max_h);
             var font = AppData.GetFont();
 
-            rgba.DrawText(font, 0, 0, "TEST TEXT",Colorizers.GetColorBlack);
+            rgba.DrawText(font, 0, 0, "TEST TEXT", Colorizers.GetColorBlack);
             var bmp = rgba.ToBitmapSource();
             image.Source = bmp;
             image.RenderTransform = new ScaleTransform(ShellVm.Zoom, ShellVm.Zoom);
@@ -67,12 +67,12 @@ namespace WpfGrabber.ViewParts
 
         private void MergeLayouts_Click(object sender, RoutedEventArgs e)
         {
-            var list= ShellVm.Layouts.OrderBy(x => x).ToList();
-            int i = 0; 
-            while(i < list.Count)
+            var list = ShellVm.Layouts.OrderBy(x => x).ToList();
+            int i = 0;
+            while (i < list.Count)
             {
                 var layout = list[i];
-                if (layout.Length != 4 || 
+                if (layout.Length != 4 ||
                     !int.TryParse(layout, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var res))
                 {
                     list.RemoveAt(i);

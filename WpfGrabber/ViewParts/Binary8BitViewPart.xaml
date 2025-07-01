@@ -33,15 +33,20 @@
                     </ContextMenu>
                 </Button.ContextMenu>
             </Button>
-
+            <Separator/>
+            <TextBlock VerticalAlignment="Center">
+                <Run Text="{Binding PosOffset,StringFormat={}+ x{0:X4}}"/> = <Run Text="{Binding PosAddr,StringFormat={}0x{0:X4}}"/> (<Run Text="{Binding PosAddr}"/>)
+            </TextBlock>
         </ItemsControl>
 
         <Grid Grid.Row="1">
             <Border x:Name="imageBorder" Style="{StaticResource checkerBorder}"
-                    SizeChanged="BorderSize_Changed" Padding="10">
+                    SizeChanged="BorderSize_Changed" Padding="10" MouseMove="OnImageBorder_MouseMove"
+                    MouseDown="OnImageBorder_MouseDown">
                     <Image x:Name="image" 
                            Stretch="None" RenderOptions.BitmapScalingMode="NearestNeighbor"
                            HorizontalAlignment="Left" VerticalAlignment="Top"
+                           
                            />
             </Border>
 

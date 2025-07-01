@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Xml;
@@ -80,6 +81,11 @@ namespace WpfGrabber.Services
             {
                 if (IsIgnored(p, ignore))
                     continue;
+                if (e.Element(p.Name) is XElement ele && p.PropertyType == typeof(XElement))
+                {
+                    p.SetValue(o, ele);
+                    continue;
+                }
                 var v = e.GetAttrValue(p.Name, p.PropertyType);
                 if (v != null)
                     p.SetValue(o, v);
@@ -87,20 +93,27 @@ namespace WpfGrabber.Services
             return o;
         }
 
-        public static void SaveProperties(this XElement e, object o, params string[] ignore)
+        public static void SaveProperties(this XElement e, object obj, params string[] ignore)
         {
-            var props = o.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
+            var props = obj.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
             foreach (var p in props)
             {
                 if (IsIgnored(p, ignore))
                     continue;
-                var s = ConvertToString(p.GetValue(o), p.PropertyType);
+                object propValue = p.GetValue(obj);
+                if (p.PropertyType == typeof(XElement) && propValue is XElement xe)
+                {
+                    xe.Name = p.Name;
+                    e.Add(xe);
+                    continue;
+                }
+                var s = ConvertToString(propValue, p.PropertyType);
                 e.SetAttributeValue(p.Name, s);
             }
         }
 
-        public static void SaveCollection<T>(this XElement parent, 
-            Expression<Func<IEnumerable<T>>> collection, 
+        public static void SaveCollection<T>(this XElement parent,
+            Expression<Func<IEnumerable<T>>> collection,
             Action<T, XElement> itemSaver)
         {
             string name = GetMemberName(collection);
@@ -123,7 +136,7 @@ namespace WpfGrabber.Services
 
         public static void LoadCollection<T>(this XElement parent,
             Expression<Func<ICollection<T>>> collection,
-            Func<XElement, T> itemLoader) where T:class
+            Func<XElement, T> itemLoader) where T : class
         {
             var name = GetMemberName(collection);
             var items = collection.Compile()();

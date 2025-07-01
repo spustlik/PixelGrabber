@@ -1,9 +1,11 @@
 ﻿using Microsoft.Win32;
+using System;
 using System.ComponentModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Xml.Serialization;
 using WpfGrabber.Readers;
 using WpfGrabber.Shell;
 
@@ -30,8 +32,26 @@ namespace WpfGrabber.ViewParts
         }
         #endregion
 
-    }
+        #region PosAddr property
+        private int _posAddr;
+        [XmlIgnore]
+        public int PosAddr
+        {
+            get => _posAddr;
+            set => Set(ref _posAddr, value);
+        }
+        #endregion
 
+        #region PostOffset property
+        private int _posOffset;
+        public int PosOffset
+        {
+            get => _posOffset;
+            set => Set(ref _posOffset, value);
+        }
+        #endregion
+
+    }
     public class Binary8BitViewPartBase : ViewPartDataViewer<Binary8BitVM>
     {
 
@@ -39,6 +59,8 @@ namespace WpfGrabber.ViewParts
 
     public partial class Binary8BitViewPart : Binary8BitViewPartBase
     {
+        public BitAddressFunction AddressFn { get; private set; }
+
         public Binary8BitViewPart()
         {
             DataContext = new Binary8BitVM();
@@ -67,6 +89,7 @@ namespace WpfGrabber.ViewParts
             BitmapSource bmp = bir.ReadBitmap(reader, max_w, max_h, w, space);
             image.Source = bmp;
             image.RenderTransform = new ScaleTransform(ShellVm.Zoom, ShellVm.Zoom);
+            AddressFn = bir.GetAddressFunction(max_w, max_h, w, space);
         }
 
         private DataReader GetBitReader()
@@ -114,6 +137,25 @@ namespace WpfGrabber.ViewParts
         {
             var bmp = ReadDataImage();
             Clipboard.SetImage(bmp);
+        }
+
+        private void OnImageBorder_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            var pt = e.GetPosition(image);
+            pt = new Point(
+                (int)Math.Floor(pt.X * image.Source.Width / image.ActualWidth),
+                (int)Math.Floor(pt.Y * image.Source.Height / image.ActualHeight));
+            if (AddressFn == null)
+                return;
+            ViewModel.PosOffset = AddressFn((int)pt.X, (int)pt.Y);
+            ViewModel.PosAddr = ShellVm.Offset + ViewModel.PosOffset;
+        }
+
+        private void OnImageBorder_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (ViewModel.PosAddr == -1)
+                return;
+            ShellVm.Offset = ViewModel.PosAddr;
         }
     }
 }

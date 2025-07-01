@@ -90,6 +90,7 @@
     <Compile Include="Data\FontData.cs" />
     <Compile Include="Data\Graphics.cs" />
     <Compile Include="Data\GraphicsWpf.cs" />
+    <Compile Include="Data\SimpleDataObjectEx.cs" />
     <Compile Include="Readers\CombinationsReader.cs" />
     <Compile Include="Readers\EngineAlienReader.cs" />
     <Compile Include="Readers\BitImageReader.cs" />
@@ -124,6 +125,9 @@
     <Compile Include="Readers\EngineFeudReader.cs" />
     <Compile Include="ViewParts\EngineViewPart.xaml.cs">
       <DependentUpon>EngineViewPart.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewParts\CalcViewPart.xaml.cs">
+      <DependentUpon>CalcViewPart.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewParts\FileMapViewPart.xaml.cs">
       <DependentUpon>FileMapViewPart.xaml</DependentUpon>
@@ -200,6 +204,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ViewParts\EngineViewPart.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ViewParts\CalcViewPart.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

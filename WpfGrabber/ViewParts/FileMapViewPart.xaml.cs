@@ -3,20 +3,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 using WpfGrabber.Services;
+using WpfGrabber.Shell;
 
 namespace WpfGrabber.ViewParts
 {
@@ -32,6 +24,15 @@ namespace WpfGrabber.ViewParts
         {
             get => _selectedItem;
             set => Set(ref _selectedItem, value);
+        }
+        #endregion
+
+        #region SyncViewPart property
+        private bool _syncViewPart = true;
+        public bool SyncViewPart
+        {
+            get => _syncViewPart;
+            set => Set(ref _syncViewPart, value);
         }
         #endregion
 
@@ -74,6 +75,25 @@ namespace WpfGrabber.ViewParts
             set => Set(ref _comment, value);
         }
         #endregion
+
+        #region ViewPartId property
+        private string _viewPartId;
+        public string ViewPartId
+        {
+            get => _viewPartId;
+            set => Set(ref _viewPartId, value);
+        }
+        #endregion
+
+        #region ViewPartLayout property
+        private XElement _viewPartLayout = new XElement(nameof(ViewPartLayout));
+        public XElement ViewPartLayout
+        {
+            get => _viewPartLayout;
+            set => Set(ref _viewPartLayout, value);
+        }
+        #endregion
+
     }
 
     public class FileMapViewPartBase : ViewPartDataViewer<FileMapVM>
@@ -87,14 +107,55 @@ namespace WpfGrabber.ViewParts
     {
         public FileMapViewPart()
         {
-            this.ViewModel.Items.Add(new FileMapItem() { Address = 0, Title = "Start", Comment = "Start of file" });
-            this.ViewModel.Items.Add(new FileMapItem() { Address = 1234, Title = "Some stuff", Comment = "There is something strange" });
-            this.ViewModel.Items.Add(new FileMapItem() { Address = 2234, Title = "Main prog" });
+            AllViewParts = App.GetService<ViewPartFactory>().Definitions.ToArray();
+            UpdateViewParts();
             InitializeComponent();
         }
+
+        public ViewPartDef[] AllViewParts { get; }
+        public ObservableCollection<ViewPartDef> ViewParts { get; } = new ObservableCollection<ViewPartDef>();
+
+        private void UpdateViewParts()
+        {
+            //if used collectionview, it is automatically applied to all itemssource of AllItems!
+            //ViewParts = CollectionViewSource.GetDefaultView(AllViewParts);
+            //ViewParts.Filter = o => IsViewPartVisible(o as ViewPartDef);
+            var visible = App.GetService<IViewPartServiceEx>().ViewParts;
+            bool IsViewPartVisible(ViewPartDef def)
+            {
+                if (def.ViewPartType == GetType())
+                    return false;
+                if (ViewModel.SelectedItem?.ViewPartId == def.TypeId)
+                    return true;
+                return visible.Any(x => x.GetType() == def.ViewPartType);
+            }
+            ViewParts.Replace(AllViewParts.Where(IsViewPartVisible));
+        }
+        protected override void OnShowData()
+        {
+            base.OnShowData();
+            UpdateViewParts();
+        }
+        protected override void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ViewModel.SelectedItem))
+            {
+                UpdateViewParts();
+                if (ViewModel.SelectedItem == null)
+                    return;
+                //combo first bind value, than source
+                ViewModel.SelectedItem.RaisePropertyChange(nameof(ViewModel.SelectedItem.ViewPartId));
+                ShellVm.Offset = ViewModel.SelectedItem.Address;
+                if (ViewModel.SyncViewPart)
+                    LoadItemViewPart();
+            }
+            base.ViewModel_PropertyChanged(sender, e);
+        }
+
         public override void OnLoadLayout(XElement ele)
         {
             base.OnLoadLayout(ele);
+            ele.LoadCollection(() => ViewModel.Items, (e) => e.LoadProperties(new FileMapItem()));
         }
         public override void OnSaveLayout(XElement ele)
         {
@@ -104,8 +165,18 @@ namespace WpfGrabber.ViewParts
 
         private void Add_Click(object sender, RoutedEventArgs e)
         {
-            this.ViewModel.Items.Add(new FileMapItem() { Address = ShellVm.Offset, Title = "at " + ShellVm.Offset });
+            var item = new FileMapItem() { Address = ShellVm.Offset, Title = "at " + ShellVm.Offset };
+            this.ViewModel.Items.Add(item);
             this.SortItems();
+            ViewModel.SelectedItem = item;
+        }
+        private void Delete_Click(object sender, RoutedEventArgs e)
+        {
+            var i = ViewModel.Items.IndexOf(ViewModel.SelectedItem);
+            ViewModel.Items.Remove(ViewModel.SelectedItem);
+            if (i >= ViewModel.Items.Count)
+                i = ViewModel.Items.Count - 1;
+            ViewModel.SelectedItem = ViewModel.Items[i];
         }
 
         private void AddrFromOffset_Click(object sender, RoutedEventArgs e)
@@ -130,17 +201,89 @@ namespace WpfGrabber.ViewParts
 
         private void SortItems()
         {
-            this.ViewModel.Items.AddRange(ViewModel.Items.OrderBy(x => x.Address).ToArray(), clear: true);
+            this.ViewModel.Items.Replace(ViewModel.Items.OrderBy(x => x.Address));
         }
 
-        private void ViewItem_Click(object sender, RoutedEventArgs e)
+
+        private void SaveViewPart_Click(object sender, RoutedEventArgs e)
         {
-            var btn = sender as Button;
-            if (btn == null) return;
-            var item = btn.DataContext as FileMapItem;
-            if (item == null) return;
-            ShellVm.Offset = item.Address;
-            //TODO: update viewparts?
+            SaveItemViewPart();
+        }
+        private void LoadViewPart_Click(object sender, RoutedEventArgs e)
+        {
+            LoadItemViewPart();
+        }
+
+
+        private ViewPart GetItemViewPart(FileMapItem item, bool create)
+        {
+            var def = AllViewParts.FirstOrDefault(p => p.TypeId == item.ViewPartId);
+            if (def == null)
+                return null;
+            var part = App.GetService<IViewPartServiceEx>().ViewParts.FirstOrDefault(p => p.GetType() == def.ViewPartType);
+            if (part == null && create)
+                part = App.GetService<IViewPartServiceEx>().AddNewPart(def);
+            return part;
+        }
+        private void SaveItemViewPart()
+        {
+            var part = GetItemViewPart(ViewModel.SelectedItem, create: false);
+            if (part == null)
+                return;
+            part.OnSaveLayout(ViewModel.SelectedItem.ViewPartLayout);
+        }
+
+        private void LoadItemViewPart()
+        {
+            var item = ViewModel.SelectedItem;
+            if (item == null || String.IsNullOrEmpty(item.ViewPartId))
+                return;
+            var part = GetItemViewPart(item, create: true);
+            if (part == null)
+                return;
+            part.OnLoadLayout(item.ViewPartLayout);
+        }
+
+        private void ViewPartId_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            if (!ViewModel.SyncViewPart)
+                return;
+            if (ViewModel.SelectedItem == null)
+                return;
+            SaveItemViewPart();
+        }
+
+        private void AddSpaces_Click(object sender, RoutedEventArgs e)
+        {
+            var i = 0;
+            var lastPos = 0;
+            var nosize = 0;
+            while (i < ViewModel.Items.Count)
+            {
+                var item = ViewModel.Items[i++];
+                if (item.Size == 0)
+                {
+                    nosize++;
+                    continue;
+                }
+                if (lastPos < item.Address)
+                {
+                    var newItem = new FileMapItem()
+                    {
+                        Address = lastPos,
+                        Size = item.Address - lastPos,
+                        Title = "» Space «"
+                    };
+                    ViewModel.Items.Insert(i, newItem);
+                    item = newItem;
+                    i++;
+                }
+                lastPos = item.Address + item.Size;
+            }
+            if (nosize > 0)
+            {
+                MessageBox.Show($"{nosize} items has no size", "Add Sizes", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
     }
 }

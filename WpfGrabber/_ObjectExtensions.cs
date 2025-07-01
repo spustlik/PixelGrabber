@@ -20,12 +20,47 @@ namespace WpfGrabber
         public static void AddRange<T>(this ObservableCollection<T> collection, IEnumerable<T> data, bool clear = false)
         {
             if (clear)
-                collection.Clear();
+            {
+                collection.Replace(data);
+                return;
+            }
             if (data == null)
                 return;
+
             foreach (var item in data)
             {
                 collection.Add(item);
+            }
+        }
+        public static void Replace<T>(this ObservableCollection<T> collection, IEnumerable<T> data)
+        {
+            if (data == null)
+            {
+                collection.Clear();
+                return;
+            }
+            var pos = 0;
+            foreach (var item in data.ToArray())//data can be linq to same collection, so we need to materialize it
+            {
+                var i = collection.IndexOf(item);
+                if (i >= 0)
+                {
+                    if (i != pos)
+                    {
+                        //uz tam je, takze ho presuneme na pos
+                        collection.Move(i, pos);
+                    }
+                    pos++;
+                    continue;
+                }
+                //neni tam, takze ho dame na pos, tim se dalsi posouvaji dale
+                collection.Insert(pos, item);
+                pos++;
+            }
+            //nektere polozky jsou navic, takze je odstranime
+            for (int i = collection.Count - 1; i >= pos; i--)
+            {
+                collection.RemoveAt(i);
             }
         }
 
@@ -100,7 +135,7 @@ namespace WpfGrabber
 
         public static StringBuilder AppendIndented(this StringBuilder sb, string indent, params string[] lines)
         {
-            if (lines.Length==1)
+            if (lines.Length == 1)
             {
                 lines = lines[0].Split('\n');
             }
