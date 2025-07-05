@@ -32,6 +32,18 @@ namespace WpfGrabber
                 collection.Add(item);
             }
         }
+        public static void RemoveAll<T>(this ObservableCollection<T> collection, Func<T, bool> predicate)
+        {
+            if (predicate == null)
+                return;
+            for (int i = collection.Count - 1; i >= 0; i--)
+            {
+                if (predicate(collection[i]))
+                {
+                    collection.RemoveAt(i);
+                }
+            }
+        }
         public static void Replace<T>(this ObservableCollection<T> collection, IEnumerable<T> data)
         {
             if (data == null)

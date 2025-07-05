@@ -44,6 +44,7 @@ namespace WpfGrabber.ViewParts
 
         #region PostOffset property
         private int _posOffset;
+        [XmlIgnore]
         public int PosOffset
         {
             get => _posOffset;

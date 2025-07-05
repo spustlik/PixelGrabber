@@ -90,7 +90,6 @@
     <Compile Include="Data\FontData.cs" />
     <Compile Include="Data\Graphics.cs" />
     <Compile Include="Data\GraphicsWpf.cs" />
-    <Compile Include="Data\SimpleDataObjectEx.cs" />
     <Compile Include="Readers\CombinationsReader.cs" />
     <Compile Include="Readers\EngineAlienReader.cs" />
     <Compile Include="Readers\BitImageReader.cs" />

@@ -18,6 +18,9 @@ namespace WpfGrabber.Themes
         public void ShowContextMenu_Click(object sender, RoutedEventArgs e)
         {
             ButtonBase b = ((ButtonBase)sender);
+            //datacontext is null?!?!
+            //var ctx = b.GetValue(ButtonBase.DataContextProperty);
+            //b.ContextMenu.DataContext = b.DataContext;
             b.ContextMenu.PlacementTarget = b;
             b.ContextMenu.IsOpen = true;
         }

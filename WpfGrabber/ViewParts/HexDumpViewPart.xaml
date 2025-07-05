@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:WpfGrabber.ViewParts"
+             xmlns:local="clr-namespace:WpfGrabber.ViewParts" xmlns:controls="clr-namespace:WpfGrabber.Controls"
+             x:Name="root"
              mc:Ignorable="d" 
              d:DesignHeight="350" d:DesignWidth="300"
              Background="LightYellow"
@@ -20,6 +21,11 @@
             <CheckBox Content="ASCII" IsChecked="{Binding ShowAscii}"/>
             <Separator/>
             <CheckBox Content="Hex" IsChecked="{Binding ShowHex}"/>
+            <Separator/>
+            <Label Content="Max length"/>
+            <TextBlock VerticalAlignment="Center" Text="{Binding MaxLength, StringFormat={}x{0:X4}}"/>
+            <Separator/>
+            <controls:NumberEditor Value="{Binding MaxLength}" Minimum="0" Maximum="8096" Width="180" SliderWidth="60" LargeChange="16"/>
         </ItemsControl>
 
         <!--<ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
@@ -28,6 +34,7 @@
         <!-- allow selection, it is not so slower -->
         <TextBox Grid.Row="1" 
                  VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
-                 FontFamily="Courier New" FontSize="12" Text="{Binding HexDump}"/>
+                 VirtualizingPanel.IsVirtualizing="True"
+                 FontFamily="Courier New" FontSize="12" Text="{Binding HexDump,IsAsync=True}"/>
     </Grid>
 </local:HexDumpViewPartBase>

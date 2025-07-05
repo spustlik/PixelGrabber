@@ -12,19 +12,24 @@ namespace WpfGrabber.Readers.Z80
     //http://www.z80.info/decoding.htm
     public class Z80Reader
     {
-        public byte[] Data { get; private set; }
+        public byte[] Data { get; }
         public int DataPosition { get; private set; }
+        public int MaxPosition { get; }
         private int _lastInstrAddr = 0;
-        public Z80Reader(byte[] data, int start = 0)
+        public Z80Reader(byte[] data, int start = 0, int max = 0)
         {
             Data = data;
             DataPosition = start;
             _lastInstrAddr = start;
+            if (max == 0)
+                MaxPosition = data.Length;
+            else
+                MaxPosition = Math.Min(max, data.Length);
         }
 
         public byte ReadByte()
         {
-            if (DataPosition >= Data.Length)
+            if (DataPosition >= MaxPosition)
                 return 0;
             return Data[DataPosition++];
         }
@@ -48,7 +53,7 @@ namespace WpfGrabber.Readers.Z80
             while (true)
             {
                 yield return ReadInstruction();
-                if (DataPosition >= Data.Length)
+                if (DataPosition >= MaxPosition)
                     break;
             }
         }
@@ -382,7 +387,7 @@ namespace WpfGrabber.Readers.Z80
             return new Z80ParamLiteral(i, 1);
         }
         private Z80Param GetIndirectAddr16(int addr)
-        {           
+        {
             var lit = new Z80ParamLiteral(addr, 4);
             return new Z80ParamIndirect(lit);
         }
@@ -392,7 +397,7 @@ namespace WpfGrabber.Readers.Z80
         }
         private Z80Param GetInOutPort(byte b)
         {
-            return new Z80ParamIndirect(new Z80ParamLiteral(b,2));
+            return new Z80ParamIndirect(new Z80ParamLiteral(b, 2));
         }
         private Z80ParamAddressLabel GetAddrLabel(int addr)
         {

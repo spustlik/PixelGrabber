@@ -7,7 +7,7 @@ using WpfGrabber.Shell;
 
 namespace WpfGrabber.ViewParts
 {
-    public class TestViewPartVM : SimpleDataObjectEx
+    public class TestViewPartVM : SimpleDataObject
     {
 
         #region TestEnum property

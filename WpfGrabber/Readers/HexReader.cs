@@ -9,6 +9,10 @@ namespace WpfGrabber.Readers
 {
     public class HexReader
     {
+        public bool ShowAddr { get; set; } = true;
+        public bool ShowAscii { get; set; } = true;
+        public bool ShowHex { get; set; } = true;
+
         public (string Hex, string Ascii) ReadLineStr(DataReader rd)
         {
             var hexline = new StringBuilder();
@@ -40,19 +44,19 @@ namespace WpfGrabber.Readers
             return (Hex: hexline.ToString(), Ascii: asciiLine.ToString());
         }
 
-        public IEnumerable<string> ReadLines(DataReader rd, bool showAddr = false, bool showAscii = false, bool showHex = false)
+        public IEnumerable<string> ReadLines(DataReader rd)
         {
             while (!rd.IsEmpty)
             {
                 var sb = new StringBuilder();
-                if (showAddr)
+                if (ShowAddr)
                     sb.Append(ToHex(rd.BytePosition)).Append(": ");
                 var line = ReadLineStr(rd);
-                if (showHex)
+                if (ShowHex)
                     sb.Append(line.Hex);
-                if (showHex && showAscii)
+                if (ShowHex && ShowAscii)
                     sb.Append("  " + new String(' ', 3 * 16 + 2 - line.Hex.Length));
-                if (showAscii)
+                if (ShowAscii)
                     sb.Append(line.Ascii);
                 yield return sb.ToString();
             }

@@ -52,7 +52,6 @@ namespace WpfGrabber.ViewParts
         [XmlIgnore]
         public ObservableCollection<string> HexLines { get; private set; } = new ObservableCollection<string>();
 
-
         #region HexDump property
         private string _hexDump;
         [XmlIgnore]
@@ -60,6 +59,15 @@ namespace WpfGrabber.ViewParts
         {
             get => _hexDump;
             set => Set(ref _hexDump, value);
+        }
+        #endregion
+
+        #region MaxLength property
+        private int _maxLength;
+        public int MaxLength
+        {
+            get => _maxLength;
+            set => Set(ref _maxLength, value);
         }
         #endregion
 
@@ -91,15 +99,20 @@ namespace WpfGrabber.ViewParts
         {
             if (ShellVm.DataLength <= 0)
                 return;
-            var br = new DataReader(ShellVm.Data, ShellVm.Offset, flipX: false);
-            var hexrd = new HexReader();
-            var lines = hexrd.ReadLines(
-                br,
-                showAddr: ViewModel.ShowAddr,
-                showAscii: ViewModel.ShowAscii,
-                showHex: ViewModel.ShowHex)
-                .Take(100)
-                .ToArray();
+            var maxLength = ViewModel.MaxLength > 0 ? ViewModel.MaxLength : ShellVm.DataLength;// 100 * 16;
+            var data = ShellVm.Data;
+            if (data.Length > ShellVm.Offset+ maxLength)
+            {
+                data = data.Take(ShellVm.Offset + maxLength).ToArray();
+            }
+            var br = new DataReader(data, ShellVm.Offset, flipX: false);
+            var hexrd = new HexReader()
+            {
+                ShowAddr = ViewModel.ShowAddr,
+                ShowAscii = ViewModel.ShowAscii,
+                ShowHex = ViewModel.ShowHex
+            };
+            var lines = hexrd.ReadLines(br).ToArray();
             ViewModel.HexDump = string.Join("\n", lines);
             ViewModel.HexLines.AddRange(lines, clear: true);
         }

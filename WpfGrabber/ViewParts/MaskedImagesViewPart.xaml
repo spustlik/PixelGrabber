@@ -66,6 +66,11 @@
                 <Separator/>
             </StackPanel>
             <StackPanel>
+                <Label Content="Max"/>
+                <c:NumberEditor ToolTip="Maximum count" Value="{Binding MaxCount}" Minimum="0" Width="80" LargeChange="0"/>
+                <Separator/>
+            </StackPanel>
+            <StackPanel>
                 <Label Content="Mask"/>
                 <c:NumberEditor ToolTip="Type of mask" Value="{Binding MaskType}" Minimum="0" Maximum="7" Width="70" LargeChange="0"/>
                 <Separator/>

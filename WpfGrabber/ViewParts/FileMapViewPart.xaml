@@ -27,9 +27,9 @@
             <Button Style="{StaticResource dropDown}" Content="Menu...">
                 <Button.ContextMenu>
                     <ContextMenu>
-                        <MenuItem  Header="❌ Delete" Click="Delete_Click"/>
                         <MenuItem  Header="Sort" Click="Sort_Click"/>
                         <MenuItem  Header="Add spaces" Click="AddSpaces_Click"/>
+                        <MenuItem  Header="❌ Delete" Click="Delete_Click"/>
                         <Separator/>
                         <MenuItem  Header="Sync Part" IsChecked="{Binding SyncViewPart}"/>
                     </ContextMenu>
@@ -46,11 +46,16 @@
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Title}" Value="» Space «">
+                                <Setter Property="Background" Value="#ffffa0"/>
+                            </DataTrigger>
+                        </Style.Triggers>
                     </Style>
                 </ListBox.ItemContainerStyle>
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type local:FileMapItem}">
-                        <Grid >
+                        <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" SharedSizeGroup="g1"/>
                                 <ColumnDefinition Width="Auto" SharedSizeGroup="g2"/>
@@ -118,23 +123,42 @@
                         <Label Content="Comment"/>
                         <TextBox Text="{Binding Comment}" MinLines="3" MaxLines="5"/>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Vertical">
                         <Label Content="Uses part"/>
-                        <ComboBox ItemsSource="{Binding ViewParts, ElementName=root}" 
-                                  SelectedValue="{Binding ViewPartId}" SelectedValuePath="TypeId"
-                                  SelectionChanged="ViewPartId_SelectionChanged"
-                                  VerticalAlignment="Center" MinWidth="60">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate DataType="{x:Type local:ViewPartDef}">
-                                    <TextBlock Text="{Binding Title}"/>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                        <Separator/>
-                        <Button Content="&lt; Save" Click="SaveViewPart_Click"/>
-                        <Separator/>
-                        <Button Content="&gt; Load" Click="LoadViewPart_Click"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Button MinWidth="100"                                    
+                                    Tag="{Binding ViewParts, ElementName=root}">
+                                <Button.ContextMenu>
+                                    <!-- hack to give datacontext to contextmenu-->
+                                    <ContextMenu ItemsSource="{Binding PlacementTarget.Tag,RelativeSource={RelativeSource Mode=Self}}">
+                                        <ContextMenu.ItemContainerStyle>
+                                            <Style TargetType="MenuItem">
+                                                <Setter Property="Header" Value="{Binding Title}"/>
+                                                <EventSetter Event="Click" Handler="AssignViewPart_Click"/>
+                                            </Style>
+                                        </ContextMenu.ItemContainerStyle>
+                                    </ContextMenu>
+                                </Button.ContextMenu>
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource dropDown}">
+                                        <Setter Property="Background" Value="#c0c0FF"/>
+                                        <Setter Property="Content" Value="{Binding ViewPartTitle}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ViewPartId}" Value="{x:Null}">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                                <Setter Property="Content" Value="Assign..."/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                            <Separator/>
+                            <Button Content="&lt; Save" Click="SaveViewPart_Click"/>
+                            <Separator/>
+                            <Button Content="&gt; Load" Click="LoadViewPart_Click"/>
+                        </StackPanel>
                     </StackPanel>
+                    <FrameworkElement Height="20"/>
                 </StackPanel>
             </Grid>
         </Grid>

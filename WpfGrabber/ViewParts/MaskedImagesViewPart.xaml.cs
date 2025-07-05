@@ -94,6 +94,17 @@ namespace WpfGrabber.ViewParts
         }
         #endregion
 
+
+        #region MaxCount property
+        private int _maxCount;
+        public int MaxCount
+        {
+            get => _maxCount;
+            set => Set(ref _maxCount, value);
+        }
+        #endregion
+
+
     }
 
     public class MaskedImagesViewPartBase : ViewPartDataViewer<MaskedImagesVM>
@@ -173,10 +184,14 @@ namespace WpfGrabber.ViewParts
                 ColorType = ViewModel.MaskType,
                 Preambule = ViewModel.Preambule
             };
+            var count = 0;
             while (rd.Reader.BytePosition < rd.Reader.DataLength)
             {
                 var img = rd.Read();
                 yield return img;
+                count++;
+                if (ViewModel.MaxCount > 0 && count >= ViewModel.MaxCount)
+                    yield break;
             }
         }
         private void OnButtonSaveImages_Click(object sender, RoutedEventArgs e)

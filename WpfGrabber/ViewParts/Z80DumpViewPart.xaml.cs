@@ -18,7 +18,7 @@ namespace WpfGrabber.ViewParts
 {
     public class Z80DumpVM : SimpleDataObject
     {
-
+        //options:
         #region ShowAddr property
         private bool _showAddr;
         public bool ShowAddr
@@ -36,7 +36,26 @@ namespace WpfGrabber.ViewParts
             set => Set(ref _showOpcodes, value);
         }
         #endregion
+        #region MapText property
+        private string _mapText;
+        public string MapText
+        {
+            get => _mapText;
+            set => Set(ref _mapText, value);
+        }
+        #endregion
 
+
+        #region MaxLength property
+        private int _maxLength;
+        public int MaxLength
+        {
+            get => _maxLength;
+            set => Set(ref _maxLength, value);
+        }
+        #endregion
+
+        //vm props
         #region DumpText property
         private string _dumptext;
         [XmlIgnore]
@@ -50,14 +69,7 @@ namespace WpfGrabber.ViewParts
         [XmlIgnore]
         public ObservableCollection<string> DumpLines { get; } = new ObservableCollection<string>();
 
-        #region MapText property
-        private string _mapText;
-        public string MapText
-        {
-            get => _mapText;
-            set => Set(ref _mapText, value);
-        }
-        #endregion
+
 
         [XmlIgnore]
         public ObservableCollection<int> UndoLine { get; } = new ObservableCollection<int>();
@@ -156,9 +168,12 @@ namespace WpfGrabber.ViewParts
             }
             var result = new StringBuilder();
             var dumpLines = new List<string>();
-            var z80 = new Z80Reader(ShellVm.Data, ShellVm.Offset);
+            var max = ViewModel.MaxLength;
+            if (max != 0)
+                max = ShellVm.Offset + max;
+            var z80 = new Z80Reader(ShellVm.Data, ShellVm.Offset, max);
             _addressMap.Clear();
-            while (z80.DataPosition < z80.Data.Length)
+            while (z80.DataPosition < z80.MaxPosition)
             {
                 var sb = new StringBuilder();
                 try

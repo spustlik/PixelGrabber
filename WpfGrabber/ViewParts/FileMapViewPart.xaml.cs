@@ -1,9 +1,13 @@
-﻿using System;
+﻿using ImageMagick;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Xml.Linq;
 using System.Xml.Serialization;
@@ -36,9 +40,17 @@ namespace WpfGrabber.ViewParts
         }
         #endregion
 
+
     }
+
     public class FileMapItem : SimpleDataObject
     {
+        private static ViewPartDef[] definitions;
+        public FileMapItem()
+        {
+            if (definitions == null)
+                definitions = App.GetService<ViewPartFactory>().Definitions.ToArray();
+        }
 
         #region Address property
         private int _address;
@@ -87,12 +99,37 @@ namespace WpfGrabber.ViewParts
 
         #region ViewPartLayout property
         private XElement _viewPartLayout = new XElement(nameof(ViewPartLayout));
+
         public XElement ViewPartLayout
         {
             get => _viewPartLayout;
             set => Set(ref _viewPartLayout, value);
         }
         #endregion
+
+        #region ViewPartTitle property
+        private string _viewPartTtile;
+        [XmlIgnore]
+        public string ViewPartTitle
+        {
+            get => _viewPartTtile;
+            private set => Set(ref _viewPartTtile, value);
+        }
+
+        private void UpdateViewPartTitle()
+        {
+            ViewPartTitle = definitions.Where(x => x.TypeId == ViewPartId).Select(x => x.Title).FirstOrDefault();
+        }
+
+        #endregion
+        protected override void DoPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            if(propertyName == nameof(ViewPartId))
+            {
+                UpdateViewPartTitle();
+            }
+            base.DoPropertyChanged(propertyName);
+        }
 
     }
 
@@ -105,6 +142,7 @@ namespace WpfGrabber.ViewParts
     /// </summary>
     public partial class FileMapViewPart : FileMapViewPartBase
     {
+
         public FileMapViewPart()
         {
             AllViewParts = App.GetService<ViewPartFactory>().Definitions.ToArray();
@@ -244,40 +282,52 @@ namespace WpfGrabber.ViewParts
             part.OnLoadLayout(item.ViewPartLayout);
         }
 
-        private void ViewPartId_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+
+        private void AssignViewPart_Click(object sender, RoutedEventArgs e)
         {
-            if (!ViewModel.SyncViewPart)
-                return;
             if (ViewModel.SelectedItem == null)
+                return;
+            var mnu = sender as MenuItem;
+            var def = mnu.DataContext as ViewPartDef;
+            if (ViewModel.SelectedItem.ViewPartId == def.TypeId)
+                return;
+            ViewModel.SelectedItem.ViewPartId = def.TypeId;
+            if (!ViewModel.SyncViewPart)
                 return;
             SaveItemViewPart();
         }
 
+        private const string SPACER = "» Space «";
         private void AddSpaces_Click(object sender, RoutedEventArgs e)
         {
             var i = 0;
             var lastPos = 0;
             var nosize = 0;
+            ViewModel.Items.RemoveAll(x => x.Title == SPACER);
+
+            //pridam space s velikosti minuly+minuly.velikost - aktualni
+            //pokud je mezera 0, preskocim ji
+
             while (i < ViewModel.Items.Count)
             {
                 var item = ViewModel.Items[i++];
                 if (item.Size == 0)
                 {
                     nosize++;
-                    continue;
                 }
-                if (lastPos < item.Address)
+                var space = item.Address - lastPos;
+                if (space > 0 && space != item.Size)
                 {
                     var newItem = new FileMapItem()
                     {
                         Address = lastPos,
-                        Size = item.Address - lastPos,
-                        Title = "» Space «"
+                        Size = space,
+                        Title = SPACER
                     };
-                    ViewModel.Items.Insert(i, newItem);
-                    item = newItem;
-                    i++;
+                    ViewModel.Items.Insert(i-1, newItem);
+                    //i++;
                 }
+
                 lastPos = item.Address + item.Size;
             }
             if (nosize > 0)
@@ -285,5 +335,6 @@ namespace WpfGrabber.ViewParts
                 MessageBox.Show($"{nosize} items has no size", "Add Sizes", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
+
     }
 }

@@ -4,8 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WpfGrabber.ViewParts" 
-             xmlns:avalon="http://icsharpcode.net/sharpdevelop/avalonedit"
-             mc:Ignorable="d" 
+             xmlns:avalon="http://icsharpcode.net/sharpdevelop/avalonedit" xmlns:controls="clr-namespace:WpfGrabber.Controls"
+                           mc:Ignorable="d" 
              d:DesignHeight="350" d:DesignWidth="628.667"
              x:Name="root"
              Background="LightYellow"
@@ -62,6 +62,8 @@
             <Separator/>
             <CheckBox Content="Op codes" IsChecked="{Binding ShowOpcodes}"/>
             <Separator/>
+            <Label Content="Max length" ToolTip="{Binding MaxLength, StringFormat={}x{0:X4}}"/>
+            <controls:NumberEditor Value="{Binding MaxLength}" Minimum="0" Maximum="65535" SliderWidth="60" Width="180" LargeChange="128"/>
             <Button Style="{StaticResource undoRedo}" ToolTip="Back" 
                     Click="BtnUndoRedo_Click" CommandParameter="-1" DataContext="{Binding UndoLine}">
                 <Path Data="M0,6 L6,0 M0,6 L6,12 M0,6 L12,6" />
@@ -97,16 +99,29 @@
             <Border Background="#606060">
                 <TextBlock Text="Map" Foreground="White" FontWeight="Bold" Padding=" 5,2"/>
             </Border>
-            <TextBox Grid.Row="1" FontFamily="Courier New" FontSize="11" Text="{Binding MapText}">
+            <TextBox Grid.Row="1" FontFamily="Courier New" FontSize="11" Text="{Binding MapText}"
+                     AcceptsReturn="True">
             </TextBox>
             <Border Grid.Row="2" Background="LightYellow" Padding="5,4">
                 <TextBlock Foreground="#808080" FontFamily="Courier New" FontSize="11">
                     <Bold>Syntax</Bold>
                     <!--<LineBreak/><Separator Width="20"/><Run>item 1</Run>-->
                     <Run xml:space="preserve">
-  ORG: addr
-  addr: 0x1234, $1234, 65535 (decimal)</Run>
-                    <LineBreak/><Run Foreground="Red">NOT WORKING FOR NOW</Run>
+line can contain comments starting by #
+{addr}: {code}
+addr: [$|!][0][x]num
+  - hex or dec address
+  - $ : position from Offset
+  - ! : position using current ORG
+code:
+  - ORG {addr} : set current addr to {addr}
+  - DB [{size}] : define data buffer of given size (default 1)
+  - LABEL name : defines just label, instructions will use it
+  - "comment" : adds comment to code
+
+TODO: expressions using labels. $! etc
+</Run>
+                  <LineBreak/><Run Foreground="Red">NOT WORKING FOR NOW</Run>
                 </TextBlock>
             </Border>
         </Grid>

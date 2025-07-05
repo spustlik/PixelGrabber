@@ -153,6 +153,8 @@ namespace WpfGrabber.Services
         {
             if (pi.GetCustomAttribute<XmlIgnoreAttribute>() != null)
                 return true;
+            if (!pi.CanWrite)
+                return true;
             if (ignore.Contains(pi.Name))
                 return true;
             return false;
